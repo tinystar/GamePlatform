@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PrjName>Test</PrjName>
+    <PrjPath>$(PrjName)\$(PlatformName)\$(Configuration)\</PrjPath>
+    <TestBinDir>$(GpBinDir)$(PrjPath)</TestBinDir>
+    <TestLibDir>$(GpLibDir)$(PrjPath)</TestLibDir>
+    <TestPdbDir>$(GpPdbDir)$(PrjPath)</TestPdbDir>
+    <TestTmpDir>$(GpTmpDir)$(PrjPath)$(ProjectName)\</TestTmpDir>
+    <DependLibFolder>CmnLib</DependLibFolder>
+    <DependLibPath>$(DependLibFolder)\$(PlatformName)\$(Configuration)\</DependLibPath>
+    <DependLibDir>$(GpLibDir)$(DependLibPath)</DependLibDir>
+    <DependBinDir>$(GpBinDir)$(DependLibPath)</DependBinDir>
+    <ServerLibFolder>Server</ServerLibFolder>
+    <ServerLibPath>$(ServerLibFolder)\$(PlatformName)\$(Configuration)\</ServerLibPath>
+    <ServerLibDir>$(GpLibDir)$(ServerLibPath)</ServerLibDir>
+    <ServerBinDir>$(GpBinDir)$(ServerLibPath)</ServerBinDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(TestTmpDir)</IntDir>
+    <OutDir>$(TestBinDir)</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(TestLibDir);$(DependLibDir);$(ServerLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(TestPdbDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(TestLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(DependBinDir)*.dll" "$(TestBinDir)" /D /Y
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>copy dll files</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PrjName">
+      <Value>$(PrjName)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PrjPath">
+      <Value>$(PrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TestBinDir">
+      <Value>$(TestBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TestLibDir">
+      <Value>$(TestLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TestPdbDir">
+      <Value>$(TestPdbDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TestTmpDir">
+      <Value>$(TestTmpDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependLibFolder">
+      <Value>$(DependLibFolder)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependLibPath">
+      <Value>$(DependLibPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependLibDir">
+      <Value>$(DependLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependBinDir">
+      <Value>$(DependBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerLibFolder">
+      <Value>$(ServerLibFolder)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerLibPath">
+      <Value>$(ServerLibPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerLibDir">
+      <Value>$(ServerLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerBinDir">
+      <Value>$(ServerBinDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

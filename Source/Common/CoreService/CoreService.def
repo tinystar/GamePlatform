@@ -1,0 +1,7 @@
+
+EXPORTS
+
+;---------------------------------------------------------------------
+;TcpService
+;---------------------------------------------------------------------
+?addEventHandler@TcpService@@QAE_NPAUITcpServiceEventHandler@@@Z

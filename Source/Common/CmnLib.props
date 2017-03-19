@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PrjName>CmnLib</PrjName>
+    <PrjPath>$(PrjName)\$(PlatformName)\$(Configuration)\</PrjPath>
+    <CmnLibBinDir>$(GpBinDir)$(PrjPath)</CmnLibBinDir>
+    <CmnLibLibDir>$(GpLibDir)$(PrjPath)</CmnLibLibDir>
+    <CmnLibPdbDir>$(GpPdbDir)$(PrjPath)</CmnLibPdbDir>
+    <CmnLibTmpDir>$(GpTmpDir)$(PrjPath)$(ProjectName)\</CmnLibTmpDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(CmnLibTmpDir)</IntDir>
+    <OutDir>$(CmnLibBinDir)</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(CmnLibLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(CmnLibPdbDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(CmnLibLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PrjName">
+      <Value>$(PrjName)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PrjPath">
+      <Value>$(PrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmnLibBinDir">
+      <Value>$(CmnLibBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmnLibLibDir">
+      <Value>$(CmnLibLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmnLibPdbDir">
+      <Value>$(CmnLibPdbDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmnLibTmpDir">
+      <Value>$(CmnLibTmpDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

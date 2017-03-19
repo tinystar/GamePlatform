@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{d9c4b214-30ce-46f0-8326-fdb9cbf6c322}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2278787b-9641-47ac-a086-e0786ac42e93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk_inc">
+      <UniqueIdentifier>{b14d5102-c6a8-4926-b992-ad07c6ac6148}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\CoreService.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TcpService.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ServiceExcp.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ClientId.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\ClientContext.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\ClientContextMgr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\IoContext.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\TcpServiceIocp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\IClientSessionMgr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\IocpRecvBuffer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TcpPackage.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ServiceTypes.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\IocpSendBuffer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ClientIdIterator.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CoreService.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\win\ClientContext.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\ClientContextMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\TcpServiceIocp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClientId.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpService.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\IocpRecvBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\IocpSendBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

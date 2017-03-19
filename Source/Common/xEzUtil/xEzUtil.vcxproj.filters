@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{95ab8d8e-cefd-4a85-b4a9-9adeff0839f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk_inc">
+      <UniqueIdentifier>{e2dbc546-8e3f-4fff-9655-913c922133a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{c792b585-9b81-41a6-a208-8f6c472ad059}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xEzUtil.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\xEzBuffer.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzCompile.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzDebug.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzException.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzLinkedList.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzLock.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzLog.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzMacro.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzNet.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzProfile.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzSystem.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzTextConvertor.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzTime.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzTypes.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzUtil.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzPlatform.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\xEzLogImp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzDump.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzArray.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\xEzLog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\xEzLogImp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\xEzProfile.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\xEzLock.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\xEzSystem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\xEzTextConvertor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzTime.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzDebug.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzDump.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

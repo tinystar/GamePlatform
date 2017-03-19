@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PrjName>Server</PrjName>
+    <PrjPath>$(PrjName)\$(PlatformName)\$(Configuration)\</PrjPath>
+    <ServerBinDir>$(GpBinDir)$(PrjPath)</ServerBinDir>
+    <ServerLibDir>$(GpLibDir)$(PrjPath)</ServerLibDir>
+    <ServerPdbDir>$(GpPdbDir)$(PrjPath)</ServerPdbDir>
+    <ServerTmpDir>$(GpTmpDir)$(PrjPath)$(ProjectName)\</ServerTmpDir>
+    <DependLibFolder>CmnLib</DependLibFolder>
+    <DependLibPath>$(DependLibFolder)\$(PlatformName)\$(Configuration)\</DependLibPath>
+    <DependLibDir>$(GpLibDir)$(DependLibPath)</DependLibDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(ServerTmpDir)</IntDir>
+    <OutDir>$(ServerBinDir)</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(ServerLibDir);$(DependLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(ServerPdbDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(ServerLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)xEzUtil\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PrjName">
+      <Value>$(PrjName)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PrjPath">
+      <Value>$(PrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerBinDir">
+      <Value>$(ServerBinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ServerLibDir">
+      <Value>$(ServerLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ServerPdbDir">
+      <Value>$(ServerPdbDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ServerTmpDir">
+      <Value>$(ServerTmpDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DependLibFolder">
+      <Value>$(DependLibFolder)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependLibPath">
+      <Value>$(DependLibPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependLibDir">
+      <Value>$(DependLibDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
