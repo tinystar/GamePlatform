@@ -54,6 +54,12 @@
     <ClInclude Include="inc\ClientIdIterator.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\TimerService.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\TimerServiceImp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CoreService.def" />
@@ -78,6 +84,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\win\IocpSendBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerService.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\TimerServiceImp.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
