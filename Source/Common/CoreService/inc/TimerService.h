@@ -15,7 +15,7 @@
 // Timer event notify interface
 struct ITimerServiceEventHandler
 {
-	virtual void onTimerMessage(unsigned int uTimerId) = 0;
+	virtual void onTimerMessage(EzUInt uTimerId) = 0;
 };
 
 class TimerService
@@ -32,9 +32,9 @@ public:
 	virtual SVCErrorCode start() = 0;
 	virtual SVCErrorCode stop() = 0;
 
-	virtual bool setTimer(unsigned int uTimerId, unsigned int uElapse) = 0;
+	virtual bool setTimer(EzUInt uTimerId, EzUInt uElapse) = 0;
 
-	virtual bool killTimer(unsigned int uTimerId) = 0;
+	virtual bool killTimer(EzUInt uTimerId) = 0;
 
 	// for debug
 	virtual void dump(EzDumpContext& dc) const = 0;

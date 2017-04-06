@@ -25,11 +25,29 @@ public:
 	virtual SVCErrorCode start();
 	virtual SVCErrorCode stop();
 
-	virtual bool setTimer(unsigned int uTimerId, unsigned int uElapse);
+	virtual bool setTimer(EzUInt uTimerId, EzUInt uElapse);
 
-	virtual bool killTimer(unsigned int uTimerId);
+	virtual bool killTimer(EzUInt uTimerId);
 
 	virtual void dump(EzDumpContext& dc) const;
+
+protected:
+	static unsigned __stdcall timerThreadProc(void* pParam);
+
+	static LRESULT CALLBACK timerWndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam);
+
+	void notifyTimerMsg(EzUInt uTimerId);
+
+private:
+	enum eStateFlags
+	{
+		kInited		= 0x00000001,
+		kRunning	= 0x00000002
+	};
+
+	EzUInt32			m_stateFlags;
+	HWND				m_hMsgWnd;
+	HANDLE				m_hThreadEvent;
 };
 
 #endif // __TIMER_SERVICE_IMP_H__

@@ -52,6 +52,7 @@ enum SVCErrorCode
 	eInvalidPackage,
 	eSockClosed,
 	eBufNotEnough,
+	eMemoryNotEnough,
 	eNotImplementedYet,
 };
 

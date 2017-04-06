@@ -5,3 +5,8 @@ EXPORTS
 ;TcpService
 ;---------------------------------------------------------------------
 ?addEventHandler@TcpService@@QAE_NPAUITcpServiceEventHandler@@@Z
+
+;---------------------------------------------------------------------
+;TimerService
+;---------------------------------------------------------------------
+?addEventHandler@TimerService@@QAE_NPAUITimerServiceEventHandler@@@Z
