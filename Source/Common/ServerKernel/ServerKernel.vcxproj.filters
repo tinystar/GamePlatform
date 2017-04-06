@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{d1b8a476-6006-4d7c-b5cf-1be3d49a6e5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk_inc">
+      <UniqueIdentifier>{742f911a-6406-4cc9-a19e-65ae32a6fa8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{f3834407-01b7-454f-92e5-77ce1e4bae85}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\ServerKernel.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ServerTemplate.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\win\ServerTemplateImp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ServerTemplate.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\win\ServerTemplateImp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ServerKernel.def" />
+  </ItemGroup>
+</Project>
