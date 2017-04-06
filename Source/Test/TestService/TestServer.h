@@ -18,8 +18,8 @@ public:
 
 public:
 	virtual void onClientConnected(ClientId id);
-	virtual bool onPackageReceived(ClientId id, void* pPackage, size_t nSize);
-	virtual bool onClientClosed(ClientId id);
+	virtual void onPackageReceived(ClientId id, void* pPackage, size_t nSize);
+	virtual void onClientClosed(ClientId id);
 
 protected:
 	TcpService*				m_pTcpService;

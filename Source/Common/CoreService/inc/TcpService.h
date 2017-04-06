@@ -52,8 +52,8 @@ struct TcpServiceClientFilter
 struct ITcpServiceEventHandler
 {
 	virtual void onClientConnected(ClientId id) = 0;
-	virtual bool onPackageReceived(ClientId id, void* pPackage, size_t nSize) = 0;
-	virtual bool onClientClosed(ClientId id) = 0;
+	virtual void onPackageReceived(ClientId id, void* pPackage, size_t nSize) = 0;
+	virtual void onClientClosed(ClientId id) = 0;
 };
 
 class TcpService

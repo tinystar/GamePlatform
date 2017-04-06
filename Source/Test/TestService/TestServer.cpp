@@ -67,11 +67,11 @@ void TestServer::onClientConnected(ClientId id)
 {
 }
 
-bool TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
+void TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
 {
 	TestMsgBase* pMsg = (TestMsgBase*)pPackage;
 	if (NULL == pMsg)
-		return true;
+		return;
 
 	switch (pMsg->nMsgId)
 	{
@@ -108,7 +108,7 @@ bool TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
 			ifstream ifile;
 			ifile.open("F:\\GamePlatform\\Out\\Bin\\Test\\Win32\\Debug\\1080i.avi", ios::binary);
 			if (!ifile)
-				return true;
+				return;
 
 			const char* pDstFile = "Download\\1080i.avi";
 
@@ -149,12 +149,11 @@ bool TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
 		break;
 	}
 
-	return true;
+	return;
 }
 
-bool TestServer::onClientClosed(ClientId id)
+void TestServer::onClientClosed(ClientId id)
 {
-	return true;
 }
 
 void TestServer::test()
