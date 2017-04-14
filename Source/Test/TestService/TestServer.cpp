@@ -137,7 +137,7 @@ void TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
 			pTsFileMsg->nFileMsgId = FMsgIdOver;
 			m_pTcpService->sendData(id, pTsFileMsg, sizeof(TransferFileMsg));
 
-			EzTrace(_T("------------after send file, Total time %d-------------"), watch.stop());
+			EzTrace(_T("------------after send file, Total time %I64d-------------"), watch.stop());
 
 			delete[] pMsgBuf;
 		}

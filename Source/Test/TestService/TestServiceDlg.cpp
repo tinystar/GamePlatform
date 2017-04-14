@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(CTestServiceDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BUTTON_TEST, &CTestServiceDlg::OnClickedButtonTest)
+	ON_BN_CLICKED(IDC_BUTTON_TIMER, &CTestServiceDlg::OnClickedButtonTimer)
 END_MESSAGE_MAP()
 
 
@@ -100,6 +101,7 @@ BOOL CTestServiceDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化代码
 	m_server.start();
+	m_timer.start();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -156,10 +158,17 @@ HCURSOR CTestServiceDlg::OnQueryDragIcon()
 void CTestServiceDlg::OnDestroy()
 {
 	m_server.stop();
+	m_timer.stop();
 	CDialogEx::OnDestroy();
 }
 
 void CTestServiceDlg::OnClickedButtonTest()
 {
 	m_server.test();
+}
+
+void CTestServiceDlg::OnClickedButtonTimer()
+{
+	m_timer.setTimer(100, 100);
+	m_timer.setTimer(101, 200);
 }

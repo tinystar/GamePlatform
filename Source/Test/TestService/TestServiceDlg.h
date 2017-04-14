@@ -4,6 +4,7 @@
 
 #pragma once
 #include "TestServer.h"
+#include "TestTimer.h"
 
 
 // CTestServiceDlg ¶Ô»°¿ò
@@ -31,8 +32,10 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnDestroy();
 	afx_msg void OnClickedButtonTest();
+	afx_msg void OnClickedButtonTimer();
 	DECLARE_MESSAGE_MAP()
 
 protected:
 	TestServer m_server;
+	TestTimer  m_timer;
 };

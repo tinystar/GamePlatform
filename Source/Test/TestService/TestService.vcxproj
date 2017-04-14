@@ -119,6 +119,7 @@
     <ClInclude Include="TestServerDefs.h" />
     <ClInclude Include="TestService.h" />
     <ClInclude Include="TestServiceDlg.h" />
+    <ClInclude Include="TestTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -128,6 +129,7 @@
     <ClCompile Include="TestServer.cpp" />
     <ClCompile Include="TestService.cpp" />
     <ClCompile Include="TestServiceDlg.cpp" />
+    <ClCompile Include="TestTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestService.rc" />
