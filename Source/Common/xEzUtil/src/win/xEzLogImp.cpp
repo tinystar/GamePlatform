@@ -228,7 +228,7 @@ bool EzLoggerImp::appendLog(TCHAR* pszLog)
 
 	EzAutoLocker locker(&m_listLock);
 
-	if (!EzVerify(m_pCurBuffer))
+	if (!EzVerify(m_pCurBuffer != NULL))
 		return false;
 
 	auto_ptr<char> strUtf8(tcharToUtf8(pszLog));
@@ -322,6 +322,9 @@ bool EzLoggerImp::writeLog()
 bool EzLoggerImp::_flush()
 {
 	if (!m_bRunning)
+		return false;
+
+	if (m_pCurBuffer == NULL)
 		return false;
 
 	if (m_pCurBuffer->isEmpty())

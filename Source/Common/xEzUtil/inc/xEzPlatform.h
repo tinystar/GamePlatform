@@ -15,7 +15,7 @@
 #define EZ_PLATFORM_LINUX				2
 
 
-#if defined(_WIN32) && defined(_WINDOWS)
+#if defined(_WIN32) || defined(_WINDOWS)
 	#define EZ_TARGET_PLATFORM			EZ_PLATFORM_WINDOWS
 #elif defined(LINUX)
 	#define EZ_TARGET_PLATFORM			EZ_PLATFORM_LINUX

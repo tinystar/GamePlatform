@@ -11,12 +11,12 @@ public:
 
 	void start() { ::QueryPerformanceCounter(&m_liPerfStart); }
 
-	EzInt64 stop() const
+	double stop() const
 	{
 		LARGE_INTEGER liPerfNow;
 		::QueryPerformanceCounter(&liPerfNow);
 
-		return ((liPerfNow.QuadPart - m_liPerfStart.QuadPart) * 1000) / m_liPerfFreq.QuadPart;
+		return (liPerfNow.QuadPart - m_liPerfStart.QuadPart) / (double)m_liPerfFreq.QuadPart;
 	}
 
 private:
@@ -45,7 +45,7 @@ void EzStopwatch::start() const
 		m_pImpWatch->start();
 }
 
-EzInt64 EzStopwatch::stop() const
+double EzStopwatch::stop() const
 {
 	if (m_pImpWatch)
 		return m_pImpWatch->stop();

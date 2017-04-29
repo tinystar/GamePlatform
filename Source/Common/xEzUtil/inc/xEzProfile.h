@@ -10,7 +10,6 @@
 #ifndef __XEZ_PROFILE_H__
 #define __XEZ_PROFILE_H__
 
-#include "xEzTypes.h"
 #include "xEzCompile.h"
 
 class EzStopwatchImp;
@@ -23,8 +22,7 @@ public:
 
 	void start() const;
 
-	// returns # of milliseconds since start was called.
-	EzInt64 stop() const;
+	double stop() const;
 
 private:
 	EzStopwatchImp*	m_pImpWatch;
