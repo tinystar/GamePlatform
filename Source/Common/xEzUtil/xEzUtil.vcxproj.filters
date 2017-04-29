@@ -72,6 +72,12 @@
     <ClInclude Include="inc\xEzArray.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\xEzMemory.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\xEzMemoryPool.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\xEzLog.cpp">
@@ -99,6 +105,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\xEzDump.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzMemoryPool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzMemory.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

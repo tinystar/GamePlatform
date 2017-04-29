@@ -27,5 +27,6 @@
 #include "xEzLinkedList.h"
 #include "xEzDump.h"
 #include "xEzArray.h"
+#include "xEzMemory.h"
 
 #endif // __XEZ_UTIL_H__
