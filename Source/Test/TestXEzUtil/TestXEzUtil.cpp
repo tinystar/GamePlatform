@@ -52,6 +52,7 @@ BOOL CTestXEzUtilApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+	srand(::GetTickCount());
 
 	AfxEnableControlContainer();
 

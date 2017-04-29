@@ -70,7 +70,7 @@ void TestTimer::onTimerMessage(EzUInt uTimerId)
 			}
 			else
 			{
-				EzTrace(_T("------------Timer100, Time: %I64d-------------"), watch.stop());
+				EzTrace(_T("------------Timer100, Time: %f-------------"), watch.stop());
 				watch.start();
 			}
 		}
@@ -87,7 +87,7 @@ void TestTimer::onTimerMessage(EzUInt uTimerId)
 			}
 			else
 			{
-				EzTrace(_T("------------Timer101, Time: %I64d-------------"), watch.stop());
+				EzTrace(_T("------------Timer101, Time: %f-------------"), watch.stop());
 				watch.start();
 			}
 		}

@@ -6,6 +6,8 @@
 #ifndef __TEST_XEZ_H__
 #define __TEST_XEZ_H__
 
+extern int rangeRand(int low, int high);
+
 extern void testEntry();
 
 #endif // __TEST_XEZ_H__

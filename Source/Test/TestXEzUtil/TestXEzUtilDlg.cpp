@@ -7,6 +7,7 @@
 #include "TestXEzUtilDlg.h"
 #include "afxdialogex.h"
 #include "Test.h"
+#include "xEzUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -63,6 +64,8 @@ BEGIN_MESSAGE_MAP(CTestXEzUtilDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BTN_MEM1, &CTestXEzUtilDlg::OnBnClickedBtnMem1)
+	ON_BN_CLICKED(IDC_BTN_MEM2, &CTestXEzUtilDlg::OnBnClickedBtnMem2)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +155,92 @@ HCURSOR CTestXEzUtilDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+double testMemPerf1()
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		int nSize = rangeRand(1, 100);
+		void* pTest = EzMalloc(nSize);
+		EzFree(pTest);
+	}
+
+	//MyTrace(_T("-------memory pool time: %f-------\n"), watch.stop());
+	return watch.stop();
+}
+
+double testMemPerf2()
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		int nSize = rangeRand(1, 100);
+		void* pTest = malloc(nSize);
+		free(pTest);
+	}
+
+	//MyTrace(_T("-------system malloc time: %f-------\n"), watch.stop());
+	return watch.stop();
+}
+
+class A : public EzHeapOper
+{
+private:
+	int mI[10];
+};
+
+class B
+{
+private:
+	int mI[10];
+};
+
+double testNewPerf1()
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		A* pA = new A();
+		delete pA;
+	}
+
+	return watch.stop();
+}
+
+double testNewPerf2()
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		B* pB = new B();
+		delete pB;
+	}
+
+	return watch.stop();
+}
+
+void CTestXEzUtilDlg::OnBnClickedBtnMem1()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	TCHAR szBuf[512] = { 0 };
+	_stprintf_s(szBuf, _T("%f"), testNewPerf1());
+	CWnd* pText = GetDlgItem(IDC_MEM1_TEXT);
+	pText->SetWindowText(szBuf);
+}
+
+void CTestXEzUtilDlg::OnBnClickedBtnMem2()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	TCHAR szBuf[512] = { 0 };
+	_stprintf_s(szBuf, _T("%f"), testNewPerf2());
+	CWnd* pText = GetDlgItem(IDC_MEM2_TEXT);
+	pText->SetWindowText(szBuf);
+}

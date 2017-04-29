@@ -155,13 +155,13 @@ void testLogPerformance()
 		mylog.log(_T("     world ttttt %s\n"), _T("test12311111"));
 	}
 	//mylog.flush();
-	EzInt64 elapse = watch.stop();
-	EzTrace(_T("my log time = %I64d"), elapse);
+	double elapse = watch.stop();
+	EzTrace(_T("my log time = %f"), elapse);
 
 	//watch.start();
 	//::Sleep(1000);
 	//elapse = watch.stop();
-	//EzTrace(_T("test1 = %I64d"), elapse);
+	//EzTrace(_T("test1 = %f"), elapse);
 
 	EzLogFlush();
 
@@ -173,17 +173,17 @@ void testLogPerformance()
 		EzLog(kLogInfo, _T("     world ttttt %s\n"), _T("test12311111"));
 	}
 	elapse = watch.stop();
-	EzTrace(_T("ezlog time = %I64d"), elapse);
+	EzTrace(_T("ezlog time = %f"), elapse);
 
 // 	watch.start();
 // 	testLog();
 // 	elapse = watch.stop();
-// 	EzTrace(_T("test log = %I64d"), elapse);
+// 	EzTrace(_T("test log = %f"), elapse);
 // 
 // 	watch.start();
 // 	testLog1();
 // 	elapse = watch.stop();
-// 	EzTrace(_T("test log1 = %I64d"), elapse);
+// 	EzTrace(_T("test log1 = %f"), elapse);
 }
 
 void testDebug()
@@ -399,8 +399,6 @@ void testEzArray()
 
 void testMapPerf()
 {
-	srand(::GetTickCount());
-
 	std::map<int, int> map1, map2, map3;
 
 	for (int i = 0; i < 40000; ++i)
@@ -432,17 +430,17 @@ void testMapPerf()
 	EzTrace(_T("---------map1----------"));
 	watch.start();
 	map1.clear();
-	EzTrace(_T("---------map1: %d------"), watch.stop());
+	EzTrace(_T("---------map1: %f------"), watch.stop());
 
 	EzTrace(_T("---------map2----------"));
 	watch.start();
 	map2.clear();
-	EzTrace(_T("---------map2: %d------"), watch.stop());
+	EzTrace(_T("---------map2: %f------"), watch.stop());
 
 	EzTrace(_T("---------map3----------"));
 	watch.start();
 	map3.clear();
-	EzTrace(_T("---------map3: %d------"), watch.stop());
+	EzTrace(_T("---------map3: %f------"), watch.stop());
 }
 
 EzRWLock g_rwLock;
@@ -479,6 +477,106 @@ void testRWLock()
 		::CloseHandle(hThreads[i]);
 }
 
+class TestNew : public EzHeapOper
+{
+private:
+	int m_i1;
+	short m_s1;
+};
+
+void testMemory()
+{
+	void* p1 = EzMalloc(1);
+	void* p2 = EzMalloc(3);
+	void* p3 = EzMalloc(4);
+	void* p4 = EzMalloc(190);
+	void* p5 = EzMalloc(192);
+	void* p6 = EzMalloc(250);
+	void* p7 = EzMalloc(256);
+	void* p8 = EzMalloc(400);
+	void* p9 = EzMalloc(500);
+	void* p10 = EzMalloc(512);
+
+	EzFree(p1);
+	EzFree(p2);
+	EzFree(p3);
+	EzFree(p4);
+	EzFree(p5);
+	EzFree(p6);
+	EzFree(p7);
+	EzFree(p8);
+	EzFree(p9);
+	EzFree(p10);
+
+ 	TestNew* pT1 = new TestNew();
+ 	delete pT1;
+}
+
+int rangeRand(int low, int high)
+{
+	return low + rand() % (high - low);
+}
+
+unsigned __stdcall testMemPerfThread1(void* pParam)
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		int nSize = rangeRand(1, 200);
+		void* pTest = EzMalloc(nSize);
+		EzFree(pTest);
+	}
+
+	MyTrace(_T("-------memory pool time: %f-------\n"), watch.stop());
+	return 0;
+}
+
+unsigned __stdcall testMemPerfThread2(void* pParam)
+{
+	EzStopwatch watch;
+	watch.start();
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		int nSize = rangeRand(1, 200);
+		void* pTest = malloc(nSize);
+		free(pTest);
+	}
+
+	MyTrace(_T("-------system malloc time: %f-------\n"), watch.stop());
+	return 0;
+}
+
+void testMemPerf()
+{
+	EzStopwatch watch1, watch2;
+
+	watch1.start();
+
+	HANDLE hThreads[5] = { 0 };
+	for (int i = 0; i < 5; ++i)
+	{
+		HANDLE hTestMemThread = (HANDLE)_beginthreadex(NULL, 0, testMemPerfThread1, NULL, 0, NULL);
+		hThreads[i] = hTestMemThread;
+	}
+	::WaitForMultipleObjects(5, hThreads, TRUE, INFINITE);
+
+	EzTrace(_T("-------memory pool alloc total time: %f-------"), watch1.stop());
+
+	watch2.start();
+
+	for (int i = 0; i < 5; ++i)
+	{
+		HANDLE hTestMemThread = (HANDLE)_beginthreadex(NULL, 0, testMemPerfThread2, NULL, 0, NULL);
+		hThreads[i] = hTestMemThread;
+	}
+	::WaitForMultipleObjects(5, hThreads, TRUE, INFINITE);
+
+	EzTrace(_T("-------system malloc alloc total time: %f-------"), watch2.stop());
+}
+
 void testEntry()
 {
 	// debug
@@ -503,5 +601,8 @@ void testEntry()
 	// std map performance test
 	testMapPerf();
 	// test RWLock
-	testRWLock();
+// 	testRWLock();
+	// test Memory Allocate
+	//testMemory();
+ 	//testMemPerf();
 }
