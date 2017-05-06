@@ -83,6 +83,8 @@ protected:
 	ServerTemplateImp*		m_pServerImp;
 	TcpService*				m_pTcpService;
 	TimerService*			m_pTimerService;
+
+	EzUInt32				m_state;
 };
 
 #endif // __SERVER_TEMPLATE_H__

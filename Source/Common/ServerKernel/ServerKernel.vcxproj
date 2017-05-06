@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="inc\ServerKernel.h" />
     <ClInclude Include="inc\ServerTemplate.h" />
+    <ClInclude Include="src\QueueItemDef.h" />
     <ClInclude Include="src\win\ServerTemplateImp.h" />
   </ItemGroup>
   <ItemGroup>

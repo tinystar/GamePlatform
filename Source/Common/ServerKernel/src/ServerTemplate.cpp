@@ -5,11 +5,18 @@
 // Todo
 #endif
 
+enum
+{
+	kInited		= 0x00000001,
+	kRunning	= 0x00000002
+};
+
 
 ServerTemplate::ServerTemplate()
 	: m_pServerImp(NULL)
 	, m_pTcpService(NULL)
 	, m_pTimerService(NULL)
+	, m_state(0)
 {
 	m_pServerImp = new ServerTemplateImp(this);
 	if (!EzVerify(m_pServerImp != NULL))
@@ -21,13 +28,21 @@ ServerTemplate::ServerTemplate()
 
 ServerTemplate::~ServerTemplate()
 {
+	stop();
+	unInit();
+
 	EZ_SAFE_DELETE(m_pServerImp);
 }
 
 SVCErrorCode ServerTemplate::init(const ServerInitConfig& serverConfig)
 {
-	SVCErrorCode ec = eOk;
+	if (m_state & kInited)
+		return eOk;
 
+	if (!m_pServerImp->init())
+		return eSystemError;
+
+	SVCErrorCode ec = eOk;
 	if (serverConfig.uCreateFlags | kCreateTcpService)
 	{
 		m_pTcpService = createTcpService();
@@ -54,6 +69,11 @@ SVCErrorCode ServerTemplate::init(const ServerInitConfig& serverConfig)
 		if (!EzVerify(m_pTimerService != NULL))
 		{
 			EzLogFatal(_T("create timer service failed, maybe memory is not enough!\n"));
+			if (m_pTcpService != NULL)
+			{
+				::releaseTcpService(m_pTcpService);
+				m_pTcpService = NULL;
+			}
 			return eMemoryNotEnough;
 		}
 
@@ -74,22 +94,85 @@ SVCErrorCode ServerTemplate::init(const ServerInitConfig& serverConfig)
 		EzVerify(m_pTimerService->addEventHandler(m_pServerImp));
 	}
 
+	m_state |= kInited;
+
+	if (!onInit())
+		unInit();
+
 	return eOk;
 }
 
 SVCErrorCode ServerTemplate::unInit()
 {
-	return eNotImplementedYet;
+	if (!(m_state & kInited))
+		return eOk;
+
+	m_pServerImp->unInit();
+
+	onUninit();
+
+	if (m_pTcpService != NULL)
+	{
+		m_pTcpService->removeEventHandler(m_pServerImp);
+		m_pTcpService->unInit();
+		::releaseTcpService(m_pTcpService);
+		m_pTcpService = NULL;
+	}
+
+	if (m_pTimerService != NULL)
+	{
+		m_pTimerService->removeEventHandler(m_pServerImp);
+		m_pTimerService->unInit();
+		::releaseTimerService(m_pTimerService);
+		m_pTimerService = NULL;
+	}
+
+	m_state &= ~kInited;
+	return eOk;
 }
 
 SVCErrorCode ServerTemplate::start()
 {
-	return eNotImplementedYet;
+	if (!(m_state & kInited))
+		return eNotInitialized;
+	if (m_state & kRunning)
+		return eOk;
+
+	SVCErrorCode ec = eOk;
+	if (m_pTcpService != NULL)
+		ec = m_pTcpService->start();
+
+	if (ec != eOk)
+		return ec;
+
+	if (m_pTimerService != NULL)
+		ec = m_pTimerService->start();
+
+	if (eOk == ec)
+	{
+		m_state |= kRunning;
+		if (!onStart())
+			stop();
+	}
+
+	return ec;
 }
 
 SVCErrorCode ServerTemplate::stop()
 {
-	return eNotImplementedYet;
+	if (!(m_state & kRunning))
+		return eOk;
+
+	onStop();
+
+	if (m_pTcpService != NULL)
+		m_pTcpService->stop();
+
+	if (m_pTimerService != NULL)
+		m_pTimerService->stop();
+
+	m_state &= ~kRunning;
+	return eOk;
 }
 
 bool ServerTemplate::setTimer(EzUInt uTimerId, EzUInt uElapse)

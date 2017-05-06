@@ -525,7 +525,7 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 	bRet = pClientCtx->asyncRecv();
 	if (!EzVerify(bRet))
 	{
-		EzLogError(_T("client post recv fails!"));
+		EzLogError(_T("client post recv fails!\n"));
 		closeAndFreeClient(pClientCtx, false);
 		return false;
 	}

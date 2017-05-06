@@ -25,7 +25,7 @@
       <ImportLibrary>$(CmnLibLibDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>.\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\inc;.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
