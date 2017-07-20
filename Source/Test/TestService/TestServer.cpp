@@ -65,6 +65,9 @@ bool TestServer::stop()
 
 void TestServer::onClientConnected(ClientId id)
 {
+	m_pTcpService->sendData(id, "hello", 5);
+	m_pTcpService->sendData(id, "test", 4);
+	m_pTcpService->sendData(id, "cocos luasocket", 15);
 }
 
 void TestServer::onPackageReceived(ClientId id, void* pPackage, size_t nSize)

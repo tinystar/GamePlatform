@@ -484,16 +484,21 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 	{
 		// refuse the client
 		EzLogInfo(_T("refuse the socket(%d)\n"), pAcceptContext->hAcceptSocket);		
+		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
 		return false;
 	}
 
 	ClientContext* pClientCtx = m_ClientContextMgr.newClientContext();
 	if (!EzVerify(pClientCtx))
+	{
+		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
 		return false;
+	}
 
 	bool bRet = pClientCtx->init(this, m_nPackageSize);
 	if (!EzVerify(bRet))
 	{
+		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
 		m_ClientContextMgr.freeClientContext(pClientCtx);
 		return false;
 	}
@@ -501,16 +506,9 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 	bRet = pClientCtx->attach(pAcceptContext->hAcceptSocket, *pClientAddr);
 	if (!EzVerify(bRet))
 	{
+		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
 		m_ClientContextMgr.freeClientContext(pClientCtx);
 		return false;
-	}
-
-	// notify new client connected.
-	for (int i = 0; i < m_EventHandlers.logicalLength(); ++i)
-	{
-		ITcpServiceEventHandler* pEventHandler = m_EventHandlers[i];
-		if (pEventHandler)
-			pEventHandler->onClientConnected(pClientCtx);
 	}
 
 	HANDLE hExistIocp = ::CreateIoCompletionPort((HANDLE)pClientCtx->getSocket(), m_hIocp, (ULONG_PTR)pClientCtx, 0);
@@ -521,6 +519,14 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 		return false;
 	}
 	
+	// notify new client connected.
+	// after associated with iocp otherwise sendData in onClientConnected callback function will have no notice in iocp.
+	for (int i = 0; i < m_EventHandlers.logicalLength(); ++i)
+	{
+		ITcpServiceEventHandler* pEventHandler = m_EventHandlers[i];
+		if (pEventHandler)
+			pEventHandler->onClientConnected(pClientCtx);
+	}
 
 	bRet = pClientCtx->asyncRecv();
 	if (!EzVerify(bRet))
