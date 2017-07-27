@@ -106,10 +106,8 @@ function ClientSocket:close()
 end
 
 function ClientSocket:onSocketRead()
-    print("----------onSocketRead-----------")
-
     local s, msg, partial = self.s_:receive('*a')
-    print(string.format("socket recv: %d, %s, %d", s ~= nil and #s or 0, msg, partial ~= nil and #partial or 0))
+
     local recvData = s or partial
     -- 服务端关闭socket时，windows平台下msg为"timeout"，此时收到的数据为0长度
     -- 将接收到0长度数据也做为socket关闭的条件
@@ -119,7 +117,6 @@ function ClientSocket:onSocketRead()
     end
 
     self.recvBuffer_ = self.recvBuffer_ .. recvData
-    print(string.format("recv %d bytes", #self.recvBuffer_))
     if #self.recvBuffer_ <= 4 then
         return
     end
@@ -128,7 +125,6 @@ function ClientSocket:onSocketRead()
         local nextPos, pkgSize = string.unpack(self.recvBuffer_, "I")
         if nil == pkgSize then break end
 
-        print(string.format("unpack return: %d, %d", nextPos, pkgSize))
         if pkgSize + 4 > #self.recvBuffer_ then
             break
         end
@@ -143,8 +139,6 @@ function ClientSocket:onSocketRead()
 end
 
 function ClientSocket:onSocketWrite()
-    --print("----------onSocketWrite-----------")
-
     -- connected
     if not self.isConnected_ then
         self.isConnected_ = true
@@ -168,12 +162,10 @@ function ClientSocket:onSocketWrite()
         return
     end
 
-    print(string.format("--------send socket data: %d, %d---------", sIdx ~= nil and sIdx or 0, aIdx ~= nil and aIdx or 0))
     local sendSize = sIdx or aIdx
     if 0 == sendSize then return end
 
     self.sendBuffer_ = string.sub(self.sendBuffer_, sendSize + 1, -1)
-    print(string.format("-------after send: %s---------", self.sendBuffer_))
 end
 
 return ClientSocket

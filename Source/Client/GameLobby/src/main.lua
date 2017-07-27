@@ -9,11 +9,11 @@ require "cocos.init"
 
 local function main()
     ClientSocketMgr.init()
-    local clientSock = ClientSocketMgr.createSocket("client")
-    clientSock:addConnectEventListener(onSocketConnected)
-    clientSock:addReceiveEventListener(onSocketReceived)
-    clientSock:connect(__GData__.serverAddress, __GData__.serverPort)
-    --require("app.MyApp"):create():run()
+    --local clientSock = ClientSocketMgr.createSocket("client")
+    --clientSock:addConnectEventListener(onSocketConnected)
+    --clientSock:addReceiveEventListener(onSocketReceived)
+    --clientSock:connect(__GData__.serverAddress, __GData__.serverPort)
+    require("app.MyApp"):create():run()
 end
 
 local status, msg = xpcall(main, __G__TRACKBACK__)

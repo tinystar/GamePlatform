@@ -47,10 +47,13 @@ local function socketEventUpdater(dt)
     end
 
     local readsocks, writesocks, msg = socket.select(socktbl, socktbl, 0)
-    --print(string.format("-----------select msg: %s------------\n", msg))
 
-    notifyClientSockWrite(writesocks)
-    notifyClientSockRead(readsocks)
+    if writesocks ~= nil and #writesocks > 0 then
+        notifyClientSockWrite(writesocks)
+    end
+    if readsocks ~= nil and #readsocks > 0 then
+        notifyClientSockRead(readsocks)
+    end
 end
 
 function M.init()
@@ -77,6 +80,14 @@ end
 
 function M.getSocket(name)
     return M.clientSockets_[name]
+end
+
+function M.closeAllSockets()
+    for k, clientsock in pairs(M.clientSockets_) do
+        if clientsock.s_ ~= nil then
+            clientsock:close()
+        end
+    end
 end
 
 return M
