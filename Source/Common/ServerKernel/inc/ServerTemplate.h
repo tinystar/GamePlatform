@@ -37,7 +37,7 @@ struct ServerInitConfig
 // server base class
 // you may inherit this class to implement your own server logic.
 // using template method pattern to let derived class to customize itself.
-class ServerTemplate
+class SK_DLL_SPEC ServerTemplate
 {
 	friend class ServerTemplateImp;
 

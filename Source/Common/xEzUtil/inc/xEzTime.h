@@ -18,6 +18,7 @@ EZ_NAMESPACE_BEGIN(EzTime)
 
 EZ_DLL_C_SPEC bool getDateToday(int& year, int& month, int& day);
 EZ_DLL_C_SPEC bool getDateFromTime(time_t tm, int& year, int& month, int& day);
+EZ_DLL_C_SPEC bool getTimeCurrent(int& hour, int& min, int& sec);
 
 EZ_NAMESPACE_END
 
