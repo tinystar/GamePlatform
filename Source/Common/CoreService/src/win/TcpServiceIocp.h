@@ -14,6 +14,7 @@
 #include "ClientContextMgr.h"
 #include "IClientSessionMgr.h"
 #include <vector>
+#include <list>
 
 struct PER_ACCEPT_CONTEXT;
 
@@ -35,6 +36,7 @@ public:
 	virtual SVCErrorCode stop();
 
 	virtual bool sendData(ClientId id, void* pData, size_t nDataLen);
+	virtual bool sendDataToAll(void* pData, size_t nDataLen);
 
 	virtual bool closeClient(ClientId id, bool bGraceful = true);
 
@@ -63,10 +65,22 @@ protected:
 
 	void notifyCloseClient(ClientContext* pClient, bool bGraceful);
 
-	static unsigned __stdcall iocpWorkerThread(void* pParam);
+	bool initSendToAllThread();
+	void stopSendToAllThread();
+	void sendToAllProc();
 
-private:	
+	static unsigned __stdcall iocpWorkerThread(void* pParam);
+	static unsigned __stdcall sendToAllThread(void* pParam);
+
+private:
+	struct SendDataCache
+	{
+		void*	pData;
+		size_t	nDataLen;
+	};
+
 	typedef std::vector<PER_ACCEPT_CONTEXT*> AcceptContextArray;
+	typedef std::list<SendDataCache>		 SendCacheList;
 
 	ULONG								m_ulAddress;
 	USHORT								m_usPort;
@@ -80,6 +94,11 @@ private:
 	bool								m_bRunning;
 	AcceptContextArray					m_AcceptContexts;
 	ClientContextMgr					m_ClientContextMgr;
+	HANDLE								m_hSendToAllThread;
+	HANDLE								m_hSendCacheSem;
+	HANDLE								m_hSendQuitEvent;
+	SendCacheList						m_sendDataCache;
+	EzLock								m_cacheListLock;
 };
 
 #endif // __TCP_SERVICE_IOCP_H__

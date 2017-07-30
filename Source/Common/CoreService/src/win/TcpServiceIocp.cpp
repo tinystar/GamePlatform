@@ -17,6 +17,12 @@ struct WorkerThreadParam
 	HANDLE			hEvent;
 };
 
+struct SendToAllThreadParam
+{
+	TcpServiceIocp* pIocpService;
+	HANDLE			hEvent;
+};
+
 BOOL PASCAL FAR MsAcceptEx(SOCKET sListen, 
 						   SOCKET sAccept, 
 						   PVOID lpOutBuffer, 
@@ -111,6 +117,9 @@ TcpServiceIocp::TcpServiceIocp()
 	, m_nPackageSize(0)
 	, m_bInitialized(false)
 	, m_bRunning(false)
+	, m_hSendToAllThread(NULL)
+	, m_hSendCacheSem(NULL)
+	, m_hSendQuitEvent(NULL)
 {
 }
 
@@ -259,6 +268,8 @@ SVCErrorCode TcpServiceIocp::stop()
 	if (!m_bRunning)
 		return eOk;
 
+	stopSendToAllThread();
+
 	closeAllClient();
 
 	for (unsigned int i = 0; i < m_nThreadCount; ++i)
@@ -331,6 +342,8 @@ SVCErrorCode TcpServiceIocp::initIocp()
 bool TcpServiceIocp::sendData(ClientId id, void* pData, size_t nDataLen)
 {
 	if (id.isNull())
+		return false;
+	if (NULL == pData || nDataLen <= 0)
 		return false;
 
 	ClientContext* pClient = id;
@@ -691,4 +704,152 @@ size_t TcpServiceIocp::getClientCount() const
 ClientIdIterator* TcpServiceIocp::newIterator() const
 {
 	return m_ClientContextMgr.newIterator();
+}
+
+bool TcpServiceIocp::sendDataToAll(void* pData, size_t nDataLen)
+{
+	if (NULL == pData || nDataLen <= 0 || nDataLen > m_nPackageSize)
+		return false;
+
+	if (NULL == m_hSendToAllThread)
+	{
+		if (!EzVerify(initSendToAllThread()))
+			return false;
+	}
+
+	SendDataCache data;
+	data.pData = new char[nDataLen];
+	if (NULL == data.pData)
+		return false;
+
+	::memcpy(data.pData, pData, nDataLen);
+	data.nDataLen = nDataLen;
+
+	m_cacheListLock.lock();
+	m_sendDataCache.push_back(data);
+	m_cacheListLock.unlock();
+
+	BOOL bRet = ::ReleaseSemaphore(m_hSendCacheSem, 1, NULL);
+	if (!bRet)
+	{
+		DWORD dwErr = ::GetLastError();
+		EzLogError(_T("Release send to all semaphore failed, error code = %d!\n"), dwErr);
+	}
+
+	return true;
+}
+
+bool TcpServiceIocp::initSendToAllThread()
+{
+	HANDLE hThreadEvt = ::CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (NULL == hThreadEvt)
+		return false;
+
+	m_hSendCacheSem = ::CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+	if (NULL == m_hSendCacheSem)
+	{
+		::CloseHandle(hThreadEvt);
+		return false;
+	}
+
+	m_hSendQuitEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	if (NULL == m_hSendQuitEvent)
+	{
+		::CloseHandle(hThreadEvt);
+		::CloseHandle(m_hSendCacheSem);
+		m_hSendCacheSem = NULL;
+		return false;
+	}
+
+	SendToAllThreadParam threadParam;
+	threadParam.pIocpService = this;
+	threadParam.hEvent = hThreadEvt;
+	m_hSendToAllThread = (HANDLE)::_beginthreadex(NULL, 0, sendToAllThread, &threadParam, 0, NULL);
+	if (NULL == m_hSendToAllThread)
+	{
+		::CloseHandle(hThreadEvt);
+		::CloseHandle(m_hSendCacheSem);
+		m_hSendCacheSem = NULL;
+		::CloseHandle(m_hSendQuitEvent);
+		m_hSendQuitEvent = NULL;
+		return false;
+	}
+
+	::WaitForSingleObject(hThreadEvt, INFINITE);
+	::CloseHandle(hThreadEvt);
+	return true;
+}
+
+void TcpServiceIocp::stopSendToAllThread()
+{
+	if (NULL == m_hSendToAllThread)
+		return;
+
+	::SetEvent(m_hSendQuitEvent);
+	::WaitForSingleObject(m_hSendToAllThread, INFINITE);
+	::CloseHandle(m_hSendToAllThread);
+	m_hSendToAllThread = NULL;
+
+	::CloseHandle(m_hSendQuitEvent);
+	m_hSendQuitEvent = NULL;
+
+	::CloseHandle(m_hSendCacheSem);
+	m_hSendCacheSem = NULL;
+
+	SendCacheList::iterator iter = m_sendDataCache.begin();
+	while (iter != m_sendDataCache.end())
+	{
+		delete[] iter->pData;
+		++iter;
+	}
+	m_sendDataCache.clear();
+}
+
+void TcpServiceIocp::sendToAllProc()
+{
+	m_cacheListLock.lock();
+	EzAssert(m_sendDataCache.size() > 0);
+	SendDataCache data = m_sendDataCache.front();
+	m_sendDataCache.pop_front();
+	m_cacheListLock.unlock();
+
+	ClientCtxIterator* pIter = m_ClientContextMgr.newIterator();
+	if (pIter)
+	{
+		while (!pIter->isDone())
+		{
+			sendData(pIter->getClientId(), data.pData, data.nDataLen);
+
+			// for test
+			Sleep(5);
+			pIter->step();
+		}
+		delete pIter;
+	}
+
+	delete[] data.pData;
+}
+
+unsigned __stdcall TcpServiceIocp::sendToAllThread(void* pParam)
+{
+	SendToAllThreadParam* pThreadParam = (SendToAllThreadParam*)pParam;
+	TcpServiceIocp* pTcpService = pThreadParam->pIocpService;
+	HANDLE hThreadEvent = pThreadParam->hEvent;
+
+	::SetEvent(hThreadEvent);		// init success
+
+	HANDLE hObjects[2] = { pTcpService->m_hSendCacheSem, pTcpService->m_hSendQuitEvent };
+
+	while (true)
+	{
+		DWORD dwRet = ::WaitForMultipleObjects(2, hObjects, FALSE, INFINITE);
+		if (WAIT_OBJECT_0 == dwRet)
+			pTcpService->sendToAllProc();
+		else if ((WAIT_OBJECT_0 + 1) == dwRet)
+			break;		// quit
+		else
+			continue;
+	}
+
+	return 0;
 }

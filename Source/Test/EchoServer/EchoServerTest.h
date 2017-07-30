@@ -19,12 +19,16 @@ protected:
 	virtual void onTimerMsg(EzUInt uTimerId);
 };
 
+#pragma pack(push, 1)
+
 struct TimeMsg
 {
 	CSINT	nHour;
 	CSINT	nMin;
 	CSINT	nSec;
 };
+
+#pragma pack(pop)
 
 class TimeServer : public ServerTemplate
 {
@@ -39,7 +43,7 @@ protected:
 	virtual bool onStop();
 
 protected:
-	bool sendCurrentTime(ClientId id) const;
+	bool sendCurrentTime(ClientId id);
 };
 
 #endif // __ECHO_SERVER_TEST__

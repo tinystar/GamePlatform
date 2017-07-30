@@ -4,7 +4,7 @@
 using namespace EzTime;
 
 #define SEND_TIME_TIMER_ID		1
-#define SEND_TIMER_ELAPSE		1000
+#define SEND_TIMER_ELAPSE		100
 
 void EchoServer::onTcpClientConnectMsg(ClientId id)
 {
@@ -52,20 +52,29 @@ void TimeServer::onTimerMsg(EzUInt uTimerId)
 		if (m_pTcpService->getClientCount() <= 0)
 			return;
 
-		ClientIdIterator* pIter = m_pTcpService->newIterator();
-		if (pIter != NULL)
-		{
-			while (!pIter->isDone())
-			{
-				sendCurrentTime(pIter->getClientId());
-				pIter->step();
-			}
-			delete pIter;
-		}
+		//ClientIdIterator* pIter = m_pTcpService->newIterator();
+		//if (pIter != NULL)
+		//{
+		//	while (!pIter->isDone())
+		//	{
+		//		sendCurrentTime(pIter->getClientId());
+		//		pIter->step();
+		//	}
+		//	delete pIter;
+		//}
+		int h, m, s;
+		getTimeCurrent(h, m, s);
+
+		TimeMsg msg;
+		msg.nHour = h;
+		msg.nMin = m;
+		msg.nSec = s;
+
+		sendDataToAll(&msg, sizeof(msg));
 	}
 }
 
-bool TimeServer::sendCurrentTime(ClientId id) const
+bool TimeServer::sendCurrentTime(ClientId id)
 {
 	if (!id.isValid())
 		return false;
@@ -77,7 +86,7 @@ bool TimeServer::sendCurrentTime(ClientId id) const
 	msg.nHour = h;
 	msg.nMin = m;
 	msg.nSec = s;
-	return m_pTcpService->sendData(id, &msg, sizeof(msg));
+	return sendData(id, &msg, sizeof(msg));
 }
 
 bool TimeServer::onStart()

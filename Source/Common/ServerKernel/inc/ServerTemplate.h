@@ -58,6 +58,7 @@ protected:
 	bool killTimer(EzUInt uTimerId);
 
 	bool sendData(ClientId id, void* pData, size_t nDataLen);
+	bool sendDataToAll(void* pData, size_t nDataLen);
 
 	// factory methods
 protected:

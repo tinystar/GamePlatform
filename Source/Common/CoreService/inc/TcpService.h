@@ -71,6 +71,7 @@ public:
 	virtual SVCErrorCode stop() = 0;
 
 	virtual bool sendData(ClientId id, void* pData, size_t nDataLen) = 0;
+	virtual bool sendDataToAll(void* pData, size_t nDataLen) = 0;
 
 	virtual bool closeClient(ClientId id, bool bGraceful = true) = 0;
 

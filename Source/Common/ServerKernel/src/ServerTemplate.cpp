@@ -199,6 +199,14 @@ bool ServerTemplate::sendData(ClientId id, void* pData, size_t nDataLen)
 	return false;
 }
 
+bool ServerTemplate::sendDataToAll(void* pData, size_t nDataLen)
+{
+	if (m_pTcpService)
+		return m_pTcpService->sendDataToAll(pData, nDataLen);
+
+	return false;
+}
+
 TcpService* ServerTemplate::createTcpService() const
 {
 #ifdef EZ_WINDOWS
