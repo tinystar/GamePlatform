@@ -109,12 +109,13 @@ bool ClientContext::closeClient(bool bGraceful)
 	m_status = kClosing;
 	m_closeLock.unlock();
 
+	int nWaitCount = 100;
 	if (m_bWaitSend)
 	{
 		::SetEvent(m_hWaitSendEvent);
 		m_bWaitSend = false;
 		m_nWaitSendSize = 0;
-		int nWaitCount = 20;
+		nWaitCount = 20;
 		while (nWaitCount-- != 0)	// wait for a few moment
 			::Sleep(0);
 	}
@@ -122,7 +123,8 @@ bool ClientContext::closeClient(bool bGraceful)
 	if (bGraceful)
 	{
 		// Todo: 超时及发送错误检测
-		while (!m_sendBuffer.isEmpty())
+		nWaitCount = 100;
+		while (!m_sendBuffer.isEmpty() && nWaitCount-- > 0)
 			::Sleep(0);		// waiting to send complete.
 	}
 
@@ -151,9 +153,11 @@ bool ClientContext::closeClient(bool bGraceful)
 	::memset(&m_address, 0, sizeof(m_address));
 
 	// 等待send、recv的异步io完成
-	while (!HasOverlappedIoCompleted(&m_sendIoContext.overlapped))
+	nWaitCount = 50;
+	while (!HasOverlappedIoCompleted(&m_sendIoContext.overlapped) && nWaitCount-- > 0)
 		::Sleep(0);
-	while (!HasOverlappedIoCompleted(&m_recvIoContext.overlapped))
+	nWaitCount = 50;
+	while (!HasOverlappedIoCompleted(&m_recvIoContext.overlapped) && nWaitCount-- > 0)
 		::Sleep(0);
 
 	m_sendIoContext.reset();
