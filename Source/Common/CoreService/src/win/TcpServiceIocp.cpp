@@ -820,8 +820,6 @@ void TcpServiceIocp::sendToAllProc()
 		{
 			sendData(pIter->getClientId(), data.pData, data.nDataLen);
 
-			// for test
-			Sleep(5);
 			pIter->step();
 		}
 		delete pIter;
