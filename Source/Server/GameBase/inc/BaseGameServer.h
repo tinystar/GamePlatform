@@ -51,11 +51,11 @@ protected:
 	bool sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, void* pData = NULL, size_t nDataLen = 0);
 	bool sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, void* pData = NULL, size_t nDataLen = 0);
 
-	bool addMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler);
-	bool addMsgMapEntry(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
+	bool registerMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler);
+	bool registerMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
 
-	bool removeMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId);
-	bool removeMsgMapEntry(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
+	bool removeMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId);
+	bool removeMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
 
 	// input parameter must be dynamically allocated and needn't be deleted,
 	// it will be automatically deleted in the destructor of this class.

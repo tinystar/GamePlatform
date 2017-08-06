@@ -124,7 +124,7 @@ bool BaseGameServer::sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, void* pData
 	return true;
 }
 
-bool BaseGameServer::addMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler)
+bool BaseGameServer::registerMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler)
 {
 	if (!EzVerify(pHandler != NULL))
 		return false;
@@ -141,18 +141,18 @@ bool BaseGameServer::addMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHan
 	return true;
 }
 
-bool BaseGameServer::addMsgMapEntry(const NetMsgMapEntry* const pEntries, size_t nEntryCount)
+bool BaseGameServer::registerMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount)
 {
 	if (NULL == pEntries || 0 == nEntryCount)
 		return false;
 
 	for (size_t i = 0; i < nEntryCount; ++i)
-		addMsgMapEntry(pEntries[i].uMainId, pEntries[i].uSubId, pEntries[i].pHandler);
+		registerMsgHandler(pEntries[i].uMainId, pEntries[i].uSubId, pEntries[i].pHandler);
 
 	return true;
 }
 
-bool BaseGameServer::removeMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId)
+bool BaseGameServer::removeMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId)
 {
 	CSUINT32 uMsgKey = MAKEMSGKEY(uMainId, uSubId);
 	NetMsgMap::iterator iter = m_NetMsgMap.find(uMsgKey);
@@ -163,13 +163,13 @@ bool BaseGameServer::removeMsgMapEntry(CSUINT16 uMainId, CSUINT16 uSubId)
 	return true;
 }
 
-bool BaseGameServer::removeMsgMapEntry(const NetMsgMapEntry* const pEntries, size_t nEntryCount)
+bool BaseGameServer::removeMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount)
 {
 	if (NULL == pEntries || 0 == nEntryCount)
 		return false;
 
 	for (size_t i = 0; i < nEntryCount; ++i)
-		removeMsgMapEntry(pEntries[i].uMainId, pEntries[i].uSubId);
+		removeMsgHandler(pEntries[i].uMainId, pEntries[i].uSubId);
 
 	return true;
 }
