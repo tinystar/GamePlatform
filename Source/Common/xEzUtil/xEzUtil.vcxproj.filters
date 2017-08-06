@@ -78,6 +78,9 @@
     <ClInclude Include="src\xEzMemoryPool.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\xEzEncryptor.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\xEzLog.cpp">
@@ -111,6 +114,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\xEzMemory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzEncryptor.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

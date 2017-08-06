@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2EAC68EE-236E-421D-BAF5-6CE8C65447B9}</ProjectGuid>
+    <ProjectGuid>{95370DB4-38B6-48F1-B4A8-2527DFE3B643}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>xEzUtil</RootNamespace>
+    <RootNamespace>GameBase</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -35,12 +35,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Common.props" />
-    <Import Project="..\CmnLib.props" />
+    <Import Project="..\Server.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Common.props" />
-    <Import Project="..\CmnLib.props" />
+    <Import Project="..\Server.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -55,15 +55,12 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GAMEBASE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>xEzUtil.def</ModuleDefinitionFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,59 +71,24 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GAME_BASE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>xEzUtil.def</ModuleDefinitionFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="xEzUtil.def" />
+    <ClInclude Include="inc\BaseGameServer.h" />
+    <ClInclude Include="inc\BaseMsgDefs.h" />
+    <ClInclude Include="inc\GameBase.h" />
+    <ClInclude Include="inc\GameUserDefs.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\xEzArray.h" />
-    <ClInclude Include="inc\xEzBuffer.h" />
-    <ClInclude Include="inc\xEzCompile.h" />
-    <ClInclude Include="inc\xEzDebug.h" />
-    <ClInclude Include="inc\xEzDump.h" />
-    <ClInclude Include="inc\xEzEncryptor.h" />
-    <ClInclude Include="inc\xEzException.h" />
-    <ClInclude Include="inc\xEzLinkedList.h" />
-    <ClInclude Include="inc\xEzLock.h" />
-    <ClInclude Include="inc\xEzLog.h" />
-    <ClInclude Include="inc\xEzMacro.h" />
-    <ClInclude Include="inc\xEzMemory.h" />
-    <ClInclude Include="inc\xEzNet.h" />
-    <ClInclude Include="inc\xEzPlatform.h" />
-    <ClInclude Include="inc\xEzProfile.h" />
-    <ClInclude Include="inc\xEzSystem.h" />
-    <ClInclude Include="inc\xEzTextConvertor.h" />
-    <ClInclude Include="inc\xEzTime.h" />
-    <ClInclude Include="inc\xEzTypes.h" />
-    <ClInclude Include="inc\xEzUtil.h" />
-    <ClInclude Include="src\win\xEzLogImp.h" />
-    <ClInclude Include="src\xEzMemoryPool.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\win\xEzLock.cpp" />
-    <ClCompile Include="src\win\xEzLogImp.cpp" />
-    <ClCompile Include="src\win\xEzProfile.cpp" />
-    <ClCompile Include="src\win\xEzSystem.cpp" />
-    <ClCompile Include="src\win\xEzTextConvertor.cpp" />
-    <ClCompile Include="src\xEzDebug.cpp" />
-    <ClCompile Include="src\xEzDump.cpp" />
-    <ClCompile Include="src\xEzEncryptor.cpp" />
-    <ClCompile Include="src\xEzLog.cpp" />
-    <ClCompile Include="src\xEzMemory.cpp" />
-    <ClCompile Include="src\xEzMemoryPool.cpp" />
-    <ClCompile Include="src\xEzTime.cpp" />
+    <ClCompile Include="src\BaseGameServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

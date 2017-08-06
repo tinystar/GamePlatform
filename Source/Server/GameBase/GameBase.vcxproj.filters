@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{1249099c-d590-4791-a0bc-f92e6a327544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk_inc">
+      <UniqueIdentifier>{6d679dc9-a78b-4b01-b025-ecc84c189c7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{b81e65b4-5bfc-4323-826a-23b9bb50deff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\GameBase.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\BaseGameServer.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\BaseMsgDefs.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameUserDefs.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BaseGameServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

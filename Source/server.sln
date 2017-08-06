@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoreService", "Common\CoreS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerKernel", "Common\ServerKernel\ServerKernel.vcxproj", "{034213BF-AF42-4A40-98F1-659BFEBDB7D0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameBase", "Server\GameBase\GameBase.vcxproj", "{95370DB4-38B6-48F1-B4A8-2527DFE3B643}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,6 +29,10 @@ Global
 		{034213BF-AF42-4A40-98F1-659BFEBDB7D0}.Debug|Win32.Build.0 = Debug|Win32
 		{034213BF-AF42-4A40-98F1-659BFEBDB7D0}.Release|Win32.ActiveCfg = Release|Win32
 		{034213BF-AF42-4A40-98F1-659BFEBDB7D0}.Release|Win32.Build.0 = Release|Win32
+		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Debug|Win32.ActiveCfg = Debug|Win32
+		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Debug|Win32.Build.0 = Debug|Win32
+		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Release|Win32.ActiveCfg = Release|Win32
+		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

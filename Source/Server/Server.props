@@ -26,9 +26,10 @@
       <AdditionalLibraryDirectories>$(ServerLibDir);$(DependLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(ServerPdbDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(ServerLibDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>xEzUtil.lib;CoreService.lib;ServerKernel.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)xEzUtil\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;$(SolutionDir)Common\CoreService\inc;$(SolutionDir)Common\ServerKernel\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -92,7 +92,7 @@ TcpService* createTcpService(NetModel model /*= kIocp*/)
 #ifdef EZ_WINDOWS
 		pService = new TcpServiceIocp();
 #else
-		EzAssert(_T("iocp can only be used in windows!"));
+		EzAssert(!_T("iocp can only be used in windows!"));
 #endif
 		break;
 	default:
