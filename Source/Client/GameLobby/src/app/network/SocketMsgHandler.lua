@@ -5,6 +5,17 @@
 -- 
 -- Author: xiaoxin
 -- Contact: 765392700(QQ)
--- Date: 2017/7/19
+-- Date: 2017/8/9
 -- *********************************************************************
 
+require "app.network.SocketMsgMapper"
+
+-- -----------------------------------------------------
+-- msg map entries
+-- MainMsgId            SubMsgId            Handler
+-- -----------------------------------------------------
+local globalMsgMaps = {
+    
+}
+
+SocketMsgMapper.registerMsgHandler()

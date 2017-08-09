@@ -41,21 +41,26 @@ void BaseGameServer::onTcpClientConnectMsg(ClientId id)
 
 void BaseGameServer::onTcpPackageRecvMsg(ClientId id, void* pPackage, size_t nSize)
 {
-	EzAssert(pPackage != NULL && nSize >= sizeof(CSUINT16)*2);
+	if (!EzVerify(pPackage != NULL && nSize >= sizeof(BaseMsgHeader)))
+	{
+		EzLogWarn(_T("BaseGameServer::onTcpPackageRecvMsg invalid package is received!\n"));
+		return;
+	}
 
 	if (m_pMsgEncryptor != NULL)
 		m_pMsgEncryptor->decrypt((unsigned char*)pPackage, nSize);
 
-	CSUINT16 uMainId = *(CSUINT16*)pPackage;
-	CSUINT16 uSubId = *((CSUINT16*)pPackage + 1);
+	BaseMsgHeader* pHeader = (BaseMsgHeader*)pPackage;
+	CSUINT16 uMainId = pHeader->uMainId;
+	CSUINT16 uSubId = pHeader->uSubId;
 	CSUINT32 uMsgKey = MAKEMSGKEY(uMainId, uSubId);
 
 	void* pMsgData = NULL;
 	size_t nMsgSize = 0;
-	if (nSize > sizeof(CSUINT16) * 2)
+	if (nSize > sizeof(BaseMsgHeader))
 	{
-		pMsgData = (CSUINT16*)pPackage + 2;
-		nMsgSize = nSize - sizeof(CSUINT16) * 2;
+		pMsgData = pHeader + 1;
+		nMsgSize = nSize - sizeof(BaseMsgHeader);
 	}
 
 	NetMsgMap::iterator iter = m_NetMsgMap.find(uMsgKey);
@@ -82,7 +87,7 @@ void BaseGameServer::onTimerMsg(EzUInt uTimerId)
 
 bool BaseGameServer::sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, void* pData /*= NULL*/, size_t nDataLen /*= 0*/)
 {
-	size_t nMsgSize = sizeof(CSUINT16) * 2;
+	size_t nMsgSize = sizeof(BaseMsgHeader);
 	if (pData != NULL && nDataLen > 0)
 		nMsgSize += nDataLen;
 
@@ -90,10 +95,12 @@ bool BaseGameServer::sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, voi
 	if (NULL == pMsgBuffer)
 		return false;
 
-	*((CSUINT16*)pMsgBuffer) = uMainId;
-	*((CSUINT16*)pMsgBuffer + 1) = uSubId;
+	BaseMsgHeader* pHeader = (BaseMsgHeader*)pMsgBuffer;
+	pHeader->uMainId = uMainId;
+	pHeader->uSubId = uSubId;
+	pHeader->uReserved = 0;
 	if (pData != NULL && nDataLen > 0)
-		::memcpy(pMsgBuffer + sizeof(CSUINT16)*2, pData, nDataLen);
+		::memcpy(pHeader + 1, pData, nDataLen);
 
 	if (m_pMsgEncryptor != NULL)
 		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
@@ -104,7 +111,7 @@ bool BaseGameServer::sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, voi
 
 bool BaseGameServer::sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, void* pData /*= NULL*/, size_t nDataLen /*= 0*/)
 {
-	size_t nMsgSize = sizeof(CSUINT16) * 2;
+	size_t nMsgSize = sizeof(BaseMsgHeader);
 	if (pData != NULL && nDataLen > 0)
 		nMsgSize += nDataLen;
 
@@ -112,10 +119,12 @@ bool BaseGameServer::sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, void* pData
 	if (NULL == pMsgBuffer)
 		return false;
 
-	*((CSUINT16*)pMsgBuffer) = uMainId;
-	*((CSUINT16*)pMsgBuffer + 1) = uSubId;
+	BaseMsgHeader* pHeader = (BaseMsgHeader*)pMsgBuffer;
+	pHeader->uMainId = uMainId;
+	pHeader->uSubId = uSubId;
+	pHeader->uReserved = 0;
 	if (pData != NULL && nDataLen > 0)
-		::memcpy(pMsgBuffer + sizeof(CSUINT16) * 2, pData, nDataLen);
+		::memcpy(pHeader + 1, pData, nDataLen);
 
 	if (m_pMsgEncryptor != NULL)
 		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
