@@ -17,7 +17,7 @@
 
 class BaseGameServer;
 
-typedef void (BaseGameServer::*NetMsgHandler)(ClientId, void*, size_t);
+typedef void (BaseGameServer::*NetMsgHandler)(ClientId, GameMsgHeader*, void*, size_t);
 
 struct NetMsgMapEntry
 {
@@ -48,8 +48,8 @@ protected:
 
 protected:
 	// msg will be encrypted if there has an msg encryptor.
-	bool sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, void* pData = NULL, size_t nDataLen = 0);
-	bool sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, void* pData = NULL, size_t nDataLen = 0);
+	bool sendMsg(ClientId id, GameMsgHeader* pHeader, void* pData = NULL, size_t nDataLen = 0);
+	bool sendMsgToAll(GameMsgHeader* pHeader, void* pData = NULL, size_t nDataLen = 0);
 
 	bool registerMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler);
 	bool registerMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
@@ -63,7 +63,7 @@ protected:
 
 protected:
 	// Msg that are not mapped by the msg map mechanism will be handled by this function.
-	virtual void onDefaultMsgHandler(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, void* pData, size_t nDataLen);
+	virtual void onDefaultMsgHandler(ClientId id, GameMsgHeader* pHeader, void* pData, size_t nDataLen);
 
 protected:
 	typedef std::map<CSUINT32, NetMsgHandler> NetMsgMap;

@@ -14,11 +14,17 @@
 
 #pragma pack(push, 1)
 
-struct BaseMsgHeader
+struct GameMsgHeader
 {
 	CSUINT16	uMainId;
 	CSUINT16	uSubId;
 	CSUINT32	uReserved;
+
+	GameMsgHeader()
+		: uMainId(0)
+		, uSubId(0)
+		, uReserved(0)
+	{}
 };
 
 #pragma pack(pop)
