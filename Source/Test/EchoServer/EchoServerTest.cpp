@@ -8,7 +8,8 @@ using namespace EzTime;
 
 void EchoServer::onTcpClientConnectMsg(ClientId id)
 {
-
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onClientConnect(id);
 }
 
 void EchoServer::onTcpPackageRecvMsg(ClientId id, void* pPackage, size_t nSize)
@@ -18,7 +19,8 @@ void EchoServer::onTcpPackageRecvMsg(ClientId id, void* pPackage, size_t nSize)
 
 void EchoServer::onTcpClientCloseMsg(ClientId id)
 {
-
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onClientClose(id);
 }
 
 void EchoServer::onTimerMsg(EzUInt uTimerId)

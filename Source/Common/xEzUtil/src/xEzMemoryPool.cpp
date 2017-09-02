@@ -133,4 +133,6 @@ size_t EzMemPoolConfig::sGetBlockSize(int index)
 //------------------------------------------------------
 // Global memory pool define
 //------------------------------------------------------
+#ifdef XEZ_USE_MEMORY_POOL
 EzMemPool<EzMemPoolConfig> g_memPool;
+#endif

@@ -3,6 +3,7 @@
 
 #include "ServerTemplate.h"
 #include "ServiceTypes.h"
+#include "IServerUIObserver.h"
 
 #define ECHO_SERVER_PORT		5010
 #define MAX_ECHOMSG_SIZE		4096
@@ -11,12 +12,23 @@
 
 class EchoServer : public ServerTemplate
 {
+public:
+	EchoServer()
+		: m_pUIObserver(NULL)
+	{}
+
+public:
+	void registerUIObserver(IServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
+
 protected:
 	virtual void onTcpClientConnectMsg(ClientId id);
 	virtual void onTcpPackageRecvMsg(ClientId id, void* pPackage, size_t nSize);
 	virtual void onTcpClientCloseMsg(ClientId id);
 
 	virtual void onTimerMsg(EzUInt uTimerId);
+
+private:
+	IServerUIObserver* m_pUIObserver;
 };
 
 #pragma pack(push, 1)

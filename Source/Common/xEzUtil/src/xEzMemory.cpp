@@ -5,7 +5,9 @@
 //------------------------------------------------------
 // EzMalloc/EzFree
 //------------------------------------------------------
+#ifdef XEZ_USE_MEMORY_POOL
 extern EzMemPool<EzMemPoolConfig> g_memPool;
+#endif
 
 void* EzMalloc(size_t size)
 {

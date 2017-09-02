@@ -49,7 +49,9 @@ END_MESSAGE_MAP()
 
 CEchoServerDlg::CEchoServerDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CEchoServerDlg::IDD, pParent)
+	, m_pClientList(NULL)
 {
+	m_echoServer.registerUIObserver(this);
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -63,6 +65,8 @@ BEGIN_MESSAGE_MAP(CEchoServerDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_DESTROY()
+	ON_MESSAGE(WM_CLIENT_CONNECT, &CEchoServerDlg::OnClientConnUIMsg)
+	ON_MESSAGE(WM_CLIENT_CLOSE, &CEchoServerDlg::OnClientCloseUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -98,6 +102,17 @@ BOOL CEchoServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
+	m_pClientList = (CListCtrl*)GetDlgItem(IDC_CLIENT_LIST);
+	if (NULL == m_pClientList)
+	{
+		AfxMessageBox(_T("get client list control failed!"));
+		return TRUE;
+	}
+
+	m_pClientList->InsertColumn(0, _T("num"), LVCFMT_LEFT, 40);
+	m_pClientList->InsertColumn(1, _T("ip"), LVCFMT_LEFT, 150);
+	m_pClientList->InsertColumn(2, _T("port"), LVCFMT_LEFT, 50);
+
 	ServerInitConfig config;
 	config.uCreateFlags = kCreateTcpService;
 	config.tcpConfig.sPort = ECHO_SERVER_PORT;
@@ -168,4 +183,54 @@ void CEchoServerDlg::OnDestroy()
 	m_echoServer.unInit();
 	m_timeServer.stop();
 	m_timeServer.unInit();
+}
+
+// 此回调函数是在工作线程中响应，需要发消息给主线程来更新界面，否则可能死锁
+void CEchoServerDlg::onClientConnect(ClientId id)
+{
+	this->PostMessage(WM_CLIENT_CONNECT, 0, (LPARAM)(ClientContext*)id);
+}
+
+void CEchoServerDlg::onClientClose(ClientId id)
+{
+	this->PostMessage(WM_CLIENT_CLOSE, 0, (LPARAM)(ClientContext*)id);
+}
+
+LRESULT CEchoServerDlg::OnClientConnUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	ClientId id( (ClientContext*)lParam );
+	if (id.isNull())
+		return 0;
+
+	int idx = m_pClientList->GetItemCount();
+
+	TCHAR szBuf[256] = { 0 };
+	_stprintf_s(szBuf, 256, _T("%d"), idx + 1);
+	idx = m_pClientList->InsertItem(idx, szBuf);
+	m_pClientList->SetItemData(idx, (DWORD_PTR)lParam);
+
+	SOCKADDR_IN clientAddr = id.getAddress();
+	char* ip = inet_ntoa(clientAddr.sin_addr);
+	wchar_t* ipAddr = EzText::ansiToWideChar(ip);
+	m_pClientList->SetItemText(idx, 1, ipAddr);
+	delete ipAddr;
+
+	_stprintf_s(szBuf, 256, _T("%d"), clientAddr.sin_port);
+	m_pClientList->SetItemText(idx, 2, szBuf);
+
+	return 0;
+}
+
+LRESULT CEchoServerDlg::OnClientCloseUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	for (int i = 0; i < m_pClientList->GetItemCount(); ++i)
+	{
+		if (m_pClientList->GetItemData(i) == (DWORD_PTR)lParam)
+		{
+			m_pClientList->DeleteItem(i);
+			break;
+		}
+	}
+
+	return 0;
 }
