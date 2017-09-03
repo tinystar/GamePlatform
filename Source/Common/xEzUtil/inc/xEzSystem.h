@@ -22,6 +22,8 @@ EZ_DLL_C_SPEC bool createDirectory(const TCHAR* pszPath);
 
 EZ_DLL_C_SPEC EzUInt getProcessorCount();
 
+EZ_DLL_C_SPEC bool getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords);
+
 EZ_NAMESPACE_END
 
 #endif // __XEZ_SYSTEM_H__

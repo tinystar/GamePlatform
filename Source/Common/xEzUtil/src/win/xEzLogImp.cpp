@@ -179,7 +179,7 @@ bool EzLoggerImp::generateFilePath()
 
 	TCHAR szPath[256] = { 0 };
 	_sntprintf_s(szPath, 256, 255, _T("%s%s"), szDrive, szDir);
-	if (!pathFileExists(szPath))
+	if (_tcslen(szPath) > 0 && !pathFileExists(szPath))
 	{
 		bool bRet = createDirectory(szPath);
 		EzAssert(bRet);
@@ -364,4 +364,9 @@ bool EzLoggerImp::checkNextDay()
 	getDateFromTime(m_startTime, year2, month2, day2);
 
 	return (day1 != day2) || (month1 != month2) || (year1 != year2);
+}
+
+void EzLoggerImp::setLogLevel(LogLevel level)
+{
+	m_logLevel = level;
 }

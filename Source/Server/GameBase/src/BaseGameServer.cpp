@@ -94,7 +94,12 @@ bool BaseGameServer::sendMsg(ClientId id, GameMsgHeader* pHeader, void* pData /*
 	if (pData != NULL && nDataLen > 0)
 		nMsgSize += nDataLen;
 
-	unsigned char* pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
+	unsigned char* pMsgBuffer = NULL;
+	if (nMsgSize > 1024)
+		pMsgBuffer = new unsigned char[nMsgSize];
+	else
+		pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
+
 	if (NULL == pMsgBuffer)
 		return false;
 
@@ -107,6 +112,10 @@ bool BaseGameServer::sendMsg(ClientId id, GameMsgHeader* pHeader, void* pData /*
 		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
 
 	sendData(id, pMsgBuffer, nMsgSize);
+
+	if (nMsgSize > 1024)
+		delete[] pMsgBuffer;
+
 	return true;
 }
 
@@ -119,7 +128,12 @@ bool BaseGameServer::sendMsgToAll(GameMsgHeader* pHeader, void* pData /*= NULL*/
 	if (pData != NULL && nDataLen > 0)
 		nMsgSize += nDataLen;
 
-	unsigned char* pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
+	unsigned char* pMsgBuffer = NULL;
+	if (nMsgSize > 1024)
+		pMsgBuffer = new unsigned char[nMsgSize];
+	else
+		pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
+
 	if (NULL == pMsgBuffer)
 		return false;
 
@@ -132,6 +146,10 @@ bool BaseGameServer::sendMsgToAll(GameMsgHeader* pHeader, void* pData /*= NULL*/
 		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
 
 	sendDataToAll(pMsgBuffer, nMsgSize);
+
+	if (nMsgSize > 1024)
+		delete[] pMsgBuffer;
+
 	return true;
 }
 

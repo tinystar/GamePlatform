@@ -11,6 +11,7 @@
     <DependLibFolder>CmnLib</DependLibFolder>
     <DependLibPath>$(DependLibFolder)\$(PlatformName)\$(Configuration)\</DependLibPath>
     <DependLibDir>$(GpLibDir)$(DependLibPath)</DependLibDir>
+    <DependBinDir>$(GpBinDir)$(DependLibPath)</DependBinDir>
   </PropertyGroup>
   <PropertyGroup>
     <IntDir>$(ServerTmpDir)</IntDir>
@@ -31,6 +32,12 @@
     <ClCompile>
       <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;$(SolutionDir)Common\CoreService\inc;$(SolutionDir)Common\ServerKernel\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(DependBinDir)*.dll" "$(ServerBinDir)" /D /Y</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>copy dll files</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="PrjName">
@@ -63,6 +70,9 @@
     </BuildMacro>
     <BuildMacro Include="DependLibDir">
       <Value>$(DependLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DependBinDir">
+      <Value>$(DependBinDir)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

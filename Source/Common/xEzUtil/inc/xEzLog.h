@@ -28,9 +28,12 @@ enum LogLevel
 class EzLogger
 {
 public:
+	// pszLogName parameter supports relative path. e.g. _T(".\\log\\xxx.log")
 	static bool init(const TCHAR* pszLogName, LogLevel level = kLogAll);
-	// please call exit() after init() has called, otherwise it will cause memory leaks.
+	// please call exit() when init() has called, otherwise it will cause memory leaks.
 	static void exit();
+
+	static void setLogLevel(LogLevel level);
 
 	static bool log(LogLevel level, const TCHAR* pszFormat, ...);
 	static bool flush();

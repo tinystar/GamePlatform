@@ -8,5 +8,6 @@ EXPORTS
 ?exit@EzLogger@@SAXXZ
 ?log@EzLogger@@SA_NW4LogLevel@@PB_WZZ
 ?flush@EzLogger@@SA_NXZ
+?setLogLevel@EzLogger@@SAXW4LogLevel@@@Z
 
 

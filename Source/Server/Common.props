@@ -7,6 +7,7 @@
     <GpLibDir>$(GpOutDir)Lib\</GpLibDir>
     <GpPdbDir>$(GpOutDir)Pdb\</GpPdbDir>
     <GpTmpDir>$(GpOutDir)Tmp\</GpTmpDir>
+    <ExternalPath>$(SolutionDir)external\</ExternalPath>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -30,6 +31,9 @@
     <BuildMacro Include="GpTmpDir">
       <Value>$(GpTmpDir)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ExternalPath">
+      <Value>$(ExternalPath)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

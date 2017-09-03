@@ -37,6 +37,8 @@ protected:
 	bool start();
 	bool stop();
 
+	void setLogLevel(LogLevel level);
+
 	bool generateFilePath();
 	const TCHAR* levelToString(LogLevel level) const;
 	void cleanBuffers();

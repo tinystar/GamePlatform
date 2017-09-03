@@ -48,3 +48,11 @@ bool EzLogger::flush()
 
 	return _s_pImpLogger->_flush();
 }
+
+void EzLogger::setLogLevel(LogLevel level)
+{
+	if (NULL == _s_pImpLogger)
+		return;
+
+	_s_pImpLogger->setLogLevel(level);
+}

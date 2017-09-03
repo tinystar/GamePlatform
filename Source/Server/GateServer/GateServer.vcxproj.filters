@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{e5fb413c-4469-4491-92ed-bd65923545f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{bcc98c40-c2eb-41e8-9063-348a31e5166f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="mfc\inc">
+      <UniqueIdentifier>{47194606-157a-4fd5-be3c-4957ec535ff8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\src">
+      <UniqueIdentifier>{6c2f73e6-67ca-4017-a908-36a8f77f7297}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChildView.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="GateServerApp.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GateServer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GateMsgDefs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GateServerMgr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UIComm\win\TrayIcon.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChildView.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GateServerApp.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GateServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GateServerMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GateServer.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\GateServer.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\GateServer.ico">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

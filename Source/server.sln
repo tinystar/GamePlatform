@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerKernel", "Common\Serv
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameBase", "Server\GameBase\GameBase.vcxproj", "{95370DB4-38B6-48F1-B4A8-2527DFE3B643}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GateServer", "Server\GateServer\GateServer.vcxproj", "{E5FD9B74-C490-4A75-A57F-34A3E639999A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -33,6 +35,10 @@ Global
 		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Debug|Win32.Build.0 = Debug|Win32
 		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Release|Win32.ActiveCfg = Release|Win32
 		{95370DB4-38B6-48F1-B4A8-2527DFE3B643}.Release|Win32.Build.0 = Release|Win32
+		{E5FD9B74-C490-4A75-A57F-34A3E639999A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E5FD9B74-C490-4A75-A57F-34A3E639999A}.Debug|Win32.Build.0 = Debug|Win32
+		{E5FD9B74-C490-4A75-A57F-34A3E639999A}.Release|Win32.ActiveCfg = Release|Win32
+		{E5FD9B74-C490-4A75-A57F-34A3E639999A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

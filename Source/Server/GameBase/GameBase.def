@@ -1,0 +1,12 @@
+
+EXPORTS
+
+;---------------------------------------------------------------------
+;BaseGameServer
+;---------------------------------------------------------------------
+??0BaseGameServer@@QAE@XZ
+??1BaseGameServer@@UAE@XZ
+?onTcpClientConnectMsg@BaseGameServer@@MAEXVClientId@@@Z
+?onTcpPackageRecvMsg@BaseGameServer@@MAEXVClientId@@PAXI@Z
+?onTcpClientCloseMsg@BaseGameServer@@MAEXVClientId@@@Z
+?onTimerMsg@BaseGameServer@@MAEXI@Z

@@ -51,3 +51,31 @@ EzUInt EzSys::getProcessorCount()
 
 	return sysInfo.dwNumberOfProcessors;
 }
+
+bool EzSys::getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords)
+{
+	HMODULE hCurMod = ::GetModuleHandle(NULL);
+	if (NULL == hCurMod)
+		return false;
+
+	TCHAR szFileName[MAX_PATH] = { 0 };
+	DWORD dwRet = ::GetModuleFileName(hCurMod, szFileName, MAX_PATH);
+	if (0 == dwRet)
+		return false;
+
+	DWORD i = 0;
+	for (i = dwRet; i >= 0; --i)
+	{
+		if (szFileName[i] == _T('\\') && i < dwRet)
+		{
+			szFileName[i + 1] = 0;
+			break;
+		}
+	}
+
+	if (i >= nSizeInWords)
+		return false;
+
+	_tcscpy_s(pszPathBuffer, nSizeInWords, szFileName);
+	return true;
+}
