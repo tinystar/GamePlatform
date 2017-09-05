@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="mfc">
+      <UniqueIdentifier>{d9cca74e-41a9-47d9-8ffd-8fcff5cfe48c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\inc">
+      <UniqueIdentifier>{e5d7e5b1-c63f-47a8-af9f-77fe4b5d8043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\src">
+      <UniqueIdentifier>{b161b26e-9613-4943-bbab-fc6663865cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{b8340e0c-6c10-433b-81b8-d0ad2143d9c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{1f72b28d-c985-4a28-b72a-f612b92bf07f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DBServer.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\DBServer.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\DBServer.ico">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChildView.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="DBServerApp.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UIComm\win\TrayIcon.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DBMsgDefs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DBServer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DBServerMgr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChildView.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="DBServerApp.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DBServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DBServerMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
