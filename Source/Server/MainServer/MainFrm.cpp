@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-#include "GateServerApp.h"
+#include "MainServerApp.h"
 
 #include "MainFrm.h"
 
@@ -169,7 +169,7 @@ LRESULT CMainFrame::OnTrayNotify(WPARAM wParam, LPARAM lParam)
 LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 {
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_trayIcon.ShowIcon(hIcon, _T("GateServer"));
+	m_trayIcon.ShowIcon(hIcon, _T("MainServer"));
 	m_bIconAdded = true;
 	CString strTip, strTipMsg;
 	strTip.LoadString(IDS_TRAY_TIP);

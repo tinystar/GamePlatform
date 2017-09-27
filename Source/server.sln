@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GateServer", "Server\GateSe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBServer", "Server\DBServer\DBServer.vcxproj", "{9314D829-2430-4630-BBD6-9C4979EBEF97}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MainServer", "Server\MainServer\MainServer.vcxproj", "{945CE534-FE3C-4849-B90E-359B753539E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -45,6 +47,10 @@ Global
 		{9314D829-2430-4630-BBD6-9C4979EBEF97}.Debug|Win32.Build.0 = Debug|Win32
 		{9314D829-2430-4630-BBD6-9C4979EBEF97}.Release|Win32.ActiveCfg = Release|Win32
 		{9314D829-2430-4630-BBD6-9C4979EBEF97}.Release|Win32.Build.0 = Release|Win32
+		{945CE534-FE3C-4849-B90E-359B753539E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{945CE534-FE3C-4849-B90E-359B753539E9}.Debug|Win32.Build.0 = Debug|Win32
+		{945CE534-FE3C-4849-B90E-359B753539E9}.Release|Win32.ActiveCfg = Release|Win32
+		{945CE534-FE3C-4849-B90E-359B753539E9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

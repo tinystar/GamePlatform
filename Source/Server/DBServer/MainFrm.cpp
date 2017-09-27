@@ -41,6 +41,7 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame()
 	: m_trayIcon(ID_TRAY_ICON)
+	, m_bIconAdded(false)
 {
 	// TODO:  在此添加成员初始化代码
 }
@@ -129,7 +130,7 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
 	CFrameWnd::OnSize(nType, cx, cy);
-	if (SIZE_MINIMIZED == nType)
+	if (SIZE_MINIMIZED == nType && m_bIconAdded)
 		ShowWindow(SW_HIDE);
 }
 
@@ -169,6 +170,7 @@ LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 {
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_trayIcon.ShowIcon(hIcon, _T("DBServer"));
+	m_bIconAdded = true;
 	CString strTip, strTipMsg;
 	strTip.LoadString(IDS_TRAY_TIP);
 	strTipMsg.LoadString(IDS_TRAY_TIP_MSG);

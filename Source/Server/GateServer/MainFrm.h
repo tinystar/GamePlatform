@@ -54,6 +54,7 @@ protected:
 
 protected:
 	CTrayIcon				m_trayIcon;
+	bool					m_bIconAdded;
 };
 
 

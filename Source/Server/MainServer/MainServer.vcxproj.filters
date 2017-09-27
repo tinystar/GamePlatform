@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{17220bae-1a08-46ce-875d-b086317e6994}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc">
+      <UniqueIdentifier>{be43b55c-8d22-4188-bad5-93abe70e3c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{9a78220f-f12f-41c3-b599-50dc27350ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{c7ae50cb-89a5-42b8-acbf-bfa27e665c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\inc">
+      <UniqueIdentifier>{6c9bef41-5dc4-443e-9f1a-291591da9833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\src">
+      <UniqueIdentifier>{f82273f3-7a68-4ad2-9911-2c0387a0a4ba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChildView.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainServerApp.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UIComm\win\TrayIcon.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\MainMsgDefs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\MainServer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\MainServerMgr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChildView.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainServerApp.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainServerMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\MainServer.ico">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\MainServer.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MainServer.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
