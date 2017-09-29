@@ -34,7 +34,7 @@ struct TcpConfig
 		: sPort(5000)
 		, nSockThreadCnt(0)
 		, nMaxAcceptCnt(10)
-		, nMaxPackageSize(8192)
+		, nMaxPackageSize(1024)
 	{
 		::memset(szAddr, 0, sizeof(szAddr));
 	}

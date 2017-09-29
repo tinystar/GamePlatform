@@ -60,6 +60,12 @@
     <ClInclude Include="src\win\TimerServiceImp.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\TcpClientSocket.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TcpClientSocketImp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CoreService.def" />
@@ -90,6 +96,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\win\TimerServiceImp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpClientSocket.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpClientSocketImp.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

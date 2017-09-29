@@ -110,6 +110,8 @@ void ServerTemplateImp::onPackageReceived(ClientId id, void* pPackage, size_t nS
 
 void ServerTemplateImp::onClientClosed(ClientId id)
 {
+	cleanQueueItemAbout(id);
+
 	QueueClientCloseMsg* pClientClose = new QueueClientCloseMsg();
 	if (!EzVerify(pClientClose != NULL))
 	{
@@ -178,6 +180,12 @@ unsigned __stdcall ServerTemplateImp::msgQueueHandleThread(void* pParam)
 void ServerTemplateImp::handleQueueMsg()
 {
 	m_queueLock.lock();
+	if (m_msgQueue.empty())
+	{
+		m_queueLock.unlock();
+		return;
+	}
+
 	QueueItemHead* pItem = m_msgQueue.front();
 	m_msgQueue.pop_front();
 	m_queueLock.unlock();
@@ -217,4 +225,43 @@ void ServerTemplateImp::handleQueueMsg()
 	}
 
 	delete pItem;
+}
+
+// the ClientContext will be reused immediately after it was closed, but the queue
+// may remain some items associated with the ClientContext, if these item continue to
+// be processed, that will cause problems. So we should clean these items when associated
+// ClientContext was closed.Another possible solution is to use reference count to manage
+// the life cycle of the ClientContext.
+void ServerTemplateImp::cleanQueueItemAbout(ClientId id)
+{
+	m_queueLock.lock();
+	list<QueueItemHead*>::iterator iter = m_msgQueue.begin();
+	while (iter != m_msgQueue.end())
+	{
+		bool bNeedErase = false;
+
+		QueueItemHead* pItem = *iter;
+		if (kTypeClientConn == pItem->uItemType)
+		{
+			QueueClientConnMsg* pClientConn = (QueueClientConnMsg*)pItem;
+			if (id == pClientConn->clientId)
+				bNeedErase = true;
+		}
+		else if (kTypePackageRecv == pItem->uItemType)
+		{
+			QueuePackageRecvMsg* pPkgRecv = (QueuePackageRecvMsg*)pItem;
+			if (id == pPkgRecv->clientId)
+				bNeedErase = true;
+		}
+
+		if (bNeedErase)
+		{
+			delete pItem;
+			iter = m_msgQueue.erase(iter);
+			continue;
+		}
+
+		++iter;
+	}
+	m_queueLock.unlock();
 }

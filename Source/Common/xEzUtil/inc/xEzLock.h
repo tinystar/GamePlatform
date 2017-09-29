@@ -32,7 +32,7 @@ private:
 class EZ_DLL_SPEC EzAutoLocker
 {
 public:
-	EzAutoLocker(EzLock* pLock)
+	explicit EzAutoLocker(EzLock* pLock)
 		: m_pLock(pLock)
 	{
 		if (m_pLock)

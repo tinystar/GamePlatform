@@ -1,6 +1,6 @@
 #include "ClientContext.h"
 
-#define DEFAULT_PACKAGE_SIZE	8192
+#define DEFAULT_PACKAGE_SIZE	1024
 #define SEND_WAIT_TIMEOUT		(3*60*1000)			// 3 minutes
 
 

@@ -30,6 +30,8 @@ public:
 	QueueItemHead()
 		: uItemType(kTypeUnknown)
 	{}
+
+	virtual ~QueueItemHead() {}
 };
 
 class QueueClientConnMsg : public QueueItemHead

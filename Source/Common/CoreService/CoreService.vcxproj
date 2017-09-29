@@ -93,9 +93,11 @@
     <ClInclude Include="inc\CoreService.h" />
     <ClInclude Include="inc\ServiceExcp.h" />
     <ClInclude Include="inc\ServiceTypes.h" />
+    <ClInclude Include="inc\TcpClientSocket.h" />
     <ClInclude Include="inc\TcpPackage.h" />
     <ClInclude Include="inc\TcpService.h" />
     <ClInclude Include="inc\TimerService.h" />
+    <ClInclude Include="src\TcpClientSocketImp.h" />
     <ClInclude Include="src\win\ClientContext.h" />
     <ClInclude Include="src\win\ClientContextMgr.h" />
     <ClInclude Include="src\win\IClientSessionMgr.h" />
@@ -110,6 +112,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClientId.cpp" />
+    <ClCompile Include="src\TcpClientSocket.cpp" />
+    <ClCompile Include="src\TcpClientSocketImp.cpp" />
     <ClCompile Include="src\TcpService.cpp" />
     <ClCompile Include="src\TimerService.cpp" />
     <ClCompile Include="src\win\ClientContext.cpp" />

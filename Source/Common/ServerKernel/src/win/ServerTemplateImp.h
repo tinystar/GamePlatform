@@ -40,6 +40,8 @@ protected:
 
 	void handleQueueMsg();
 
+	void cleanQueueItemAbout(ClientId id);
+
 protected:
 	ServerTemplate*				m_pApiObj;
 

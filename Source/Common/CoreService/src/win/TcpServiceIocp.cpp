@@ -149,7 +149,7 @@ SVCErrorCode TcpServiceIocp::initFromConfig(const TcpConfig& config)
 		m_nAcceptCount = config.nMaxAcceptCnt;
 
 	if (0 == config.nMaxPackageSize)
-		m_nPackageSize = 8192;
+		m_nPackageSize = 1024;
 	else
 		m_nPackageSize = config.nMaxPackageSize;
 
