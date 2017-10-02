@@ -14,7 +14,7 @@ BaseGameServer::~BaseGameServer()
 	EZ_SAFE_DELETE(m_pMsgEncryptor);
 }
 
-bool BaseGameServer::onInit()
+bool BaseGameServer::onInit(const ServerInitConfig&)
 {
 	return true;
 }
@@ -55,23 +55,15 @@ void BaseGameServer::onTcpPackageRecvMsg(ClientId id, void* pPackage, size_t nSi
 	CSUINT16 uSubId = pHeader->uSubId;
 	CSUINT32 uMsgKey = MAKEMSGKEY(uMainId, uSubId);
 
-	void* pMsgData = NULL;
-	size_t nMsgSize = 0;
-	if (nSize > sizeof(GameMsgHeader))
-	{
-		pMsgData = pHeader + 1;
-		nMsgSize = nSize - sizeof(GameMsgHeader);
-	}
-
 	NetMsgMap::iterator iter = m_NetMsgMap.find(uMsgKey);
 	if (iter != m_NetMsgMap.end())
 	{
 		NetMsgHandler pMsgHandler = iter->second;
-		(this->*pMsgHandler)(id, pHeader, pMsgData, nMsgSize);
+		(this->*pMsgHandler)(id, pPackage, nSize);
 	}
 	else
 	{
-		onDefaultMsgHandler(id, pHeader, pMsgData, nMsgSize);
+		onDefaultMsgHandler(id, pPackage, nSize);
 	}
 }
 
@@ -85,71 +77,60 @@ void BaseGameServer::onTimerMsg(EzUInt uTimerId)
 
 }
 
-bool BaseGameServer::sendMsg(ClientId id, GameMsgHeader* pHeader, void* pData /*= NULL*/, size_t nDataLen /*= 0*/)
+void BaseGameServer::onUserItemMsg(int itemId, void* pData, size_t nSize)
 {
-	if (NULL == pHeader)
+
+}
+
+bool BaseGameServer::sendMsg(ClientId id, void* pData, size_t nDataLen)
+{
+	if (NULL == pData || 0 == nDataLen)
 		return false;
-
-	size_t nMsgSize = sizeof(GameMsgHeader);
-	if (pData != NULL && nDataLen > 0)
-		nMsgSize += nDataLen;
-
-	unsigned char* pMsgBuffer = NULL;
-	if (nMsgSize > 1024)
-		pMsgBuffer = new unsigned char[nMsgSize];
-	else
-		pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
-
-	if (NULL == pMsgBuffer)
-		return false;
-
-	GameMsgHeader* pMsgHeader = (GameMsgHeader*)pMsgBuffer;
-	*pMsgHeader = *pHeader;
-	if (pData != NULL && nDataLen > 0)
-		::memcpy(pMsgHeader + 1, pData, nDataLen);
 
 	if (m_pMsgEncryptor != NULL)
-		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
+		m_pMsgEncryptor->encrypt((unsigned char*)pData, nDataLen);
 
-	sendData(id, pMsgBuffer, nMsgSize);
-
-	if (nMsgSize > 1024)
-		delete[] pMsgBuffer;
-
+	sendData(id, pData, nDataLen);
 	return true;
 }
 
-bool BaseGameServer::sendMsgToAll(GameMsgHeader* pHeader, void* pData /*= NULL*/, size_t nDataLen /*= 0*/)
+bool BaseGameServer::sendMsg(ClientId id, CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved /*= 0*/)
 {
-	if (NULL == pHeader)
-		return false;
-
-	size_t nMsgSize = sizeof(GameMsgHeader);
-	if (pData != NULL && nDataLen > 0)
-		nMsgSize += nDataLen;
-
-	unsigned char* pMsgBuffer = NULL;
-	if (nMsgSize > 1024)
-		pMsgBuffer = new unsigned char[nMsgSize];
-	else
-		pMsgBuffer = (unsigned char*)_alloca(nMsgSize);
-
-	if (NULL == pMsgBuffer)
-		return false;
-
-	GameMsgHeader* pMsgHeader = (GameMsgHeader*)pMsgBuffer;
-	*pMsgHeader = *pHeader;
-	if (pData != NULL && nDataLen > 0)
-		::memcpy(pMsgHeader + 1, pData, nDataLen);
+	GameMsgHeader header;
+	header.uMainId = uMainId;
+	header.uSubId = uSubId;
+	header.uReserved = uReserved;
 
 	if (m_pMsgEncryptor != NULL)
-		m_pMsgEncryptor->encrypt(pMsgBuffer, nMsgSize);
+		m_pMsgEncryptor->encrypt((unsigned char*)&header, sizeof(header));
 
-	sendDataToAll(pMsgBuffer, nMsgSize);
+	sendData(id, &header, sizeof(header));
+	return true;
+}
 
-	if (nMsgSize > 1024)
-		delete[] pMsgBuffer;
+bool BaseGameServer::sendMsgToAll(void* pData, size_t nDataLen)
+{
+	if (NULL == pData || 0 == nDataLen)
+		return false;
 
+	if (m_pMsgEncryptor != NULL)
+		m_pMsgEncryptor->encrypt((unsigned char*)pData, nDataLen);
+
+	sendDataToAll(pData, nDataLen);
+	return true;
+}
+
+bool BaseGameServer::sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved /*= 0*/)
+{
+	GameMsgHeader header;
+	header.uMainId = uMainId;
+	header.uSubId = uSubId;
+	header.uReserved = uReserved;
+
+	if (m_pMsgEncryptor != NULL)
+		m_pMsgEncryptor->encrypt((unsigned char*)&header, sizeof(header));
+
+	sendDataToAll(&header, sizeof(header));
 	return true;
 }
 
@@ -212,7 +193,7 @@ void BaseGameServer::setMsgEncryptor(IEzEncryptor* pEncryptor)
 	}
 }
 
-void BaseGameServer::onDefaultMsgHandler(ClientId id, GameMsgHeader* pHeader, void* pData, size_t nDataLen)
+void BaseGameServer::onDefaultMsgHandler(ClientId id, void* pData, size_t nDataLen)
 {
 
 }
