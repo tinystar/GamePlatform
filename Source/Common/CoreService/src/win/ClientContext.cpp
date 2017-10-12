@@ -160,15 +160,7 @@ bool ClientContext::closeClient(bool bGraceful)
 	while (!HasOverlappedIoCompleted(&m_recvIoContext.overlapped) && nWaitCount-- > 0)
 		::Sleep(0);
 
-	m_sendIoContext.reset();
-	m_recvIoContext.reset();
-
-	m_sendBuffer.reset();
-	m_recvBuffer.reset();
-
 	m_status = kClosed;
-
-	m_pUserData = NULL;
 
 	return true;
 }
@@ -207,4 +199,15 @@ const char* ClientContext::Status2String(Status status) const
 		break;
 	}
 	return pszStatus;
+}
+
+void ClientContext::reset()
+{
+	m_sendIoContext.reset();
+	m_recvIoContext.reset();
+
+	m_sendBuffer.reset();
+	m_recvBuffer.reset();
+
+	m_pUserData = NULL;
 }

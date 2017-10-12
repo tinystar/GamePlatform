@@ -82,6 +82,8 @@ public:
 	void dump(EzDumpContext& dc) const;
 	const char* Status2String(Status status) const;
 
+	void reset();
+
 private:
 	IClientSessionMgr*	m_pClientMgr;
 	Status				m_status;

@@ -17,16 +17,6 @@
 class TcpClientSocketImp
 {
 public:
-	enum Status
-	{
-		kInvalid = 0,
-		kCreated,
-		kConnecting,
-		kConnected,
-		kClosing
-	};
-
-public:
 	TcpClientSocketImp(TcpClientSocket* pApiObj, size_t nMaxPkgSize);
 	~TcpClientSocketImp();
 
@@ -34,12 +24,13 @@ public:
 	static void select(unsigned int nTimeOut);
 
 public:
-	SOCKET getSocket() { return m_hSocket; }
+	SOCKET getSocket() const { return m_hSocket; }
+	TcpClientSocket::Status getStatus() const { return m_sockStatus; }
 
-	bool create(bool bBlocking);
-	bool connect(const char* pszAddress, unsigned short uPort);
-	bool sendData(void* pData, size_t nDataLen);
-	void close();
+	int create(bool bBlocking);
+	int connect(const char* pszAddress, unsigned short uPort);
+	int sendData(void* pData, size_t nDataLen);
+	void close(int nErrCode = SEC_SUCCESS);
 
 public:
 	bool addEventHandler(ITcpClientSocketEventHandler* pEventHandler);
@@ -47,14 +38,17 @@ public:
 
 protected:
 	bool initBuffer(size_t nPkgSize);
+	void clearBuffer();
 	bool copyToSendBuf(void* pData, size_t nDataLen);
-	bool sendBlocking(void* pData, size_t nDataLen);
-	bool doSend();
-	bool doRecv();
+	int sendBlocking(void* pData, size_t nDataLen);
+	int doSend();
+	int doRecv();
 
 	void notifyConnectedEvent();
 	void notifyRecvedEvent(void* pPackage, size_t nSize);
-	void notifyClosedEvent();
+	void notifyClosedEvent(int nErrCode);
+
+	int translateErrCode(int nSysCode);
 
 protected:
 	typedef EzArray<ITcpClientSocketEventHandler*>	EventHandlerArray;
@@ -63,21 +57,21 @@ protected:
 	static SocketToClientMap	ms_SocketsMap;
 	static EzLock				ms_mapLock;
 
-	TcpClientSocket*	m_pApiObj;
-	size_t				m_nMaxPkgSize;
-	SOCKET				m_hSocket;
-	bool				m_bBlocking;
-	EventHandlerArray	m_EventHandlers;
-	char*				m_pSendBuffer;
-	size_t				m_nSendBufSize;
-	size_t				m_nSendBufUsed;
-	char*				m_pRecvBuffer;
-	size_t				m_nRecvBufSize;
-	size_t				m_nRecvBufUsed;
-	EzLock				m_sendLock;
-	Status				m_sockStatus;
-	EzLock				m_statusLock;
-	bool				m_bWaitSend;
+	TcpClientSocket*		m_pApiObj;
+	size_t					m_nMaxPkgSize;
+	SOCKET					m_hSocket;
+	bool					m_bBlocking;
+	EventHandlerArray		m_EventHandlers;
+	char*					m_pSendBuffer;
+	size_t					m_nSendBufSize;
+	size_t					m_nSendBufUsed;
+	char*					m_pRecvBuffer;
+	size_t					m_nRecvBufSize;
+	size_t					m_nRecvBufUsed;
+	EzLock					m_sendLock;
+	TcpClientSocket::Status	m_sockStatus;
+	EzLock					m_statusLock;
+	bool					m_bWaitSend;
 };
 
 #endif // __TCP_CLIENTSOCKET_IMP_H__

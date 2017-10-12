@@ -182,6 +182,7 @@ SVCErrorCode TcpServiceIocp::unInit()
 	m_nPackageSize = 0;
 
 	// delete all the client context node
+	m_ClientContextMgr.releaseClosedArray();
 	m_ClientContextMgr.clearFreeClientList();
 
 	m_bInitialized = false;
@@ -372,7 +373,8 @@ bool TcpServiceIocp::closeAndFreeClient(ClientContext* pClient, bool bGraceful)
 			if (pEventHandler)
 				pEventHandler->onClientClosed(pClient);
 		}
-		m_ClientContextMgr.freeClientContext(pClient);
+
+		m_ClientContextMgr.closeClientContext(pClient);
 	}
 
 	return true;
@@ -512,7 +514,7 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 	if (!EzVerify(bRet))
 	{
 		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
-		m_ClientContextMgr.freeClientContext(pClientCtx);
+		m_ClientContextMgr.closeAndFreeClientContext(pClientCtx);
 		return false;
 	}
 
@@ -520,7 +522,7 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 	if (!EzVerify(bRet))
 	{
 		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
-		m_ClientContextMgr.freeClientContext(pClientCtx);
+		m_ClientContextMgr.closeAndFreeClientContext(pClientCtx);
 		return false;
 	}
 
@@ -850,4 +852,14 @@ unsigned __stdcall TcpServiceIocp::sendToAllThread(void* pParam)
 	}
 
 	return 0;
+}
+
+void TcpServiceIocp::finalReleaseClient(ClientId id)
+{
+	if (id.isNull())
+		return;
+
+	ClientContext* pClient = (ClientContext*)id;
+	pClient->reset();
+	m_ClientContextMgr.freeClientContext(pClient);
 }

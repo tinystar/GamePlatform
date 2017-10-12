@@ -11,7 +11,7 @@ ClientContextMgr::ClientContextMgr()
 
 ClientContextMgr::~ClientContextMgr()
 {
-
+	releaseClosedArray();
 }
 
 ClientContext* ClientContextMgr::newClientContext()
@@ -40,7 +40,7 @@ ClientContext* ClientContextMgr::newClientContext()
 	return &pClientNode->value;
 }
 
-void ClientContextMgr::freeClientContext(ClientContext* pClient)
+void ClientContextMgr::closeClientContext(ClientContext* pClient)
 {
 	if (NULL == pClient)
 		return;
@@ -55,9 +55,39 @@ void ClientContextMgr::freeClientContext(ClientContext* pClient)
 	notifyIteratorsAfterRemove();						// notify iterators after remove node from the list.
 	m_ActiveListLock.unlock();
 
+	m_ClosedArrLock.lock();
+	m_ClosedArray.append(pClient);
+	m_ClosedArrLock.unlock();
+}
+
+void ClientContextMgr::freeClientContext(ClientContext* pClient)
+{
+	if (NULL == pClient)
+		return;
+
+	m_ClosedArrLock.lock();
+	int idx = m_ClosedArray.find(pClient);
+	if (idx < 0)
+	{
+		m_ClosedArrLock.unlock();
+		return;
+	}
+
+	m_ClosedArray.removeAt(idx);
+	m_ClosedArrLock.unlock();
+
+	ClientContextNode* pClientNode = CONTAINING_RECORD(pClient, ClientContextNode, value);
+	EzAssert(pClientNode != NULL);
+
 	m_FreeListLock.lock();
 	m_FreeClientList.push_back(pClientNode);
 	m_FreeListLock.unlock();
+}
+
+void ClientContextMgr::closeAndFreeClientContext(ClientContext* pClient)
+{
+	closeClientContext(pClient);
+	freeClientContext(pClient);
 }
 
 ClientCtxIterator* ClientContextMgr::newIterator() const
@@ -70,6 +100,18 @@ void ClientContextMgr::clearFreeClientList()
 	m_FreeListLock.lock();
 	m_FreeClientList.clear();
 	m_FreeListLock.unlock();
+}
+
+void ClientContextMgr::releaseClosedArray()
+{
+	m_ClosedArrLock.lock();
+	for (int i = 0; i < m_ClosedArray.logicalLength(); ++i)
+	{
+		ClientContextNode* pClientNode = CONTAINING_RECORD(m_ClosedArray[i], ClientContextNode, value);
+		delete pClientNode;
+	}
+	m_ClosedArray.removeAll();
+	m_ClosedArrLock.unlock();
 }
 
 void ClientContextMgr::attachIterator(ClientCtxIterator* pIter)

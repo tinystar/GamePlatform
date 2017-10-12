@@ -20,22 +20,27 @@ void TcpClientSocket::select(unsigned int nTimeOut)
 	TcpClientSocketImp::select(nTimeOut);
 }
 
-bool TcpClientSocket::create(bool bBlocking /*= true*/)
+int TcpClientSocket::create(bool bBlocking /*= true*/)
 {
 	return m_pClientSockImp->create(bBlocking);
 }
 
-SOCKET TcpClientSocket::getSocket()
+SOCKET TcpClientSocket::getSocket() const
 {
 	return m_pClientSockImp->getSocket();
 }
 
-bool TcpClientSocket::connect(const char* pszAddress, unsigned short uPort)
+TcpClientSocket::Status TcpClientSocket::getStatus() const
+{
+	return m_pClientSockImp->getStatus();
+}
+
+int TcpClientSocket::connect(const char* pszAddress, unsigned short uPort)
 {
 	return m_pClientSockImp->connect(pszAddress, uPort);
 }
 
-bool TcpClientSocket::sendData(void* pData, size_t nDataLen)
+int TcpClientSocket::sendData(void* pData, size_t nDataLen)
 {
 	return m_pClientSockImp->sendData(pData, nDataLen);
 }

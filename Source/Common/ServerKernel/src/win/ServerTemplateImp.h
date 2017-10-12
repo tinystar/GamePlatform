@@ -23,8 +23,8 @@ protected:
 	ServerTemplateImp(ServerTemplate* pApiObj);
 	virtual ~ServerTemplateImp();
 	
-	bool init();
-	bool unInit();
+	bool start();
+	bool stop();
 
 protected:
 	virtual void onClientConnected(ClientId id);
@@ -40,7 +40,7 @@ protected:
 
 	void handleQueueMsg();
 
-	void cleanQueueItemAbout(ClientId id);
+	bool queueUserItem(int itemId, void* pData, size_t nSize);
 
 protected:
 	ServerTemplate*				m_pApiObj;
@@ -50,6 +50,7 @@ protected:
 	HANDLE						m_hQuitEvent;
 	HANDLE						m_hMsgThread;
 	EzLock						m_queueLock;
+	bool						m_bRunning;
 };
 
 #endif // __SERVER_TEMPLATE_IMP_H__

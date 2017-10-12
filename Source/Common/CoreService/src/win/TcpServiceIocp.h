@@ -46,6 +46,8 @@ public:
 
 	virtual void dump(EzDumpContext& dc) const;
 
+	virtual void finalReleaseClient(ClientId id);
+
 	// IClientSessionMgr interfaces
 public:
 	virtual bool OnErrorOccurredNotify(ClientContext* pClient, SVCErrorCode errType, int iErrCode);

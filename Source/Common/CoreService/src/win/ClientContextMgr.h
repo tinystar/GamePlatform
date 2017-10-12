@@ -24,7 +24,9 @@ public:
 	~ClientContextMgr();
 
 	ClientContext* newClientContext();
+	void closeClientContext(ClientContext* pClient);
 	void freeClientContext(ClientContext* pClient);
+	void closeAndFreeClientContext(ClientContext* pClient);
 
 	size_t getClientCount() const { return m_ActiveClientList.size(); }
 	size_t getFreeCount() const { return m_FreeClientList.size(); }
@@ -32,6 +34,7 @@ public:
 	ClientCtxIterator* newIterator() const;
 
 	void clearFreeClientList();
+	void releaseClosedArray();
 
 private:
 	typedef EzDoublyLinkedList<ClientContext>	ClientContextList;
@@ -50,6 +53,8 @@ private:
 	EzLock						m_FreeListLock;
 	EzArray<ClientCtxIterator*>	m_iters;
 	EzLock						m_itersLock;
+	EzArray<ClientContext*>		m_ClosedArray;
+	EzLock						m_ClosedArrLock;
 };
 
 

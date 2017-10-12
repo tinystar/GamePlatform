@@ -39,9 +39,6 @@ SVCErrorCode ServerTemplate::init(const ServerInitConfig& serverConfig)
 	if (m_state & kInited)
 		return eOk;
 
-	if (!m_pServerImp->init())
-		return eSystemError;
-
 	SVCErrorCode ec = eOk;
 	if (serverConfig.uCreateFlags | kCreateTcpService)
 	{
@@ -96,8 +93,11 @@ SVCErrorCode ServerTemplate::init(const ServerInitConfig& serverConfig)
 
 	m_state |= kInited;
 
-	if (!onInit())
+	if (!onInit(serverConfig))
+	{
 		unInit();
+		return eNotApplicable;
+	}
 
 	return eOk;
 }
@@ -106,8 +106,6 @@ SVCErrorCode ServerTemplate::unInit()
 {
 	if (!(m_state & kInited))
 		return eOk;
-
-	m_pServerImp->unInit();
 
 	onUninit();
 
@@ -138,6 +136,9 @@ SVCErrorCode ServerTemplate::start()
 	if (m_state & kRunning)
 		return eOk;
 
+	if (!m_pServerImp->start())
+		return eSystemError;
+
 	SVCErrorCode ec = eOk;
 	if (m_pTcpService != NULL)
 		ec = m_pTcpService->start();
@@ -152,7 +153,10 @@ SVCErrorCode ServerTemplate::start()
 	{
 		m_state |= kRunning;
 		if (!onStart())
+		{
 			stop();
+			return eNotApplicable;
+		}
 	}
 
 	return ec;
@@ -164,6 +168,8 @@ SVCErrorCode ServerTemplate::stop()
 		return eOk;
 
 	onStop();
+
+	m_pServerImp->stop();
 
 	if (m_pTcpService != NULL)
 		m_pTcpService->stop();
@@ -219,4 +225,9 @@ TcpService* ServerTemplate::createTcpService() const
 TimerService* ServerTemplate::createTimerService() const
 {
 	return ::createTimerService();
+}
+
+bool ServerTemplate::queueUserItem(int itemId, void* pData, size_t nSize)
+{
+	return m_pServerImp->queueUserItem(itemId, pData, nSize);
 }

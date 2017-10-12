@@ -19,7 +19,8 @@ enum QueueItemType
 	kTypeClientConn,
 	kTypePackageRecv,
 	kTypeClientClose,
-	kTypeTimer
+	kTypeTimer,
+	kTypeUserItem
 };
 
 class QueueItemHead : public EzHeapOper
@@ -72,6 +73,33 @@ class QueueTimerMsg : public QueueItemHead
 {
 public:
 	EzUInt			uTimerId;
+
+	QueueTimerMsg()
+		: uTimerId(0)
+	{}
+};
+
+class QueueUserItemMsg : public QueueItemHead
+{
+public:
+	int				itemId;
+	void*			pItemData;
+	EzUInt32		uDataSize;
+
+	QueueUserItemMsg()
+		: itemId(0)
+		, pItemData(NULL)
+		, uDataSize(0)
+	{}
+
+	~QueueUserItemMsg()
+	{
+		if (pItemData != NULL)
+		{
+			delete[] pItemData;
+			pItemData = NULL;
+		}
+	}
 };
 
 #endif // __QUEUE_ITEM_DEF_H__

@@ -53,6 +53,13 @@ public:
 	SVCErrorCode start();
 	SVCErrorCode stop();
 
+public:
+	// add a user defined item to the producer/consumer queue.
+	// The item will be retrieved from the queue later and be
+	// dispatched through the 'onUserItemMsg' virtual function.
+	// You can override the virtual function to process the item.
+	bool queueUserItem(int itemId, void* pData, size_t nSize);
+
 protected:
 	bool setTimer(EzUInt uTimerId, EzUInt uElapse);
 	bool killTimer(EzUInt uTimerId);
@@ -67,7 +74,7 @@ protected:
 
 	// template methods
 protected:
-	virtual bool onInit() { return true; }
+	virtual bool onInit(const ServerInitConfig&) { return true; }
 	virtual bool onUninit() { return true; }
 	virtual bool onStart() { return true; }
 	virtual bool onStop() { return true; }
@@ -79,6 +86,8 @@ protected:
 	virtual void onTcpClientCloseMsg(ClientId id) = 0;
 
 	virtual void onTimerMsg(EzUInt uTimerId) = 0;
+
+	virtual void onUserItemMsg(int itemId, void* pData, size_t nSize) = 0;
 
 protected:
 	ServerTemplateImp*		m_pServerImp;

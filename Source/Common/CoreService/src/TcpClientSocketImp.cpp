@@ -15,7 +15,7 @@ TcpClientSocketImp::TcpClientSocketImp(TcpClientSocket* pApiObj, size_t nMaxPkgS
 	, m_pRecvBuffer(NULL)
 	, m_nRecvBufSize(0)
 	, m_nRecvBufUsed(0)
-	, m_sockStatus(kInvalid)
+	, m_sockStatus(TcpClientSocket::kInvalid)
 	, m_bBlocking(true)
 	, m_bWaitSend(false)
 {
@@ -25,8 +25,6 @@ TcpClientSocketImp::TcpClientSocketImp(TcpClientSocket* pApiObj, size_t nMaxPkgS
 TcpClientSocketImp::~TcpClientSocketImp()
 {
 	close();
-	EZ_SAFE_DELETE_ARRAY(m_pSendBuffer);
-	EZ_SAFE_DELETE_ARRAY(m_pRecvBuffer);
 }
 
 void TcpClientSocketImp::select(unsigned int nTimeOut)
@@ -38,6 +36,12 @@ void TcpClientSocketImp::select(unsigned int nTimeOut)
 	FD_ZERO(&fdWrite);
 
 	ms_mapLock.lock();
+	if (ms_SocketsMap.empty())
+	{
+		ms_mapLock.unlock();
+		return;
+	}
+
 	EzArray<SOCKET> selSocks(ms_SocketsMap.size());
 	SocketToClientMap::iterator iter = ms_SocketsMap.begin();
 	while (iter != ms_SocketsMap.end())
@@ -45,7 +49,7 @@ void TcpClientSocketImp::select(unsigned int nTimeOut)
 		selSocks.append(iter->first);
 		FD_SET(iter->first, &fdRead);
 		TcpClientSocketImp* pClientImp = iter->second;
-		if (pClientImp->m_sockStatus == kConnecting ||
+		if (pClientImp->m_sockStatus == TcpClientSocket::kConnecting ||
 			pClientImp->m_bWaitSend)
 		{
 			FD_SET(iter->first, &fdWrite);
@@ -66,7 +70,10 @@ void TcpClientSocketImp::select(unsigned int nTimeOut)
 			ms_mapLock.lock();
 			SocketToClientMap::iterator iter = ms_SocketsMap.find(s);
 			if (iter == ms_SocketsMap.end())
+			{
+				ms_mapLock.unlock();
 				continue;
+			}
 			TcpClientSocketImp* pClientImp = iter->second;
 			ms_mapLock.unlock();
 
@@ -78,21 +85,23 @@ void TcpClientSocketImp::select(unsigned int nTimeOut)
 	}
 }
 
-bool TcpClientSocketImp::create(bool bBlocking)
+int TcpClientSocketImp::create(bool bBlocking)
 {
 	if (m_hSocket != INVALID_SOCKET)
-		return false;
+		return SEC_SUCCESS;
 
 	m_bBlocking = bBlocking;
 
 	if (!initBuffer(m_nMaxPkgSize))
-		return false;
+		return SEC_INTERNAL;
 
 	m_hSocket = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (!EzVerify(m_hSocket != INVALID_SOCKET))
 	{
-		EzLogError(_T("TcpClientSocketImp::create create socket failed! error code = %d\n"), ::WSAGetLastError());
-		return false;
+		int wsaCode = ::WSAGetLastError();
+		EzLogError(_T("TcpClientSocketImp::create create socket failed! error code = %d\n"), wsaCode);
+		clearBuffer();
+		return translateErrCode(wsaCode);
 	}
 
 	if (!bBlocking)
@@ -102,29 +111,32 @@ bool TcpClientSocketImp::create(bool bBlocking)
 		int nRet = ::ioctlsocket(m_hSocket, FIONBIO, &mode);
 		if (!EzVerify(nRet == 0))
 		{
-			close();
-			EzLogError(_T("convert socket to non-blocking mode failed! error code = %d\n"), ::WSAGetLastError());
-			return false;
+			int wsaCode = ::WSAGetLastError();
+			int errCode = translateErrCode(wsaCode);
+			close(errCode);
+			EzLogError(_T("convert socket to non-blocking mode failed! error code = %d\n"), wsaCode);
+			return errCode;
 		}
 #else
 		// todo
 #endif
 	}
 
-	m_sockStatus = kCreated;
+	m_sockStatus = TcpClientSocket::kCreated;
 	ms_mapLock.lock();
 	ms_SocketsMap.insert(std::make_pair(m_hSocket, this));
 	ms_mapLock.unlock();
-	return true;
+
+	return SEC_SUCCESS;
 }
 
-bool TcpClientSocketImp::connect(const char* pszAddress, unsigned short uPort)
+int TcpClientSocketImp::connect(const char* pszAddress, unsigned short uPort)
 {
 	if (INVALID_SOCKET == m_hSocket)
-		return false;
+		return SEC_INVALIDSOCK;
 
 	if (NULL == pszAddress || 0 == *pszAddress)
-		return false;
+		return SEC_INVALIDPARAM;
 
 	sockaddr_in serverAddr;
 	::memset(&serverAddr, 0, sizeof(serverAddr));
@@ -135,33 +147,34 @@ bool TcpClientSocketImp::connect(const char* pszAddress, unsigned short uPort)
 	int nRet = ::connect(m_hSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
 	if (nRet != 0)
 	{
-		if (WSAEWOULDBLOCK == ::WSAGetLastError())
+		int wsaErr = ::WSAGetLastError();
+		if (WSAEWOULDBLOCK == wsaErr)
 		{
-			m_sockStatus = kConnecting;
-			return true;
+			m_sockStatus = TcpClientSocket::kConnecting;
+			return SEC_WOULDBLOCK;
 		}
 		else
 		{
-			return false;
+			return translateErrCode(wsaErr);
 		}
 	}
 
-	m_sockStatus = kConnected;
+	m_sockStatus = TcpClientSocket::kConnected;
 	notifyConnectedEvent();
 
-	return true;
+	return SEC_SUCCESS;
 }
 
-bool TcpClientSocketImp::sendData(void* pData, size_t nDataLen)
+int TcpClientSocketImp::sendData(void* pData, size_t nDataLen)
 {
 	if (INVALID_SOCKET == m_hSocket)
-		return false;
+		return SEC_INVALIDSOCK;
 
 	if (NULL == pData || 0 == nDataLen)
-		return false;
+		return SEC_INVALIDPARAM;
 
 	if (nDataLen > m_nMaxPkgSize)
-		return false;
+		return SEC_INVALIDPKG;
 
 	if (m_bBlocking)
 	{
@@ -170,22 +183,22 @@ bool TcpClientSocketImp::sendData(void* pData, size_t nDataLen)
 	else
 	{
 		if (!copyToSendBuf(pData, nDataLen))
-			return false;
+			return SEC_BUFNOTENOUGH;
 
 		return doSend();
 	}
 }
 
-void TcpClientSocketImp::close()
+void TcpClientSocketImp::close(int nErrCode /*= SEC_SUCCESS*/)
 {
 	m_statusLock.lock();
-	if (kClosing == m_sockStatus)
+	if (TcpClientSocket::kClosing == m_sockStatus)
 	{
 		m_statusLock.unlock();
 		return;
 	}
 
-	m_sockStatus = kClosing;
+	m_sockStatus = TcpClientSocket::kClosing;
 	m_statusLock.unlock();
 
 	if (m_hSocket != INVALID_SOCKET)
@@ -198,10 +211,12 @@ void TcpClientSocketImp::close()
 
 		::closesocket(m_hSocket);
 		m_hSocket = INVALID_SOCKET;
-		notifyClosedEvent();
+		notifyClosedEvent(nErrCode);
 	}
 
-	m_sockStatus = kInvalid;
+	clearBuffer();
+
+	m_sockStatus = TcpClientSocket::kInvalid;
 }
 
 bool TcpClientSocketImp::addEventHandler(ITcpClientSocketEventHandler* pEventHandler)
@@ -247,6 +262,12 @@ bool TcpClientSocketImp::initBuffer(size_t nPkgSize)
 	return true;
 }
 
+void TcpClientSocketImp::clearBuffer()
+{
+	EZ_SAFE_DELETE_ARRAY(m_pSendBuffer);
+	EZ_SAFE_DELETE_ARRAY(m_pRecvBuffer);
+}
+
 bool TcpClientSocketImp::copyToSendBuf(void* pData, size_t nDataLen)
 {
 	EzAutoLocker _locker(&m_sendLock);
@@ -265,53 +286,59 @@ bool TcpClientSocketImp::copyToSendBuf(void* pData, size_t nDataLen)
 	return true;
 }
 
-bool TcpClientSocketImp::sendBlocking(void* pData, size_t nDataLen)
+int TcpClientSocketImp::sendBlocking(void* pData, size_t nDataLen)
 {
 	TcpPackageHeader header;
 	header.uPackageSize = nDataLen;
 	int nRet = ::send(m_hSocket, (const char*)&header, sizeof(header), 0);
 	if (SOCKET_ERROR == nRet)
 	{
-		close();
-		return false;
+		int nWsaErr = ::WSAGetLastError();
+		int errCode = translateErrCode(nWsaErr);
+		close(errCode);
+		return errCode;
 	}
 
 	nRet = ::send(m_hSocket, (const char*)pData, nDataLen, 0);
 	if (SOCKET_ERROR == nRet)
 	{
-		close();
-		return false;
+		int nWsaErr = ::WSAGetLastError();
+		int errCode = translateErrCode(nWsaErr);
+		close(errCode);
+		return errCode;
 	}
 
-	return true;
+	return SEC_SUCCESS;
 }
 
-bool TcpClientSocketImp::doSend()
+int TcpClientSocketImp::doSend()
 {
 	EzAutoLocker _locker(&m_sendLock);
 
-	if (kConnecting == m_sockStatus)
+	if (TcpClientSocket::kConnecting == m_sockStatus)
 	{
-		m_sockStatus = kConnected;
+		m_sockStatus = TcpClientSocket::kConnected;
 		notifyConnectedEvent();
-		return true;
+		return SEC_SUCCESS;
 	}
 
 	if (m_nSendBufUsed <= 0)
-		return true;
+		return SEC_SUCCESS;
 
 	int nRet = ::send(m_hSocket, m_pSendBuffer, m_nSendBufUsed, 0);
 	if (SOCKET_ERROR == nRet)
 	{
-		if (WSAEWOULDBLOCK == ::WSAGetLastError())
+		int wsaErr = ::WSAGetLastError();
+		if (WSAEWOULDBLOCK == wsaErr)
 		{
 			m_bWaitSend = true;
-			return true;
+			return SEC_WOULDBLOCK;
 		}
 		else
 		{
-			close();
-			return false;
+			int errCode = translateErrCode(wsaErr);
+			close(errCode);
+			return errCode;
 		}
 	}
 
@@ -326,30 +353,32 @@ bool TcpClientSocketImp::doSend()
 		m_nSendBufUsed = 0;
 	}
 
-	return true;
+	return SEC_SUCCESS;
 }
 
-bool TcpClientSocketImp::doRecv()
+int TcpClientSocketImp::doRecv()
 {
 	do
 	{
 		int nRet = ::recv(m_hSocket, m_pRecvBuffer + m_nRecvBufUsed, m_nRecvBufSize - m_nRecvBufUsed, 0);
 		if (SOCKET_ERROR == nRet)
 		{
-			if (WSAEWOULDBLOCK == ::WSAGetLastError())
+			int nWsaErr = ::WSAGetLastError();
+			if (WSAEWOULDBLOCK == nWsaErr)
 			{
-				return true;
+				return SEC_WOULDBLOCK;
 			}
 			else
 			{
-				close();
-				return false;
+				int errCode = translateErrCode(nWsaErr);
+				close(errCode);
+				return errCode;
 			}
 		}
 		else if (0 == nRet)
 		{
-			close();
-			return false;
+			close(SEC_CLOSEDBYPEER);
+			return SEC_CLOSEDBYPEER;
 		}
 
 		m_nRecvBufUsed += nRet;
@@ -396,12 +425,59 @@ void TcpClientSocketImp::notifyRecvedEvent(void* pPackage, size_t nSize)
 	}
 }
 
-void TcpClientSocketImp::notifyClosedEvent()
+void TcpClientSocketImp::notifyClosedEvent(int nErrCode)
 {
 	for (int i = 0; i < m_EventHandlers.logicalLength(); ++i)
 	{
 		ITcpClientSocketEventHandler* pEventHandler = m_EventHandlers[i];
 		if (pEventHandler)
-			pEventHandler->onSocketClosed(m_pApiObj);
+			pEventHandler->onSocketClosed(m_pApiObj, nErrCode);
 	}
+}
+
+int TcpClientSocketImp::translateErrCode(int nSysCode)
+{
+	switch (nSysCode)
+	{
+	case WSAEWOULDBLOCK:
+		return SEC_WOULDBLOCK;
+	case WSAENETDOWN:
+		return SEC_NETDOWN;
+	case WSAEINTR:
+		return SEC_INTR;
+	case WSAEADDRINUSE:
+		return SEC_ADDRINUSE;
+	case WSAEINPROGRESS:
+		return SEC_INPROGRESS;
+	case WSAEALREADY:
+		return SEC_ALREADY;
+	case WSAEADDRNOTAVAIL:
+		return SEC_ADDRNOTAVAIL;
+	case WSAEAFNOSUPPORT:
+		return SEC_AFNOSUPPORT;
+	case WSAECONNREFUSED:
+		return SEC_CONNREFUSED;
+	case WSAEFAULT:
+		return SEC_FAULT;
+	case WSAEINVAL:
+		return SEC_INVAL;
+	case WSAEISCONN:
+		return SEC_ISCONN;
+	case WSAENETUNREACH:
+		return SEC_NETUNREACH;
+	case WSAENOBUFS:
+		return SEC_NOBUFS;
+	case WSAENOTSOCK:
+		return SEC_NOTSOCK;
+	case WSAETIMEDOUT:
+		return SEC_TIMEDOUT;
+	case WSAEACCES:
+		return SEC_ACCES;
+	case WSAECONNABORTED:
+		return SEC_CONNABORTED;
+	case WSAECONNRESET:
+		return SEC_CONNRESET;
+	}
+
+	return SEC_UNKNOWN;
 }

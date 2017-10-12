@@ -11,15 +11,16 @@ ServerTemplateImp::ServerTemplateImp(ServerTemplate* pApiObj)
 	, m_hSemaphore(NULL)
 	, m_hQuitEvent(NULL)
 	, m_hMsgThread(NULL)
+	, m_bRunning(false)
 {
 }
 
 ServerTemplateImp::~ServerTemplateImp()
 {
-	unInit();
+	stop();
 }
 
-bool ServerTemplateImp::init()
+bool ServerTemplateImp::start()
 {
 	m_hSemaphore = ::CreateSemaphore(NULL, 0, MAX_MSG_COUNT, NULL);
 	if (!EzVerify(m_hSemaphore != NULL))
@@ -43,11 +44,13 @@ bool ServerTemplateImp::init()
 		return false;
 	}
 
+	m_bRunning = true;
 	return true;
 }
 
-bool ServerTemplateImp::unInit()
+bool ServerTemplateImp::stop()
 {
+	m_bRunning = false;
 	if (m_hMsgThread != NULL)
 	{
 		EzAssert(m_hQuitEvent != NULL);
@@ -77,6 +80,9 @@ bool ServerTemplateImp::unInit()
 
 void ServerTemplateImp::onClientConnected(ClientId id)
 {
+	if (!m_bRunning)
+		return;
+
 	QueueClientConnMsg* pClientConn = new QueueClientConnMsg();
 	if (!EzVerify(pClientConn != NULL))
 	{
@@ -92,6 +98,9 @@ void ServerTemplateImp::onClientConnected(ClientId id)
 
 void ServerTemplateImp::onPackageReceived(ClientId id, void* pPackage, size_t nSize)
 {
+	if (!m_bRunning)
+		return;
+
 	QueuePackageRecvMsg* pPkgRecv = new QueuePackageRecvMsg();
 	if (!EzVerify(pPkgRecv != NULL))
 	{
@@ -110,7 +119,8 @@ void ServerTemplateImp::onPackageReceived(ClientId id, void* pPackage, size_t nS
 
 void ServerTemplateImp::onClientClosed(ClientId id)
 {
-	cleanQueueItemAbout(id);
+	if (!m_bRunning)
+		return;
 
 	QueueClientCloseMsg* pClientClose = new QueueClientCloseMsg();
 	if (!EzVerify(pClientClose != NULL))
@@ -127,6 +137,9 @@ void ServerTemplateImp::onClientClosed(ClientId id)
 
 void ServerTemplateImp::onTimerMessage(EzUInt uTimerId)
 {
+	if (!m_bRunning)
+		return;
+
 	QueueTimerMsg* pTimerMsg = new QueueTimerMsg();
 	if (!EzVerify(pTimerMsg != NULL))
 	{
@@ -211,12 +224,20 @@ void ServerTemplateImp::handleQueueMsg()
 		{
 			QueueClientCloseMsg* pClientClose = (QueueClientCloseMsg*)pItem;
 			m_pApiObj->onTcpClientCloseMsg(pClientClose->clientId);
+
+			m_pApiObj->m_pTcpService->finalReleaseClient(pClientClose->clientId);
 		}
 		break;
 	case kTypeTimer:
 		{
 			QueueTimerMsg* pTimerMsg = (QueueTimerMsg*)pItem;
 			m_pApiObj->onTimerMsg(pTimerMsg->uTimerId);
+		}
+		break;
+	case kTypeUserItem:
+		{
+			QueueUserItemMsg* pUserItem = (QueueUserItemMsg*)pItem;
+			m_pApiObj->onUserItemMsg(pUserItem->itemId, pUserItem->pItemData, pUserItem->uDataSize);
 		}
 		break;
 	default:
@@ -227,41 +248,23 @@ void ServerTemplateImp::handleQueueMsg()
 	delete pItem;
 }
 
-// the ClientContext will be reused immediately after it was closed, but the queue
-// may remain some items associated with the ClientContext, if these item continue to
-// be processed, that will cause problems. So we should clean these items when associated
-// ClientContext was closed.Another possible solution is to use reference count to manage
-// the life cycle of the ClientContext.
-void ServerTemplateImp::cleanQueueItemAbout(ClientId id)
+bool ServerTemplateImp::queueUserItem(int itemId, void* pData, size_t nSize)
 {
-	m_queueLock.lock();
-	list<QueueItemHead*>::iterator iter = m_msgQueue.begin();
-	while (iter != m_msgQueue.end())
+	if (!m_bRunning)
+		return false;
+
+	QueueUserItemMsg* pUserItem = new QueueUserItemMsg();
+	if (!EzVerify(pUserItem != NULL))
 	{
-		bool bNeedErase = false;
-
-		QueueItemHead* pItem = *iter;
-		if (kTypeClientConn == pItem->uItemType)
-		{
-			QueueClientConnMsg* pClientConn = (QueueClientConnMsg*)pItem;
-			if (id == pClientConn->clientId)
-				bNeedErase = true;
-		}
-		else if (kTypePackageRecv == pItem->uItemType)
-		{
-			QueuePackageRecvMsg* pPkgRecv = (QueuePackageRecvMsg*)pItem;
-			if (id == pPkgRecv->clientId)
-				bNeedErase = true;
-		}
-
-		if (bNeedErase)
-		{
-			delete pItem;
-			iter = m_msgQueue.erase(iter);
-			continue;
-		}
-
-		++iter;
+		EzLogError(_T("create QueueUserItemMsg failed, maybe memory is not enough!\n"));
+		return false;
 	}
-	m_queueLock.unlock();
+
+	pUserItem->uItemType = kTypeUserItem;
+	pUserItem->itemId = itemId;
+	pUserItem->uDataSize = (EzUInt32)nSize;
+	pUserItem->pItemData = new char[nSize];
+	::memcpy(pUserItem->pItemData, pData, nSize);
+
+	return addQueueItem(pUserItem);
 }

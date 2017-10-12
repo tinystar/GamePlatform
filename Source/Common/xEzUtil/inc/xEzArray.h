@@ -37,6 +37,7 @@ public:
 template<typename T>
 class EzArrayObjectCopyReallocator
 {
+public:
 	static void reallocateArray(T* pCopy, const T* pSource, int nCount)
 	{
 		EzAssert(nCount >= 0);

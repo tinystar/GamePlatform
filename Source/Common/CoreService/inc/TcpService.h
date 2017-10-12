@@ -83,6 +83,14 @@ public:
 	// for debug
 	virtual void dump(EzDumpContext& dc) const = 0;
 
+	// used in ServerKernel module.The producer and consumer model is used in ServerKernel module to
+	// improve the efficiency of IO.When a client is closed, the closed event notification is appended
+	// to the queue.We can't release the client context that associated with the client specified by the id
+	// parameter until the closed event notification has been processed.
+	// This function is been designed to release the client context after the client's closed event 
+	// notification has been processed.
+	virtual void finalReleaseClient(ClientId id) = 0;
+
 public:
 	bool addEventHandler(ITcpServiceEventHandler* pEventHandler);
 	bool removeEventHandler(ITcpServiceEventHandler* pEventHandler);
