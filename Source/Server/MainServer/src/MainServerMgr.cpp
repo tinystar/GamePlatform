@@ -11,20 +11,13 @@ using namespace rapidjson;
 
 MainServerMgr::MainServerMgr()
 	: m_bDebugMode(false)
-	, m_logLevel(kLogAll)
-	, m_sGatePort(0)
-	, m_sDBPort(0)
 {
 	m_tcpConfig.sPort = DEF_MAINSVR_PORT;
 	m_tcpConfig.nMaxPackageSize = DEF_PACKAGE_SIZE;
-	::memset(m_szGateAddr, 0, sizeof(m_szGateAddr));
-	::memset(m_szDBAddr, 0, sizeof(m_szDBAddr));
 }
 
 SVCErrorCode MainServerMgr::initServer()
 {
-	EzLogger::setLogLevel(m_logLevel);
-
 	ServerInitConfig initCfg;
 	initCfg.tcpConfig = m_tcpConfig;
 	return m_server.init(initCfg);
@@ -71,53 +64,58 @@ bool MainServerMgr::loadConfig()
 	doc.ParseStream(is);
 
 	m_bDebugMode = doc["debugMode"].GetBool();
-	m_logLevel = (LogLevel)doc["logLevel"].GetInt();
+	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
+	unsigned int uMaxUser = doc["maxUser"].GetUint();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
 	m_tcpConfig.nSockThreadCnt = tcpCfg["threadCount"].GetUint();
 	m_tcpConfig.nMaxAcceptCnt = tcpCfg["acceptCount"].GetUint();
 	m_tcpConfig.nMaxPackageSize = tcpCfg["pkgSize"].GetUint();
 	const Value& gateSvrCfg = doc["GateSvrAddr"];
-	strncpy(m_szGateAddr, gateSvrCfg["addr"].GetString(), 20);
-	m_sGatePort = (unsigned short)gateSvrCfg["port"].GetInt();
+	const char* pszGateAddr = gateSvrCfg["addr"].GetString();
+	unsigned short sGatePort = (unsigned short)gateSvrCfg["port"].GetInt();
 	const Value& DBSvrCfg = doc["DBSvrAddr"];
-	strncpy(m_szDBAddr, DBSvrCfg["addr"].GetString(), 20);
-	m_sDBPort = (unsigned short)DBSvrCfg["port"].GetInt();
+	const char* pszDBAddr = DBSvrCfg["addr"].GetString();
+	unsigned short sDBPort = (unsigned short)DBSvrCfg["port"].GetInt();
+
+	EzLogger::setLogLevel(logLevel);
+
+	m_server.setMaxUser(uMaxUser);
+	m_server.setGateSvrAddr(pszGateAddr, sGatePort);
+	m_server.setDBSvrAddr(pszDBAddr, sDBPort);
 
 	return true;
 }
 
 void MainServerMgr::setGateSvrAddr(const char* pszAddr, unsigned short sPort)
 {
-	strncpy(m_szGateAddr, pszAddr, 20);
-	m_sGatePort = sPort;
 	m_server.setGateSvrAddr(pszAddr, sPort);
 }
 
-bool MainServerMgr::getGateSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort)
+bool MainServerMgr::getGateSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort) const
 {
-	if (strlen(m_szGateAddr) >= nSize)
+	const char* pszIP = m_server.getGateSvrIP();
+	if (strlen(pszIP) >= nSize)
 		return false;
 
-	strncpy(pszAddr, m_szGateAddr, strlen(m_szGateAddr));
-	pszAddr[strlen(m_szGateAddr)] = 0;
-	sPort = m_sGatePort;
+	strncpy(pszAddr, pszIP, strlen(pszIP));
+	pszAddr[strlen(pszIP)] = 0;
+	sPort = m_server.getGateSvrPort();
 	return true;
 }
 
 void MainServerMgr::setDBSvrAddr(const char* pszAddr, unsigned short sPort)
 {
-	strncpy(m_szDBAddr, pszAddr, 20);
-	m_sDBPort = sPort;
 	m_server.setDBSvrAddr(pszAddr, sPort);
 }
 
-bool MainServerMgr::getDBSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort)
+bool MainServerMgr::getDBSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort) const
 {
-	if (strlen(m_szDBAddr) >= nSize)
+	const char* pszIP = m_server.getDBSvrIP();
+	if (strlen(pszIP) >= nSize)
 		return false;
 
-	strncpy(pszAddr, m_szDBAddr, strlen(m_szDBAddr));
-	sPort = m_sDBPort;
+	strncpy(pszAddr, pszIP, strlen(pszIP));
+	sPort = m_server.getDBSvrPort();
 	return true;
 }

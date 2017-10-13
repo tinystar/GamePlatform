@@ -36,6 +36,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
 	ON_WM_TIMER()
+	ON_WM_DESTROY()
 	ON_BN_CLICKED(ID_BTN_START, &CChildView::OnBtnStartClick)
 	ON_BN_CLICKED(ID_BTN_DUMP, &CChildView::OnBtnDumpClick)
 	ON_BN_CLICKED(ID_BTN_UPDCFG, &CChildView::OnBtnUpdCfgClick)
@@ -200,8 +201,15 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	{
 		::PostMessage(GetParent()->GetSafeHwnd(), WM_FIRST_STARTSVR, 0, 0);
 		KillTimer(IDT_FIRST_STARTSVR);
+		return;
 	}
 
 	CWnd::OnTimer(nIDEvent);
 }
 
+void CChildView::OnDestroy()
+{
+	m_gateSvrMgr.stopServer();
+	m_gateSvrMgr.unInitServer();
+	CWnd::OnDestroy();
+}

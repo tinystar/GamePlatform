@@ -12,7 +12,7 @@ DBServer::~DBServer()
 
 }
 
-bool DBServer::onInit()
+bool DBServer::onInit(const ServerInitConfig&)
 {
 	return true;
 }

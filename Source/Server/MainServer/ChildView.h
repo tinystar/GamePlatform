@@ -46,6 +46,7 @@ protected:
 	afx_msg void OnBtnUpdCfgClick();
 	afx_msg void OnBtnOpenDirClick();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 	DECLARE_MESSAGE_MAP()
 
 protected:
@@ -65,6 +66,8 @@ protected:
 	CStatic					m_DBPortLabel;
 	CEdit					m_DBAddrEdit;
 	CEdit					m_DBPortEdit;
+	CStatic					m_maxUserLabel;
+	CEdit					m_maxUserEdit;
 	CFont					m_font;
 	BOOL					m_bFirstStart;
 };

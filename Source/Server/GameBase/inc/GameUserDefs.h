@@ -10,12 +10,22 @@
 #ifndef __GAME_USER_DEFS_H__
 #define __GAME_USER_DEFS_H__
 
-#include <string>
+#include "xEzTypes.h"
 
-struct GameUser
+class GameUser
 {
-	unsigned int		uId;
-	std::string			sName;
+public:
+	GameUser();
+
+	EzUInt32 getUserId() const { return uId; }
+	bool setUserId(EzUInt32 id);
+
+	const char* getUserName() const { return szName; }
+	bool setUserName(const char* pszName);
+
+protected:
+	EzUInt32			uId;
+	char				szName[256];
 };
 
 #endif // __GAME_USER_DEFS_H__

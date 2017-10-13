@@ -53,6 +53,9 @@
     <ClInclude Include="..\UIComm\win\TrayIcon.h">
       <Filter>mfc\inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\MainServerList.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp">
@@ -75,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
       <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainServerList.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

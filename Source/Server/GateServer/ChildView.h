@@ -46,6 +46,7 @@ protected:
 	afx_msg void OnBtnUpdCfgClick();
 	afx_msg void OnBtnOpenDirClick();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 	DECLARE_MESSAGE_MAP()
 
 protected:

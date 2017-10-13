@@ -11,6 +11,7 @@
 #define __GATE_SERVER_H__
 
 #include "BaseGameServer.h"
+#include "MainServerList.h"
 
 class GateServer : public BaseGameServer
 {
@@ -18,14 +19,34 @@ public:
 	GateServer();
 	virtual ~GateServer();
 
+public:
+	const char* getVersion() const { return m_szVersion; }
+	bool setVersion(const char* pszVer);
+
+	const char* getUpdUrl() const { return m_szUpdUrl; }
+	bool setUpdUrl(const char* pszUrl);
+
 protected:
-	virtual bool onInit();
+	virtual bool onInit(const ServerInitConfig&);
 	virtual bool onUninit();
 	virtual bool onStart();
 	virtual bool onStop();
 
 protected:
-	virtual void onDefaultMsgHandler(ClientId id, GameMsgHeader* pHeader, void* pData, size_t nDataLen);
+	virtual void onTcpClientCloseMsg(ClientId id);
+
+protected:
+	void onRequestConfig(ClientId id, void* pData, size_t nDataLen);
+	void onRequestMainAddr(ClientId id, void* pData, size_t nDataLen);
+
+	void onMainConnect(ClientId id, void* pData, size_t nDataLen);
+
+protected:
+	static NetMsgMapEntry s_msgMapArray[];
+
+	MainServerList		m_mainSvrList;
+	char				m_szVersion[16];
+	char				m_szUpdUrl[256];
 };
 
 #endif // __GATE_SERVER_H__

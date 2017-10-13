@@ -11,7 +11,6 @@ using namespace rapidjson;
 
 DBServerMgr::DBServerMgr()
 	: m_bDebugMode(false)
-	, m_logLevel(kLogAll)
 {
 	m_tcpConfig.sPort = DEF_DBSVR_PORT;
 	m_tcpConfig.nMaxPackageSize = DEF_PACKAGE_SIZE;
@@ -21,8 +20,6 @@ SVCErrorCode DBServerMgr::initServer()
 {
 	if (!EzVerify(loadConfig()))
 		return eNotApplicable;
-
-	EzLogger::setLogLevel(m_logLevel);
 
 	ServerInitConfig initCfg;
 	initCfg.tcpConfig = m_tcpConfig;
@@ -70,12 +67,14 @@ bool DBServerMgr::loadConfig()
 	doc.ParseStream(is);
 
 	m_bDebugMode = doc["debugMode"].GetBool();
-	m_logLevel = (LogLevel)doc["logLevel"].GetInt();
+	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
 	m_tcpConfig.nSockThreadCnt = tcpCfg["threadCount"].GetUint();
 	m_tcpConfig.nMaxAcceptCnt = tcpCfg["acceptCount"].GetUint();
 	m_tcpConfig.nMaxPackageSize = tcpCfg["pkgSize"].GetUint();
+
+	EzLogger::setLogLevel(logLevel);
 
 	return true;
 }

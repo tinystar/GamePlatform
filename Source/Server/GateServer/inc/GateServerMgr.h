@@ -11,7 +11,6 @@
 #define __GATE_SERVER_MGR_H__
 
 #include "GateServer.h"
-#include <string>
 
 class GateServerMgr
 {
@@ -24,8 +23,9 @@ public:
 	SVCErrorCode startServer();
 	SVCErrorCode stopServer();
 
-	unsigned short getPort() { return m_tcpConfig.sPort; }
-	std::string getVersion() { return m_sVersion; }
+	unsigned short getPort() const { return m_tcpConfig.sPort; }
+	const char* getVersion() const { return m_server.getVersion(); }
+	const char* getUpdUrl() const { return m_server.getUpdUrl(); }
 
 protected:
 	bool loadConfig();
@@ -34,8 +34,6 @@ protected:
 	GateServer		m_server;
 
 	bool			m_bDebugMode;
-	std::string		m_sVersion;
-	LogLevel		m_logLevel;
 	TcpConfig		m_tcpConfig;
 };
 

@@ -11,7 +11,6 @@
 #define __MAIN_SERVER_MGR_H__
 
 #include "MainServer.h"
-#include <string>
 
 class MainServerMgr
 {
@@ -26,25 +25,23 @@ public:
 
 	bool loadConfig();
 
-	unsigned short getPort() { return m_tcpConfig.sPort; }
+	unsigned short getPort() const { return m_tcpConfig.sPort; }
 	void setPort(unsigned short sPort) { m_tcpConfig.sPort = sPort; }
 	
 	void setGateSvrAddr(const char* pszAddr, unsigned short sPort);
-	bool getGateSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort);
+	bool getGateSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort) const;
 
 	void setDBSvrAddr(const char* pszAddr, unsigned short sPort);
-	bool getDBSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort);
+	bool getDBSvrAddr(char* pszAddr, size_t nSize, unsigned short& sPort) const;
+
+	void setMaxUser(unsigned int uMax) { return m_server.setMaxUser(uMax); }
+	unsigned int getMaxUser() const { return m_server.getMaxUser(); }
 
 protected:
 	MainServer			m_server;
 
 	bool				m_bDebugMode;
-	LogLevel			m_logLevel;
 	TcpConfig			m_tcpConfig;
-	char				m_szGateAddr[20];
-	char				m_szDBAddr[20];
-	unsigned short		m_sGatePort;
-	unsigned short		m_sDBPort;
 };
 
 #endif // __MAIN_SERVER_MGR_H__

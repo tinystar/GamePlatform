@@ -11,7 +11,6 @@
 #define __DB_SERVER_MGR_H__
 
 #include "DBServer.h"
-#include <string>
 
 class DBServerMgr
 {
@@ -31,7 +30,6 @@ protected:
 	DBServer		m_server;
 
 	bool			m_bDebugMode;
-	LogLevel		m_logLevel;
 	TcpConfig		m_tcpConfig;
 };
 

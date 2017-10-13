@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
 	ON_WM_TIMER()
+	ON_WM_DESTROY()
 	ON_BN_CLICKED(ID_BTN_START, &CChildView::OnBtnStartClick)
 	ON_BN_CLICKED(ID_BTN_DUMP, &CChildView::OnBtnDumpClick)
 	ON_BN_CLICKED(ID_BTN_UPDCFG, &CChildView::OnBtnUpdCfgClick)
@@ -105,6 +106,14 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rcControl.SetRect(52, 298, 97, 318);
 	m_portEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
 
+	rcControl.SetRect(117, 300, 192, 320);
+	strRes.LoadString(IDS_MAX_USER);
+	m_maxUserLabel.Create(strRes, WS_CHILD | WS_VISIBLE, rcControl, this);
+	m_maxUserLabel.SetFont(&m_font);
+
+	rcControl.SetRect(194, 298, 254, 318);
+	m_maxUserEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
+
 	rcControl.SetRect(25, 330, 110, 350);
 	strRes.LoadString(IDS_GATE_ADDR);
 	m_gateAddrLabel.Create(strRes, WS_CHILD | WS_VISIBLE, rcControl, this);
@@ -147,6 +156,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		CString strPort;
 		strPort.Format(_T("%d"), m_mainSvrMgr.getPort());
 		m_portEdit.SetWindowText(strPort);
+
+		strPort.Format(_T("%d"), m_mainSvrMgr.getMaxUser());
+		m_maxUserEdit.SetWindowText(strPort);
 
 		char szAddr[50] = { 0 };
 		unsigned short sPort = 0;
@@ -196,6 +208,10 @@ void CChildView::OnBtnStartClick()
 		unsigned short port = (unsigned short)_ttoi(sPort.GetString());
 		m_mainSvrMgr.setPort(port);
 
+		m_maxUserEdit.GetWindowText(sPort);
+		unsigned int uMaxUser = (unsigned int)_ttoi(sPort.GetString());
+		m_mainSvrMgr.setMaxUser(uMaxUser);
+
 		if ((ec = m_mainSvrMgr.initServer()) != eOk)
 		{
 			TCHAR szLog[512] = { 0 };
@@ -208,6 +224,7 @@ void CChildView::OnBtnStartClick()
 		{
 			m_svrStatus |= kInited;
 			m_portEdit.EnableWindow(FALSE);
+			m_maxUserEdit.EnableWindow(FALSE);
 		}
 	}
 
@@ -317,8 +334,15 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	{
 		::PostMessage(GetParent()->GetSafeHwnd(), WM_FIRST_STARTSVR, 0, 0);
 		KillTimer(IDT_FIRST_STARTSVR);
+		return;
 	}
 
 	CWnd::OnTimer(nIDEvent);
 }
 
+void CChildView::OnDestroy()
+{
+	m_mainSvrMgr.stopServer();
+	m_mainSvrMgr.unInitServer();
+	CWnd::OnDestroy();
+}

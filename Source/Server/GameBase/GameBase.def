@@ -10,4 +10,9 @@ EXPORTS
 ?onTcpPackageRecvMsg@BaseGameServer@@MAEXVClientId@@PAXI@Z
 ?onTcpClientCloseMsg@BaseGameServer@@MAEXVClientId@@@Z
 ?onTimerMsg@BaseGameServer@@MAEXI@Z
-?onDefaultMsgHandler@BaseGameServer@@MAEXVClientId@@PAUGameMsgHeader@@PAXI@Z
+?onDefaultMsgHandler@BaseGameServer@@MAEXVClientId@@PAXI@Z
+?onUserItemMsg@BaseGameServer@@MAEXHPAXI@Z
+?registerMsgHandler@BaseGameServer@@IAE_NQBUNetMsgMapEntry@@I@Z
+?removeMsgHandler@BaseGameServer@@IAE_NQBUNetMsgMapEntry@@I@Z
+?sendMsg@BaseGameServer@@IAE_NVClientId@@PAXI@Z
+?sendMsg@BaseGameServer@@IAE_NVClientId@@GGI@Z

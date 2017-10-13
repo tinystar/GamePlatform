@@ -11,7 +11,6 @@ using namespace rapidjson;
 
 GateServerMgr::GateServerMgr()
 	: m_bDebugMode(false)
-	, m_logLevel(kLogAll)
 {
 	m_tcpConfig.sPort = DEF_GATESVR_PORT;
 	m_tcpConfig.nMaxPackageSize = DEF_PACKAGE_SIZE;
@@ -21,8 +20,6 @@ SVCErrorCode GateServerMgr::initServer()
 {
 	if (!EzVerify(loadConfig()))
 		return eNotApplicable;
-
-	EzLogger::setLogLevel(m_logLevel);
 
 	ServerInitConfig initCfg;
 	initCfg.tcpConfig = m_tcpConfig;
@@ -70,13 +67,19 @@ bool GateServerMgr::loadConfig()
 	doc.ParseStream(is);
 
 	m_bDebugMode = doc["debugMode"].GetBool();
-	m_sVersion = doc["version"].GetString();
-	m_logLevel = (LogLevel)doc["logLevel"].GetInt();
+	const char* pszVer = doc["version"].GetString();
+	const char* pszUrl = doc["updateUrl"].GetString();
+	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
 	m_tcpConfig.nSockThreadCnt = tcpCfg["threadCount"].GetUint();
 	m_tcpConfig.nMaxAcceptCnt = tcpCfg["acceptCount"].GetUint();
 	m_tcpConfig.nMaxPackageSize = tcpCfg["pkgSize"].GetUint();
+
+	EzLogger::setLogLevel(logLevel);
+
+	m_server.setVersion(pszVer);
+	m_server.setUpdUrl(pszUrl);
 
 	return true;
 }

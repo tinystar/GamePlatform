@@ -79,15 +79,15 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "退出(&X)",                       ID_APP_EXIT
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
     POPUP "视图(&V)"
     BEGIN
-        MENUITEM "状态栏(&S)",                 ID_VIEW_STATUS_BAR
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "关于 MainServer(&A)...",          ID_APP_ABOUT
+        MENUITEM "关于 MainServer(&A)...",        ID_APP_ABOUT
     END
 END
 
@@ -108,16 +108,16 @@ END
 
 IDR_MAINFRAME ACCELERATORS
 BEGIN
-    "C",            ID_EDIT_COPY,           VIRTKEY,CONTROL,NOINVERT
-    "V",            ID_EDIT_PASTE,          VIRTKEY,CONTROL,NOINVERT
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY,ALT,NOINVERT
-    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY,SHIFT,NOINVERT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY ,NOINVERT
-    VK_F6,          ID_PREV_PANE,           VIRTKEY,SHIFT,NOINVERT
-    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY,CONTROL,NOINVERT
-    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY,SHIFT,NOINVERT
-    "X",            ID_EDIT_CUT,            VIRTKEY,CONTROL,NOINVERT
-    "Z",            ID_EDIT_UNDO,           VIRTKEY,CONTROL,NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -129,7 +129,7 @@ END
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 MainServer"
-FONT 9, "MS Shell Dlg"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
     LTEXT           "MainServer，1.0.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
@@ -195,6 +195,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
@@ -202,28 +203,31 @@ END
 
 STRINGTABLE
 BEGIN
-    IDP_OLE_INIT_FAILED		"OLE 初始化失败。  请确保 OLE 库是正确的版本。"
-    IDS_STARTSERVER			"启动"
+    IDP_OLE_INIT_FAILED     "OLE 初始化失败。  请确保 OLE 库是正确的版本。"
+    IDS_STARTSERVER         "启动"
     IDS_STOPSERVER          "停止"
     IDS_UPDATECONFIG        "更新配置"
     IDS_OPENDIR             "打开目录"
     IDS_TRAY_TIP            "提示"
     IDS_TRAY_TIP_MSG        "MainServer启动成功！"
-	IDS_PORT				"端口"
-	IDS_GATE_ADDR			"Gate Server地址"
-	IDS_GATE_PORT			"Gate Server端口"
-	IDS_DB_ADDR				"DB Server地址"
-	IDS_DB_PORT				"DB Server端口"
+    IDS_PORT                "端口"
+    IDS_GATE_ADDR           "Gate Server地址"
+    IDS_GATE_PORT           "Gate Server端口"
+    IDS_DB_ADDR             "DB Server地址"
+    IDS_DB_PORT             "DB Server端口"
 END
+
 STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "MainServer"
 END
+
 STRINGTABLE
 BEGIN
     AFX_IDS_APP_TITLE       "MainServer"
     AFX_IDS_IDLEMESSAGE     "就绪"
 END
+
 STRINGTABLE
 BEGIN
     ID_INDICATOR_EXT        "EXT"
@@ -233,13 +237,26 @@ BEGIN
     ID_INDICATOR_OVR        "OVR"
     ID_INDICATOR_REC        "REC"
 END
+
 STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "显示程序信息、版本号和版权信息\n关于"
     ID_APP_EXIT             "退出应用程序；提示保存文档\n退出"
+END
+
+STRINGTABLE
+BEGIN
     ID_NEXT_PANE            "切换到下一个窗格\n下一窗格"
     ID_PREV_PANE            "切换回上一个窗格\n上一窗格"
+END
+
+STRINGTABLE
+BEGIN
     ID_WINDOW_SPLIT         "将活动窗口拆分为多个窗格\n拆分"
+END
+
+STRINGTABLE
+BEGIN
     ID_EDIT_CLEAR           "清除所选内容\n清除"
     ID_EDIT_CLEAR_ALL       "清除全部内容\n全部清除"
     ID_EDIT_COPY            "复制所选内容，将其放入剪贴板\n复制"
@@ -251,6 +268,10 @@ BEGIN
     ID_EDIT_SELECT_ALL      "选定整个文档\n全选"
     ID_EDIT_UNDO            "撤消上一操作\n撤消"
     ID_EDIT_REDO            "重做上次撤消的操作\n重做"
+END
+
+STRINGTABLE
+BEGIN
     ID_VIEW_STATUS_BAR      "显示或隐藏状态栏\n切换状态栏"
 END
 
@@ -263,8 +284,17 @@ BEGIN
     AFX_IDS_SCNEXTWINDOW    "切换到下一个文档窗口"
     AFX_IDS_SCPREVWINDOW    "切换到上一个文档窗口"
     AFX_IDS_SCCLOSE         "关闭活动窗口并提示保存文档"
+END
+
+STRINGTABLE
+BEGIN
     AFX_IDS_SCRESTORE       "将窗口恢复到正常大小"
     AFX_IDS_SCTASKLIST      "激活任务列表"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MAX_USER            "最大人数限制"
 END
 
 #endif    // 中文(简体，中国) resources

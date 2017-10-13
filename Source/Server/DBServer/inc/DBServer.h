@@ -19,7 +19,7 @@ public:
 	virtual ~DBServer();
 
 protected:
-	virtual bool onInit();
+	virtual bool onInit(const ServerInitConfig&);
 	virtual bool onUninit();
 	virtual bool onStart();
 	virtual bool onStop();
