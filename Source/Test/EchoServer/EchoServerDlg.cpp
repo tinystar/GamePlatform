@@ -183,6 +183,7 @@ void CEchoServerDlg::OnDestroy()
 	m_echoServer.unInit();
 	m_timeServer.stop();
 	m_timeServer.unInit();
+	CDialogEx::OnDestroy();
 }
 
 // 此回调函数是在工作线程中响应，需要发消息给主线程来更新界面，否则可能死锁

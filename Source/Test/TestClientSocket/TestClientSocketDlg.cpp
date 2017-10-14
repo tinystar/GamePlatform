@@ -117,9 +117,9 @@ BOOL CTestClientSocketDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
-	SetTimer(ID_TIMER_SELECT, 1, NULL);
-// 	HANDLE hThread = (HANDLE)::_beginthreadex(NULL, 0, selectThread, this, 0, NULL);
-// 	::CloseHandle(hThread);
+	//SetTimer(ID_TIMER_SELECT, 1, NULL);
+ 	HANDLE hThread = (HANDLE)::_beginthreadex(NULL, 0, selectThread, this, 0, NULL);
+ 	::CloseHandle(hThread);
 	m_sockTest1.create(false);
 	m_sockTest1.connect("127.0.0.1", 5010);
 
@@ -195,8 +195,7 @@ void CTestClientSocketDlg::OnTest1Clicked()
 	while (!ifile.eof())
 	{
 		ifile.read(szBuffer, MAX_ECHOMSG_SIZE);
-		while (!m_sockTest1.sendData(szBuffer, (size_t)ifile.gcount()))
-			::Sleep(1);
+		m_sockTest1.sendData(szBuffer, (size_t)ifile.gcount());
 	}
 
 	EzTrace(_T("send file:%s spend %f seconds"), m_sSrcFile.GetString(), watch.stop());
@@ -226,7 +225,7 @@ void CTestClientSocketDlg::onSocketRecved(TcpClientSocket* pClientSock, void* pP
 	}
 }
 
-void CTestClientSocketDlg::onSocketClosed(TcpClientSocket* pClientSock)
+void CTestClientSocketDlg::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 {
 
 }

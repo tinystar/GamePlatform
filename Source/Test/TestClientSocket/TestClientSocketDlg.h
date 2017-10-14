@@ -28,7 +28,7 @@ public:
 protected:
 	virtual void onSocketConnected(TcpClientSocket* pClientSock);
 	virtual void onSocketRecved(TcpClientSocket* pClientSock, void* pPackage, size_t nSize);
-	virtual void onSocketClosed(TcpClientSocket* pClientSock);
+	virtual void onSocketClosed(TcpClientSocket* pClientSock, int nErrCode);
 
 // й╣ож
 protected:

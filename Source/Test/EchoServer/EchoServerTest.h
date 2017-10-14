@@ -27,6 +27,8 @@ protected:
 
 	virtual void onTimerMsg(EzUInt uTimerId);
 
+	virtual void onUserItemMsg(int itemId, void* pData, size_t nSize){}
+
 private:
 	IServerUIObserver* m_pUIObserver;
 };
@@ -50,6 +52,8 @@ protected:
 	virtual void onTcpClientCloseMsg(ClientId id);
 
 	virtual void onTimerMsg(EzUInt uTimerId);
+
+	virtual void onUserItemMsg(int itemId, void* pData, size_t nSize){}
 
 	virtual bool onStart();
 	virtual bool onStop();
