@@ -12,6 +12,7 @@
 
 #include "BaseGameServer.h"
 #include "TcpClientSocket.h"
+#include "IMainServerUIObserver.h"
 
 class MainServer : public BaseGameServer, public ITcpClientSocketEventHandler
 {
@@ -29,6 +30,8 @@ public:
 	unsigned short getGateSvrPort() const { return m_sGatePort; }
 	unsigned short getDBSvrPort() const { return m_sDBPort; }
 	unsigned int getMaxUser() const { return m_uMaxUser; }
+
+	void registerUIObserver(IMainServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
 
 protected:
 	virtual bool onInit(const ServerInitConfig& serverConfig);
@@ -59,18 +62,20 @@ protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
 protected:
-	char				m_szGateAddr[20];
-	char				m_szDBAddr[20];
-	unsigned short		m_sGatePort;
-	unsigned short		m_sDBPort;
-	unsigned short		m_sPort;
-	unsigned int		m_uMaxUser;
-	char				m_szSvrName[256];	// 保留，暂不使用
+	char					m_szGateAddr[20];
+	char					m_szDBAddr[20];
+	unsigned short			m_sGatePort;
+	unsigned short			m_sDBPort;
+	unsigned short			m_sPort;
+	unsigned int			m_uMaxUser;
+	char					m_szSvrName[256];	// 保留，暂不使用
 
-	TcpClientSocket		m_clientToGate;
-	TcpClientSocket		m_clientToDB;
-	HANDLE				m_hSelectThread;
-	bool				m_bStopServer;
+	TcpClientSocket			m_clientToGate;
+	TcpClientSocket			m_clientToDB;
+	HANDLE					m_hSelectThread;
+	bool					m_bStopServer;
+
+	IMainServerUIObserver*	m_pUIObserver;
 };
 
 #endif // __MAIN_SERVER_H__

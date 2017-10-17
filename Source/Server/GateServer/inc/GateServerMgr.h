@@ -27,6 +27,8 @@ public:
 	const char* getVersion() const { return m_server.getVersion(); }
 	const char* getUpdUrl() const { return m_server.getUpdUrl(); }
 
+	GateServer& getServer() { return m_server; }
+
 protected:
 	bool loadConfig();
 

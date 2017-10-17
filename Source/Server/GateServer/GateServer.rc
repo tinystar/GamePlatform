@@ -214,6 +214,7 @@ BEGIN
     IDS_OPENDIR             "打开目录"
     IDS_TRAY_TIP            "提示"
     IDS_TRAY_TIP_MSG        "GateServer启动成功！"
+    ID_INDICATOR_SVRINFO    "Port: 00000 Version: 1.0.0"
 END
 
 STRINGTABLE

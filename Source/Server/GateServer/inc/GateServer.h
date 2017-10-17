@@ -12,6 +12,7 @@
 
 #include "BaseGameServer.h"
 #include "MainServerList.h"
+#include "IGateServerUIObserver.h"
 
 class GateServer : public BaseGameServer
 {
@@ -25,6 +26,8 @@ public:
 
 	const char* getUpdUrl() const { return m_szUpdUrl; }
 	bool setUpdUrl(const char* pszUrl);
+
+	void registerUIObserver(IGateServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
 
 protected:
 	virtual bool onInit(const ServerInitConfig&);
@@ -44,9 +47,10 @@ protected:
 protected:
 	static NetMsgMapEntry s_msgMapArray[];
 
-	MainServerList		m_mainSvrList;
-	char				m_szVersion[16];
-	char				m_szUpdUrl[256];
+	MainServerList			m_mainSvrList;
+	char					m_szVersion[16];
+	char					m_szUpdUrl[256];
+	IGateServerUIObserver*	m_pUIObserver;
 };
 
 #endif // __GATE_SERVER_H__

@@ -20,6 +20,7 @@ EZ_NAMESPACE_BEGIN(EzText)
 EZ_DLL_C_SPEC char* wideCharToUtf8(const wchar_t* pSrc);
 EZ_DLL_C_SPEC char* wideCharToAnsi(const wchar_t* pSrc);
 EZ_DLL_C_SPEC wchar_t* ansiToWideChar(const char* pSrc);
+EZ_DLL_C_SPEC wchar_t* utf8ToWideChar(const char* pSrc);
 EZ_DLL_C_SPEC char* ansiToUtf8(const char* pSrc);
 /**
  * convert wchar_t to utf8 if _UNICODE defined

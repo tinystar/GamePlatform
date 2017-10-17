@@ -37,6 +37,8 @@ public:
 	void setMaxUser(unsigned int uMax) { return m_server.setMaxUser(uMax); }
 	unsigned int getMaxUser() const { return m_server.getMaxUser(); }
 
+	MainServer& getServer() { return m_server; }
+
 protected:
 	MainServer			m_server;
 

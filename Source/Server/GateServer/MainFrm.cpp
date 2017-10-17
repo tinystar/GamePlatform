@@ -32,6 +32,7 @@ END_MESSAGE_MAP()
 static UINT indicators[] =
 {
 	ID_SEPARATOR,           // 状态行指示器
+	ID_INDICATOR_SVRINFO,
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -68,6 +69,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 未能创建
 	}
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
+	m_wndStatusBar.SetPaneText(1, NULL);
 
 	m_trayIcon.Init(this->GetSafeHwnd(), WM_TRAY_NOTIFY);
 
@@ -176,6 +178,17 @@ LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 	strTipMsg.LoadString(IDS_TRAY_TIP_MSG);
 	m_trayIcon.ShowBalloon(strTip, strTipMsg);
 	ShowWindow(SW_MINIMIZE);
+
+	GateServerMgr& gateMgr = m_wndView.getServerMgr();
+	TCHAR szInfo[256] = { 0 };
+#ifdef _UNICODE
+	wchar_t* pVer = EzText::utf8ToWideChar(gateMgr.getVersion());
+	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), pVer);
+	delete pVer;
+#else
+	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), gateMgr.getVersion());
+#endif
+	m_wndStatusBar.SetPaneText(1, szInfo);
 	return 1;
 }
 

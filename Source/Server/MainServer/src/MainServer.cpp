@@ -14,6 +14,7 @@ MainServer::MainServer()
 	, m_hSelectThread(NULL)
 	, m_sPort(0)
 	, m_uMaxUser(0)
+	, m_pUIObserver(NULL)
 {
 	::memset(m_szGateAddr, 0, sizeof(m_szGateAddr));
 	::memset(m_szDBAddr, 0, sizeof(m_szDBAddr));
@@ -89,6 +90,14 @@ void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 		connMsg.uMaxUser = m_uMaxUser;
 
 		sendMsgToServer(pClientSock, &connMsg, sizeof(connMsg));
+
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToGateSuccess();
+	}
+	else if (pClientSock == &m_clientToDB)
+	{
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToDBSuccess();
 	}
 }
 
@@ -104,11 +113,17 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 {
 	if (pClientSock == &m_clientToGate)
 	{
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToGateClosed();
+
 		if (!m_bStopServer && nErrCode != SEC_SUCCESS && nErrCode != SEC_CLOSEDBYPEER && nErrCode != SEC_CONNRESET)
 			connectToGate();
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToDBClosed();
+
 		if (!m_bStopServer && nErrCode != SEC_SUCCESS && nErrCode != SEC_CLOSEDBYPEER && nErrCode != SEC_CONNRESET)
 			connectToDB();
 	}
@@ -145,7 +160,11 @@ bool MainServer::connectToGate()
 		return false;
 	int nCode = m_clientToGate.connect(m_szGateAddr, m_sGatePort);
 	if (nCode != SEC_SUCCESS)
+	{
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToGateFail(nCode);
 		return false;
+	}
 	return true;
 }
 
@@ -155,7 +174,11 @@ bool MainServer::connectToDB()
 		return false;
 	int nCode = m_clientToDB.connect(m_szDBAddr, m_sDBPort);
 	if (nCode != SEC_SUCCESS)
+	{
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIConnToDBFail(nCode);
 		return false;
+	}
 	return true;
 }
 

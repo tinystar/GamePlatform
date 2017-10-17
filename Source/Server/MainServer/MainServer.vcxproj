@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\UIComm\win\TrayIcon.h" />
     <ClInclude Include="ChildView.h" />
+    <ClInclude Include="inc\IMainServerUIObserver.h" />
     <ClInclude Include="inc\MainMsgDefs.h" />
     <ClInclude Include="inc\MainServer.h" />
     <ClInclude Include="inc\MainServerMgr.h" />

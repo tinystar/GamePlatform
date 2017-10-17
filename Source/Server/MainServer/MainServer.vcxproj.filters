@@ -51,6 +51,9 @@
     <ClInclude Include="inc\MainServerMgr.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\IMainServerUIObserver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp">

@@ -65,6 +65,26 @@ wchar_t* ansiToWideChar(const char* pSrc)
 	return pUnicode;
 }
 
+wchar_t* utf8ToWideChar(const char* pSrc)
+{
+	if (NULL == pSrc)
+		return NULL;
+
+	int len = ::MultiByteToWideChar(CP_UTF8, 0, pSrc, -1, NULL, 0);
+	wchar_t* pUnicode = new wchar_t[len];
+	if (!EzVerify(pUnicode))
+		return NULL;
+
+	int cLen = ::MultiByteToWideChar(CP_UTF8, 0, pSrc, -1, pUnicode, len);
+	if (!EzVerify(cLen > 0))
+	{
+		delete pUnicode;
+		return NULL;
+	}
+
+	return pUnicode;
+}
+
 char* ansiToUtf8(const char* pSrc)
 {
 	wchar_t* pUnicode = ansiToWideChar(pSrc);

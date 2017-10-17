@@ -110,6 +110,7 @@
     <ClInclude Include="inc\GateMsgDefs.h" />
     <ClInclude Include="inc\GateServer.h" />
     <ClInclude Include="inc\GateServerMgr.h" />
+    <ClInclude Include="inc\IGateServerUIObserver.h" />
     <ClInclude Include="inc\MainServerList.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />

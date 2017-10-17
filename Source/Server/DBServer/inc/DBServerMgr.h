@@ -23,6 +23,8 @@ public:
 	SVCErrorCode startServer();
 	SVCErrorCode stopServer();
 
+	unsigned short getPort() const { return m_tcpConfig.sPort; }
+
 protected:
 	bool loadConfig();
 

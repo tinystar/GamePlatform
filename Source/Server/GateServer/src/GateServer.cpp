@@ -12,6 +12,7 @@ NetMsgMapEntry GateServer::s_msgMapArray[] = {
 
 
 GateServer::GateServer()
+	: m_pUIObserver(NULL)
 {
 	::memset(m_szVersion, 0, sizeof(m_szVersion));
 	::memset(m_szUpdUrl, 0, sizeof(m_szUpdUrl));
@@ -87,13 +88,21 @@ void GateServer::onMainConnect(ClientId id, void* pData, size_t nDataLen)
 	m_mainSvrList.addServer(svrNode);
 
 	id.setUserData((void*)CLIENT_TYPE_MAIN);
+
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onUIMainServerAdded(id, svrNode);
 }
 
 void GateServer::onTcpClientCloseMsg(ClientId id)
 {
 	int nType = (int)(id.getUserData());
 	if (CLIENT_TYPE_MAIN == nType)
+	{
 		m_mainSvrList.removeServer(id);
+
+		if (m_pUIObserver != NULL)
+			m_pUIObserver->onUIMainServerRemoved(id);
+	}
 }
 
 bool GateServer::setVersion(const char* pszVer)

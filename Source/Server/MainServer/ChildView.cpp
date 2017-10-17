@@ -18,12 +18,22 @@
 #define IDT_FIRST_STARTSVR		110
 
 
+// UI notify msg
+#define WM_CONNTO_GATE_SUCCESS			(WM_USER + 1)
+#define WM_CONNTO_GATE_FAIL				(WM_USER + 2)
+#define WM_CONNTO_GATE_CLOSED			(WM_USER + 3)
+#define WM_CONNTO_DB_SUCCESS			(WM_USER + 4)
+#define WM_CONNTO_DB_FAIL				(WM_USER + 5)
+#define WM_CONNTO_DB_CLOSED				(WM_USER + 6)
+
+
 // CChildView
 
 CChildView::CChildView()
 	: m_svrStatus(0)
 	, m_bFirstStart(TRUE)
 {
+	m_mainSvrMgr.getServer().registerUIObserver(this);
 }
 
 CChildView::~CChildView()
@@ -40,6 +50,12 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_BN_CLICKED(ID_BTN_DUMP, &CChildView::OnBtnDumpClick)
 	ON_BN_CLICKED(ID_BTN_UPDCFG, &CChildView::OnBtnUpdCfgClick)
 	ON_BN_CLICKED(ID_BTN_OPENDIR, &CChildView::OnBtnOpenDirClick)
+	ON_MESSAGE(WM_CONNTO_GATE_SUCCESS, &CChildView::OnConnToGateSuccessUIMsg)
+	ON_MESSAGE(WM_CONNTO_GATE_FAIL, &CChildView::OnConnToGateFailUIMsg)
+	ON_MESSAGE(WM_CONNTO_GATE_CLOSED, &CChildView::OnConnToGateClosedUIMsg)
+	ON_MESSAGE(WM_CONNTO_DB_SUCCESS, &CChildView::OnConnToDBSuccessUIMsg)
+	ON_MESSAGE(WM_CONNTO_DB_FAIL, &CChildView::OnConnToDBFailUIMsg)
+	ON_MESSAGE(WM_CONNTO_DB_CLOSED, &CChildView::OnConnToDBClosedUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -146,6 +162,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rcControl.SetRect(355, 358, 400, 378);
 	m_DBPortEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
 
+	rcControl.SetRect(20, 10, 610, 280);
+	m_svrMsgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY, rcControl, this, -1);
+
 	if (!m_mainSvrMgr.loadConfig())
 	{
 		MessageBox(_T("load config failed\n"));
@@ -164,14 +183,14 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		unsigned short sPort = 0;
 #ifdef _UNICODE
 		m_mainSvrMgr.getGateSvrAddr(szAddr, 50, sPort);
-		wchar_t* pAddrW = EzText::ansiToWideChar(szAddr);
+		wchar_t* pAddrW = EzText::utf8ToWideChar(szAddr);
 		m_gateAddrEdit.SetWindowText(pAddrW);
 		delete pAddrW;
 		strPort.Format(_T("%d"), sPort);
 		m_gatePortEdit.SetWindowText(strPort);
 
 		m_mainSvrMgr.getDBSvrAddr(szAddr, 50, sPort);
-		pAddrW = EzText::ansiToWideChar(szAddr);
+		pAddrW = EzText::utf8ToWideChar(szAddr);
 		m_DBAddrEdit.SetWindowText(pAddrW);
 		delete pAddrW;
 		strPort.Format(_T("%d"), sPort);
@@ -345,4 +364,85 @@ void CChildView::OnDestroy()
 	m_mainSvrMgr.stopServer();
 	m_mainSvrMgr.unInitServer();
 	CWnd::OnDestroy();
+}
+
+void CChildView::onUIConnToGateSuccess()
+{
+	this->PostMessage(WM_CONNTO_GATE_SUCCESS);
+}
+
+void CChildView::onUIConnToGateFail(int nErrCode)
+{
+	this->PostMessage(WM_CONNTO_GATE_FAIL, 0, (LPARAM)nErrCode);
+}
+
+void CChildView::onUIConnToGateClosed()
+{
+	this->PostMessage(WM_CONNTO_GATE_CLOSED);
+}
+
+void CChildView::onUIConnToDBSuccess()
+{
+	this->PostMessage(WM_CONNTO_DB_SUCCESS);
+}
+
+void CChildView::onUIConnToDBFail(int nErrCode)
+{
+	this->PostMessage(WM_CONNTO_DB_FAIL, 0, (LPARAM)nErrCode);
+}
+
+void CChildView::onUIConnToDBClosed()
+{
+	this->PostMessage(WM_CONNTO_DB_CLOSED);
+}
+
+LRESULT CChildView::OnConnToGateSuccessUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AppendServerMsg(_T("连接GateServer成功！\r\n"));
+	return 0;
+}
+
+LRESULT CChildView::OnConnToGateFailUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	int nErrCode = (int)lParam;
+
+	TCHAR szMsg[256] = { 0 };
+	_stprintf_s(szMsg, _T("连接GateServer失败，错误码：%d\r\n"), nErrCode);
+	AppendServerMsg(szMsg);
+	return 0;
+}
+
+LRESULT CChildView::OnConnToGateClosedUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AppendServerMsg(_T("已断开和GateServer的连接！\r\n"));
+	return 0;
+}
+
+LRESULT CChildView::OnConnToDBSuccessUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AppendServerMsg(_T("连接DBServer成功！\r\n"));
+	return 0;
+}
+
+LRESULT CChildView::OnConnToDBFailUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	int nErrCode = (int)lParam;
+
+	TCHAR szMsg[256] = { 0 };
+	_stprintf_s(szMsg, _T("连接DBServer失败，错误码：%d\r\n"), nErrCode);
+	AppendServerMsg(szMsg);
+	return 0;
+}
+
+LRESULT CChildView::OnConnToDBClosedUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AppendServerMsg(_T("已断开和DBServer的连接！\r\n"));
+	return 0;
+}
+
+void CChildView::AppendServerMsg(const TCHAR* pszMsg)
+{
+	int nLength = m_svrMsgEdit.SendMessage(WM_GETTEXTLENGTH);
+	m_svrMsgEdit.SetSel(nLength, nLength);
+	m_svrMsgEdit.ReplaceSel(pszMsg);
 }

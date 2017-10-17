@@ -19,12 +19,31 @@
 #define IDT_FIRST_STARTSVR		110
 
 
+// UI notify msg
+#define WM_MAINSVR_ADD			(WM_USER + 1)
+#define WM_MAINSVR_REMOVE		(WM_USER + 2)
+
+struct AddServerParam
+{
+	ClientId			id;
+	TCHAR				szMainIP[20];
+	unsigned short		sMainPort;
+	unsigned int		uMaxUser;
+};
+
+struct RemoveServerParam
+{
+	ClientId			id;
+};
+
+
 // CChildView
 
 CChildView::CChildView()
 	: m_svrStatus(0)
 	, m_bFirstStart(TRUE)
 {
+	m_gateSvrMgr.getServer().registerUIObserver(this);
 }
 
 CChildView::~CChildView()
@@ -41,6 +60,8 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_BN_CLICKED(ID_BTN_DUMP, &CChildView::OnBtnDumpClick)
 	ON_BN_CLICKED(ID_BTN_UPDCFG, &CChildView::OnBtnUpdCfgClick)
 	ON_BN_CLICKED(ID_BTN_OPENDIR, &CChildView::OnBtnOpenDirClick)
+	ON_MESSAGE(WM_MAINSVR_ADD, &CChildView::OnAddServerUIMsg)
+	ON_MESSAGE(WM_MAINSVR_REMOVE, &CChildView::OnRemoveServerUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -211,5 +232,74 @@ void CChildView::OnDestroy()
 {
 	m_gateSvrMgr.stopServer();
 	m_gateSvrMgr.unInitServer();
+
+	for (int i = 0; i < m_msvrList.GetItemCount(); ++i)
+	{
+		AddServerParam* pAddParam = (AddServerParam*)m_msvrList.GetItemData(i);
+		delete pAddParam;
+	}
+
 	CWnd::OnDestroy();
+}
+
+void CChildView::onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode)
+{
+	AddServerParam* pAddParam = new AddServerParam();
+#ifdef _UNICODE
+	const wchar_t* pszMainIP = EzText::ansiToWideChar(svrNode.szMainAddr);
+	memcpy(pAddParam->szMainIP, pszMainIP, sizeof(pAddParam->szMainIP));
+	delete pszMainIP;
+#else
+	memcpy(pAddParam->szMainIP, svrNode.szMainAddr, sizeof(pAddParam->szMainIP));
+#endif
+	pAddParam->id = id;
+	pAddParam->sMainPort = svrNode.sMainPort;
+	pAddParam->uMaxUser = svrNode.uMaxUser;
+
+	this->PostMessage(WM_MAINSVR_ADD, 0, (LPARAM)pAddParam);
+}
+
+void CChildView::onUIMainServerRemoved(ClientId id)
+{
+	RemoveServerParam* pRemoveParam = new RemoveServerParam();
+	pRemoveParam->id = id;
+
+	this->PostMessage(WM_MAINSVR_REMOVE, 0, (LPARAM)pRemoveParam);
+}
+
+LRESULT CChildView::OnAddServerUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AddServerParam* pAddParam = (AddServerParam*)lParam;
+
+	int idx = m_msvrList.GetItemCount();
+	idx = m_msvrList.InsertItem(idx, NULL);
+	m_msvrList.SetItemData(idx, (DWORD_PTR)pAddParam);
+
+	m_msvrList.SetItemText(idx, 0, pAddParam->szMainIP);
+	TCHAR szBuf[256] = { 0 };
+	_stprintf_s(szBuf, 256, _T("%d"), pAddParam->sMainPort);
+	m_msvrList.SetItemText(idx, 1, szBuf);
+	_stprintf_s(szBuf, 256, _T("%d"), pAddParam->uMaxUser);
+	m_msvrList.SetItemText(idx, 2, szBuf);
+
+	return 0;
+}
+
+LRESULT CChildView::OnRemoveServerUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	RemoveServerParam* pRemoveParam = (RemoveServerParam*)lParam;
+
+	for (int i = 0; i < m_msvrList.GetItemCount(); ++i)
+	{
+		AddServerParam* pAddParam = (AddServerParam*)m_msvrList.GetItemData(i);
+		if (pAddParam->id == pRemoveParam->id)
+		{
+			m_msvrList.DeleteItem(i);
+			delete pAddParam;
+			break;
+		}
+	}
+
+	delete pRemoveParam;
+	return 0;
 }

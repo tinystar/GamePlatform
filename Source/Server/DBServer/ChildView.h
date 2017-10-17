@@ -28,6 +28,7 @@ public:
 
 // ²Ù×÷
 public:
+	DBServerMgr& getServerMgr() { return m_dbSvrMgr; }
 
 // ÖØÐ´
 	protected:

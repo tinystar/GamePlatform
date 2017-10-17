@@ -17,7 +17,7 @@ enum ServerStatus
 
 // CChildView 窗口
 
-class CChildView : public CWnd
+class CChildView : public CWnd, public IMainServerUIObserver
 {
 // 构造
 public:
@@ -37,6 +37,18 @@ public:
 public:
 	virtual ~CChildView();
 
+protected:
+	virtual void onUIConnToGateSuccess();
+	virtual void onUIConnToGateFail(int nErrCode);
+	virtual void onUIConnToGateClosed();
+
+	virtual void onUIConnToDBSuccess();
+	virtual void onUIConnToDBFail(int nErrCode);
+	virtual void onUIConnToDBClosed();
+
+protected:
+	void AppendServerMsg(const TCHAR* pszMsg);
+
 	// 生成的消息映射函数
 protected:
 	afx_msg void OnPaint();
@@ -47,6 +59,12 @@ protected:
 	afx_msg void OnBtnOpenDirClick();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
+	afx_msg LRESULT OnConnToGateSuccessUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnConnToGateFailUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnConnToGateClosedUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnConnToDBSuccessUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnConnToDBFailUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnConnToDBClosedUIMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:
@@ -68,6 +86,7 @@ protected:
 	CEdit					m_DBPortEdit;
 	CStatic					m_maxUserLabel;
 	CEdit					m_maxUserEdit;
+	CEdit					m_svrMsgEdit;
 	CFont					m_font;
 	BOOL					m_bFirstStart;
 };

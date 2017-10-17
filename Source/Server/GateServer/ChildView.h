@@ -5,6 +5,7 @@
 
 #pragma once
 #include "GateServerMgr.h"
+#include "IGateServerUIObserver.h"
 
 
 enum ServerStatus
@@ -17,7 +18,7 @@ enum ServerStatus
 
 // CChildView 窗口
 
-class CChildView : public CWnd
+class CChildView : public CWnd, public IGateServerUIObserver
 {
 // 构造
 public:
@@ -28,6 +29,7 @@ public:
 
 // 操作
 public:
+	GateServerMgr& getServerMgr() { return m_gateSvrMgr; }
 
 // 重写
 	protected:
@@ -36,6 +38,10 @@ public:
 // 实现
 public:
 	virtual ~CChildView();
+
+protected:
+	virtual void onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode);
+	virtual void onUIMainServerRemoved(ClientId id);
 
 	// 生成的消息映射函数
 protected:
@@ -47,6 +53,8 @@ protected:
 	afx_msg void OnBtnOpenDirClick();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
+	afx_msg LRESULT OnAddServerUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnRemoveServerUIMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:
