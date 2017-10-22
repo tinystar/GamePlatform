@@ -33,7 +33,7 @@ struct GateConfigMsg
 {
 	GameMsgHeader	header;
 	char			szVersion[16];
-	char			szUpdUrl[256];
+	char			szUpdUrl[128];
 
 	GateConfigMsg()
 	{

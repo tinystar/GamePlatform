@@ -116,7 +116,7 @@ bool GateServer::setVersion(const char* pszVer)
 
 bool GateServer::setUpdUrl(const char* pszUrl)
 {
-	if (strlen(pszUrl) > 255)
+	if (strlen(pszUrl) > (sizeof(m_szUpdUrl) - 1))
 		return false;
 
 	strcpy(m_szUpdUrl, pszUrl);

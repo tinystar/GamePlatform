@@ -49,7 +49,7 @@ protected:
 
 	MainServerList			m_mainSvrList;
 	char					m_szVersion[16];
-	char					m_szUpdUrl[256];
+	char					m_szUpdUrl[128];
 	IGateServerUIObserver*	m_pUIObserver;
 };
 
