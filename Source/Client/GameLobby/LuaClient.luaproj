@@ -49,8 +49,10 @@
     <Compile Include="app\MyApp.lua" />
     <Compile Include="app\network\ClientSocket.lua" />
     <Compile Include="app\network\ClientSocketMgr.lua" />
+    <Compile Include="app\network\NetMsgGlobalDefs.lua" />
     <Compile Include="app\network\SocketMsgHandler.lua" />
     <Compile Include="app\network\SocketMsgMapper.lua" />
+    <Compile Include="app\views\LoginScene.lua" />
     <Compile Include="app\views\MainScene.lua" />
     <Compile Include="cocos\3d\3dConstants.lua" />
     <Compile Include="cocos\cocos2d\bitExtend.lua" />

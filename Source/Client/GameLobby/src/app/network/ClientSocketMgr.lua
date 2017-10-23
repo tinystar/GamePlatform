@@ -48,6 +48,8 @@ local function socketEventUpdater(dt)
 
     local readsocks, writesocks, msg = socket.select(socktbl, socktbl, 0)
 
+    print(#readsocks, #writesocks, msg)
+
     if writesocks ~= nil and #writesocks > 0 then
         notifyClientSockWrite(writesocks)
     end

@@ -14,6 +14,6 @@ xcopy "..\..\src" ".\src" /D /E /I /F /Y
 :: start client
 echo
 echo start the client...
-start GameLobby.exe
+start GameLobby.exe -workdir ./ -resolution 1280x720 -scale 0.75
 
 ::pause

@@ -12,7 +12,7 @@ local M = {}
 SocketMsgMapper = M
 
 function M.onSocketMsgRecv(sockObj, data, len)
-    local nextPos, mainId, subId, _ = string.unpack(data, "HHI")
+    local mainId, subId, msg, msgLen = parseNetMsgHeader(data, len)
 
     if nil == M.SockMsgMap_ or nil == M.SockMsgMap_[sockObj] then
         return
@@ -25,12 +25,6 @@ function M.onSocketMsgRecv(sockObj, data, len)
 
     local msghandler = mainMsgMap[subId]
     if msghandler ~= nil then
-        local msg = nil
-        local msgLen = 0
-        if nextPos < len then
-            msg = string.sub(data, nextPos, len)
-            msgLen = len - nextPos
-        end
         msghandler(sockObj, msg, msgLen)
     end
 end
@@ -74,3 +68,5 @@ function M.removeMsgHandler(sockObj, msgMapArray)
         end
     end
 end
+
+return M

@@ -10,8 +10,9 @@
 
 -- global game context data
 __GData__ = {
-    serverAddress = "127.0.0.1",
-    serverPort = 5001
+    GateSvrAddr = "127.0.0.1",
+    GateSvrPort = 5010,
+    Version = "1.0.0"
 }
 
 return __GData__
