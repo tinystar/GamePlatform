@@ -5,12 +5,17 @@
 -- 
 -- Author: xiaoxin
 -- Contact: 765392700(QQ)
--- Date: 2017/7/16
+-- Date: 2017/8/9
 -- *********************************************************************
 
--- global game context data
-__GData__ = {
+require "app.network.SocketMsgMapper"
 
+-- -----------------------------------------------------
+-- msg map entries
+-- MainMsgId            SubMsgId            Handler
+-- -----------------------------------------------------
+local globalMsgMaps = {
+    
 }
 
-return __GData__
+SocketMsgMapper.registerMsgHandler()

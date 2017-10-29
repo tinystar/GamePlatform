@@ -2,6 +2,7 @@
 #include "SimpleAudioEngine.h"
 #include "cocostudio\CocoStudio.h"
 #include "ui\UIHelper.h"
+#include "ui\UIButton.h"
 
 USING_NS_CC;
 USING_NS_TIMELINE;
@@ -77,6 +78,11 @@ bool HelloWorld::init()
 	rootNode->runAction(action);
 
 	action->gotoFrameAndPlay(0, 50, true);
+
+	auto loginPanel = rootNode->getChildByName("Panel_Login");
+	loginPanel->setVisible(true);
+	auto wechatBtn = (ui::Button*)loginPanel->getChildByName("Button_WeChat");
+	wechatBtn->addClickEventListener(CC_CALLBACK_1(HelloWorld::wechatLoginClicked, this));
 #endif
     return true;
 }
@@ -97,4 +103,9 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
     
     
+}
+
+void HelloWorld::wechatLoginClicked(Ref* sender)
+{
+
 }

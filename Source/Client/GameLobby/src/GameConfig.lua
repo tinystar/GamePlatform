@@ -5,12 +5,14 @@
 -- 
 -- Author: xiaoxin
 -- Contact: 765392700(QQ)
--- Date: 2017/7/16
+-- Date: 2017/10/29
 -- *********************************************************************
 
--- global game context data
-__GData__ = {
-
+GameConfig = {
+    --GateSvrAddr = "119.75.217.109",       -- Baidu
+    GateSvrAddr = "127.0.0.1",
+    GateSvrPort = 5010,
+    Version = "1.0.0"
 }
 
-return __GData__
+return GameConfig

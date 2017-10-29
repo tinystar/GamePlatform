@@ -35,6 +35,14 @@ function ClientSocket:socket()
     return self.s_
 end
 
+function ClientSocket:isConnected()
+    return self.isConnected_
+end
+
+function ClientSocket:getOption(optname)
+    return self.s_:getoption(optname)
+end
+
 function ClientSocket:addConnectEventListener(func)
     if func ~= nil then
         table.insert(self.connectListeners_, func)
@@ -69,6 +77,18 @@ function ClientSocket:connect(host, port)
         self.isConnected_ = true
     else
         print(string.format("connect msg: %s", msg))
+    end
+end
+
+function ClientSocket:checkConnecting()
+    local errOpt = self:getOption("error")
+    if errOpt ~= nil then   -- error occured
+        -- notify connect failed
+        for _, func in ipairs(self.connectListeners_) do
+            func(self, false, errOpt)
+        end
+
+        self:close()
     end
 end
 
@@ -145,7 +165,7 @@ function ClientSocket:onSocketWrite()
 
         -- notify all connect event listeners
         for _, func in ipairs(self.connectListeners_) do
-            func(self)
+            func(self, true, nil)
         end
 
         return

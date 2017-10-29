@@ -17,7 +17,7 @@ ClientSocketMgr = M
 local function notifyClientSockRead(readsocks)
     for _, s in ipairs(readsocks) do
         for k, clientsock in pairs(M.clientSockets_) do
-            if s == clientsock.s_ then
+            if s == clientsock:socket() then
                 clientsock:onSocketRead()
             end
         end
@@ -27,7 +27,7 @@ end
 local function notifyClientSockWrite(writesocks)
     for _, s in ipairs(writesocks) do
         for k, clientsock in pairs(M.clientSockets_) do
-            if s == clientsock.s_ then
+            if s == clientsock:socket() then
                 clientsock:onSocketWrite()
             end
         end
@@ -37,8 +37,12 @@ end
 local function socketEventUpdater(dt)
     local socktbl = {}
     for _, clientsock in pairs(M.clientSockets_) do
-        if clientsock.s_ ~= nil then
-            socktbl[#socktbl + 1] = clientsock.s_
+        if clientsock:socket() ~= nil then
+            if not clientsock:isConnected() then
+                clientsock:checkConnecting()
+            end
+
+            socktbl[#socktbl + 1] = clientsock:socket()
         end
     end
 
@@ -47,8 +51,6 @@ local function socketEventUpdater(dt)
     end
 
     local readsocks, writesocks, msg = socket.select(socktbl, socktbl, 0)
-
-    print(#readsocks, #writesocks, msg)
 
     if writesocks ~= nil and #writesocks > 0 then
         notifyClientSockWrite(writesocks)
@@ -86,7 +88,7 @@ end
 
 function M.closeAllSockets()
     for k, clientsock in pairs(M.clientSockets_) do
-        if clientsock.s_ ~= nil then
+        if clientsock:socket() ~= nil then
             clientsock:close()
         end
     end
