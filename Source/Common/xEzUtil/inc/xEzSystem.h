@@ -24,6 +24,14 @@ EZ_DLL_C_SPEC EzUInt getProcessorCount();
 
 EZ_DLL_C_SPEC bool getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords);
 
+
+typedef void*	HEZMODULE;
+
+EZ_DLL_C_SPEC HEZMODULE loadLibrary(const char* pszModName);
+EZ_DLL_C_SPEC void freeLibrary(HEZMODULE hModule);
+EZ_DLL_C_SPEC void* getSymbolAddress(HEZMODULE hModule, const char* pszSymbol);
+EZ_DLL_C_SPEC HEZMODULE getModuleHandle(const char* pszModName);
+
 EZ_NAMESPACE_END
 
 #endif // __XEZ_SYSTEM_H__

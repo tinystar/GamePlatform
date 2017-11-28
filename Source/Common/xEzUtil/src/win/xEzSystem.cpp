@@ -3,7 +3,9 @@
 #include <windows.h>
 
 
-bool EzSys::pathFileExists(const TCHAR* pszPath)
+EZ_NAMESPACE_BEGIN(EzSys)
+
+bool pathFileExists(const TCHAR* pszPath)
 {
 	if (NULL == pszPath || 0 == *pszPath)
 		return false;
@@ -11,7 +13,7 @@ bool EzSys::pathFileExists(const TCHAR* pszPath)
 	return (0 == _taccess(pszPath, 0));
 }
 
-bool EzSys::createDirectory(const TCHAR* pszPath)
+bool createDirectory(const TCHAR* pszPath)
 {
 	if (NULL == pszPath || 0 == *pszPath)
 		return false;
@@ -44,7 +46,7 @@ bool EzSys::createDirectory(const TCHAR* pszPath)
 	return true;
 }
 
-EzUInt EzSys::getProcessorCount()
+EzUInt getProcessorCount()
 {
 	SYSTEM_INFO sysInfo;
 	::GetSystemInfo(&sysInfo);
@@ -52,7 +54,7 @@ EzUInt EzSys::getProcessorCount()
 	return sysInfo.dwNumberOfProcessors;
 }
 
-bool EzSys::getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords)
+bool getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords)
 {
 	HMODULE hCurMod = ::GetModuleHandle(NULL);
 	if (NULL == hCurMod)
@@ -79,3 +81,25 @@ bool EzSys::getCurModulePath(TCHAR* pszPathBuffer, unsigned long nSizeInWords)
 	_tcscpy_s(pszPathBuffer, nSizeInWords, szFileName);
 	return true;
 }
+
+HEZMODULE loadLibrary(const char* pszModName)
+{
+	return (HEZMODULE)::LoadLibraryA(pszModName);
+}
+
+void freeLibrary(HEZMODULE hModule)
+{
+	::FreeLibrary((HMODULE)hModule);
+}
+
+void* getSymbolAddress(HEZMODULE hModule, const char* pszSymbol)
+{
+	return (void*)::GetProcAddress((HMODULE)hModule, pszSymbol);
+}
+
+HEZMODULE getModuleHandle(const char* pszModName)
+{
+	return (HEZMODULE)::GetModuleHandleA(pszModName);
+}
+
+EZ_NAMESPACE_END

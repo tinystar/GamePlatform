@@ -2,7 +2,9 @@
 #include "xEzDebug.h"
 
 
-bool EzTime::getDateToday(int& year, int& month, int& day)
+EZ_NAMESPACE_BEGIN(EzTime)
+
+bool getDateToday(int& year, int& month, int& day)
 {
 	time_t nowTime = 0;
 	nowTime = time(NULL);
@@ -10,7 +12,7 @@ bool EzTime::getDateToday(int& year, int& month, int& day)
 	return getDateFromTime(nowTime, year, month, day);
 }
 
-bool EzTime::getDateFromTime(time_t tm, int& year, int& month, int& day)
+bool getDateFromTime(time_t tm, int& year, int& month, int& day)
 {
 	struct tm local;
 	errno_t err = localtime_s(&local, &tm);
@@ -24,7 +26,7 @@ bool EzTime::getDateFromTime(time_t tm, int& year, int& month, int& day)
 	return true;
 }
 
-bool EzTime::getTimeCurrent(int& hour, int& min, int& sec)
+bool getTimeCurrent(int& hour, int& min, int& sec)
 {
 	time_t nowTime = time(NULL);
 	struct tm local;
@@ -38,3 +40,5 @@ bool EzTime::getTimeCurrent(int& hour, int& min, int& sec)
 
 	return true;
 }
+
+EZ_NAMESPACE_END
