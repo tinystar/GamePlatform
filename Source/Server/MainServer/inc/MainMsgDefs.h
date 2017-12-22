@@ -12,4 +12,32 @@
 
 #include "BaseMsgDefs.h"
 
+#define MSG_MAINID_USER						10
+
+// client -> server
+#define MSG_SUBID_ACCOUNT_LOGIN				1
+#define MSG_SUBID_WECHAT_LOGIN				2
+
+// server -> client
+#define MSG_SUBID_LOGIN_SUCCESS				1
+#define MSG_SUBID_ACCOUNT_NOT_EXIST			2
+#define MSG_SUBID_WRONG_PASSWORD			3
+
+#pragma pack(push, 1)
+
+struct AccountLoginMsg
+{
+	GameMsgHeader	header;
+	char			szAccount[64];
+	char			szPassword[16];
+
+	AccountLoginMsg()
+	{
+		::memset(szAccount, 0, sizeof(szAccount));
+		::memset(szPassword, 0, sizeof(szPassword));
+	}
+};
+
+#pragma pack(pop)
+
 #endif // __MAIN_MSG_DEFS_H__

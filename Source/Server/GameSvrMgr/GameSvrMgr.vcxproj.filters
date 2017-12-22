@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{7444de55-bc73-4073-9b02-775078c1613a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk_inc">
+      <UniqueIdentifier>{f9b19f3a-3181-4176-9be3-e12e7ae4e6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{6538dae4-3c32-4398-83a2-921e83f1e6cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\GameSvrMgr.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameServerManager.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameDesk.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameModuleDef.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameRoomServer.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\GameServerManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameRoomServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameSvrMgr.def" />
+  </ItemGroup>
+</Project>

@@ -12,5 +12,10 @@
 
 #include "BaseMsgDefs.h"
 
+#define MSG_MAINID_DB						5
+
+#define MSG_SUBID_QUERY_GAMEKINDS			1
+#define MSG_SUBID_QUERY_GAMEPLACES			2
+#define MSG_SUBID_QUERY_GAMEROOMS			3
 
 #endif // __DB_MSG_DEFS_H__

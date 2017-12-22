@@ -7,6 +7,11 @@
 #define ITEM_ID_DB			2
 
 
+NetMsgMapEntry MainServer::s_msgMapArray[] = {
+	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) }
+};
+
+
 MainServer::MainServer()
 	: m_sGatePort(0)
 	, m_sDBPort(0)
@@ -31,17 +36,26 @@ MainServer::~MainServer()
 
 bool MainServer::onInit(const ServerInitConfig& serverConfig)
 {
+	if (!BaseGameServer::onInit(serverConfig))
+		return false;
+
 	m_sPort = serverConfig.tcpConfig.sPort;
+
+	registerMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	return true;
 }
 
 bool MainServer::onUninit()
 {
-	return true;
+	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
+	return BaseGameServer::onUninit();
 }
 
 bool MainServer::onStart()
 {
+	if (!BaseGameServer::onStart())
+		return false;
+
 	if (!connectToGate())
 		return false;
 	if (!connectToDB())
@@ -57,6 +71,9 @@ bool MainServer::onStart()
 
 bool MainServer::onStop()
 {
+	if (!BaseGameServer::onStop())
+		return false;
+
 	m_bStopServer = true;
 	::WaitForSingleObject(m_hSelectThread, INFINITE);
 	::CloseHandle(m_hSelectThread);
@@ -216,4 +233,25 @@ bool MainServer::sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId,
 
 	pClientSock->sendData(&header, sizeof(header));
 	return true;
+}
+
+void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
+{
+	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
+
+	// Todo:
+
+	// test
+	if (strcmp(pAccountLoginMsg->szAccount, "whx") != 0)
+	{
+		sendMsg(id, MSG_MAINID_USER, MSG_SUBID_ACCOUNT_NOT_EXIST);
+		return;
+	}
+	if (strcmp(pAccountLoginMsg->szPassword, "123456") != 0)
+	{
+		sendMsg(id, MSG_MAINID_USER, MSG_SUBID_WRONG_PASSWORD);
+		return;
+	}
+
+	sendMsg(id, MSG_MAINID_USER, MSG_SUBID_LOGIN_SUCCESS);
 }

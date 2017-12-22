@@ -10,7 +10,9 @@
 
 -- global game context data
 __GData__ = {
-
+    MainSvrAddress = nil,
+    MainSvrPort = nil,
+    MainSocket = nil
 }
 
 return __GData__

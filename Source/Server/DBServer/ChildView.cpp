@@ -18,12 +18,18 @@
 #define IDT_FIRST_STARTSVR		110
 
 
+// UI notify msg
+#define WM_DATABASE_OPEN		(WM_USER + 1)
+#define WM_DATABASE_CLOSE		(WM_USER + 2)
+
+
 // CChildView
 
 CChildView::CChildView()
 	: m_svrStatus(0)
 	, m_bFirstStart(TRUE)
 {
+	m_dbSvrMgr.getServer().registerUIObserver(this);
 }
 
 CChildView::~CChildView()
@@ -40,6 +46,8 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_BN_CLICKED(ID_BTN_DUMP, &CChildView::OnBtnDumpClick)
 	ON_BN_CLICKED(ID_BTN_UPDCFG, &CChildView::OnBtnUpdCfgClick)
 	ON_BN_CLICKED(ID_BTN_OPENDIR, &CChildView::OnBtnOpenDirClick)
+	ON_MESSAGE(WM_DATABASE_OPEN, &CChildView::OnDatabaseOpenUIMsg)
+	ON_MESSAGE(WM_DATABASE_CLOSE, &CChildView::OnDatabaseCloseUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +105,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	strRes.LoadString(IDS_OPENDIR);
 	m_openDirBtn.Create(strRes, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, rcControl, this, ID_BTN_OPENDIR);
 	m_openDirBtn.SetFont(&m_font);
+
+	rcControl.SetRect(10, 10, 575, 280);
+	m_msgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY, rcControl, this, -1);
 
 	SVCErrorCode ec = eOk;
 	if ((ec = m_dbSvrMgr.initServer()) != eOk)
@@ -197,4 +208,39 @@ void CChildView::OnDestroy()
 	m_dbSvrMgr.stopServer();
 	m_dbSvrMgr.unInitServer();
 	CWnd::OnDestroy();
+}
+
+void CChildView::onUIDatabaseOpen(bool bSucc, const TCHAR* pszMsg)
+{
+	this->PostMessage(WM_DATABASE_OPEN, (WPARAM)bSucc);
+}
+
+void CChildView::onUIDatabaseClose()
+{
+	this->PostMessage(WM_DATABASE_CLOSE);
+}
+
+LRESULT CChildView::OnDatabaseOpenUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	bool bSucc = (bool)wParam;
+
+	if (bSucc)
+		AppendServerMsg(_T("连接数据库成功！\r\n"));
+	else
+		AppendServerMsg(_T("连接数据库失败！\r\n"));
+
+	return 0;
+}
+
+LRESULT CChildView::OnDatabaseCloseUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	AppendServerMsg(_T("关闭数据库连接！\r\n"));
+	return 0;
+}
+
+void CChildView::AppendServerMsg(const TCHAR* pszMsg)
+{
+	int nLength = m_msgEdit.SendMessage(WM_GETTEXTLENGTH);
+	m_msgEdit.SetSel(nLength, nLength);
+	m_msgEdit.ReplaceSel(pszMsg);
 }

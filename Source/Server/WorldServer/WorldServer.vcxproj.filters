@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{e938d356-607b-485e-bfd9-ee27c8d396ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc">
+      <UniqueIdentifier>{b8134a3e-f037-4b0d-8e06-2deb257b4148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{7eb1404a-591f-4027-93ed-e2fbb55c1e5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{7266d1ea-219f-46ae-97e5-36011efb914f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\inc">
+      <UniqueIdentifier>{f8ca832a-ce50-4fc9-8ce1-ab596732e469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mfc\src">
+      <UniqueIdentifier>{fa0bb22f-9176-4f48-a6b7-d8c85272d15f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChildView.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldServerApp.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UIComm\win\TrayIcon.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChildView.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldServerApp.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\WorldServer.ico">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\WorldServer.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WorldServer.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

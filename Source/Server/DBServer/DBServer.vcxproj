@@ -117,8 +117,10 @@
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="DBServerApp.h" />
     <ClInclude Include="inc\DBMsgDefs.h" />
+    <ClInclude Include="inc\DBRecordSets.h" />
     <ClInclude Include="inc\DBServer.h" />
     <ClInclude Include="inc\DBServerMgr.h" />
+    <ClInclude Include="inc\IDBServerUIObserver.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -129,6 +131,7 @@
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="DBServerApp.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="src\DBRecordSets.cpp" />
     <ClCompile Include="src\DBServer.cpp" />
     <ClCompile Include="src\DBServerMgr.cpp" />
     <ClCompile Include="stdafx.cpp" />

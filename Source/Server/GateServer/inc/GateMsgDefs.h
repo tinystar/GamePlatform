@@ -46,7 +46,7 @@ struct MainAddressMsg
 {
 	GameMsgHeader	header;
 	char			szIP[20];
-	unsigned short	sPort;
+	CSUINT16		sPort;
 
 	MainAddressMsg()
 		: sPort(0)
@@ -58,8 +58,8 @@ struct MainAddressMsg
 struct MainConnectMsg
 {
 	GameMsgHeader	header;
-	unsigned short	sPort;
-	unsigned int	uMaxUser;
+	CSUINT16		sPort;
+	CSUINT32		uMaxUser;
 
 	MainConnectMsg()
 		: sPort(0)

@@ -62,6 +62,11 @@ protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
 protected:
+	void onAccountLogin(ClientId id, void* pData, size_t nDataLen);
+
+protected:
+	static NetMsgMapEntry s_msgMapArray[];
+
 	char					m_szGateAddr[20];
 	char					m_szDBAddr[20];
 	unsigned short			m_sGatePort;

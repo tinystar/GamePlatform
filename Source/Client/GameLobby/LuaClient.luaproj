@@ -25,6 +25,7 @@
     <Folder Include="app\" />
     <Folder Include="app\model\" />
     <Folder Include="app\network\" />
+    <Folder Include="app\utils\" />
     <Folder Include="app\resource\" />
     <Folder Include="app\views\" />
     <Folder Include="cocos\" />
@@ -46,6 +47,8 @@
     <Folder Include="packages\mvc\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="app\model\GameConstDefs.lua" />
+    <Compile Include="app\model\GameGlobalFunc.lua" />
     <Compile Include="app\model\GData.lua" />
     <Compile Include="app\MyApp.lua" />
     <Compile Include="app\network\ClientSocket.lua" />
@@ -56,9 +59,17 @@
     <Compile Include="app\resource\LoadRes.lua" />
     <Compile Include="app\resource\StringRes_chs.lua" />
     <Compile Include="app\resource\StringRes_enu.lua" />
+    <Compile Include="app\utils\BufStream.lua" />
+    <Compile Include="app\utils\UtilsFunc.lua" />
+    <Compile Include="app\views\AccountLoginLayer.lua" />
+    <Compile Include="app\views\LobbyPopupLayer.lua" />
+    <Compile Include="app\views\LobbyScene.lua" />
+    <Compile Include="app\views\LobbyViewBase.lua" />
     <Compile Include="app\views\LoginScene.lua" />
     <Compile Include="app\views\MainScene.lua" />
     <Compile Include="app\views\PromptLayer.lua" />
+    <Compile Include="app\views\UserInfoLayer.lua" />
+    <Compile Include="app\views\ViewMainMsgMapper.lua" />
     <Compile Include="cocos\3d\3dConstants.lua" />
     <Compile Include="cocos\cocos2d\bitExtend.lua" />
     <Compile Include="cocos\cocos2d\Cocos2d.lua" />

@@ -8,6 +8,7 @@ LOCAL_MODULE_FILENAME := libcocos2dlua
 
 LOCAL_SRC_FILES := \
 ../../../Classes/AppDelegate.cpp \
+../../../Classes/lpack/lpack.c \
 hellolua/main.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes
@@ -22,6 +23,7 @@ LOCAL_STATIC_LIBRARIES := cocos2d_lua_static
 
 include $(BUILD_SHARED_LIBRARY)
 
+LOCAL_SHORT_COMMANDS := true
 $(call import-module,scripting/lua-bindings/proj.android)
 
 # _COCOS_LIB_IMPORT_ANDROID_BEGIN

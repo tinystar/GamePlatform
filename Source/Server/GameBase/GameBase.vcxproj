@@ -55,7 +55,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GAMEBASE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GAME_BASE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -87,10 +87,14 @@
     <ClInclude Include="inc\BaseGameServer.h" />
     <ClInclude Include="inc\BaseMsgDefs.h" />
     <ClInclude Include="inc\GameBase.h" />
+    <ClInclude Include="inc\GameNode.h" />
+    <ClInclude Include="inc\GameNodeInfo.h" />
     <ClInclude Include="inc\GameUserDefs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp" />
+    <ClCompile Include="src\GameNode.cpp" />
+    <ClCompile Include="src\GameNodeInfo.cpp" />
     <ClCompile Include="src\GameUserDefs.cpp" />
   </ItemGroup>
   <ItemGroup>

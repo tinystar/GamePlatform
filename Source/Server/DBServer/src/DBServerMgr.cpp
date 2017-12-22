@@ -68,6 +68,7 @@ bool DBServerMgr::loadConfig()
 
 	m_bDebugMode = doc["debugMode"].GetBool();
 	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
+	const char* pszDSN = doc["DSN"].GetString();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
 	m_tcpConfig.nSockThreadCnt = tcpCfg["threadCount"].GetUint();
@@ -75,6 +76,7 @@ bool DBServerMgr::loadConfig()
 	m_tcpConfig.nMaxPackageSize = tcpCfg["pkgSize"].GetUint();
 
 	EzLogger::setLogLevel(logLevel);
+	m_server.setDSN(pszDSN);
 
 	return true;
 }

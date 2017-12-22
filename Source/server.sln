@@ -17,6 +17,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBServer", "Server\DBServer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MainServer", "Server\MainServer\MainServer.vcxproj", "{945CE534-FE3C-4849-B90E-359B753539E9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WorldServer", "Server\WorldServer\WorldServer.vcxproj", "{1512E25C-125B-4009-804D-89BF19F752B5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameSvrMgr", "Server\GameSvrMgr\GameSvrMgr.vcxproj", "{96B677B9-F811-467C-BE1E-E1C18E3504F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -51,6 +55,14 @@ Global
 		{945CE534-FE3C-4849-B90E-359B753539E9}.Debug|Win32.Build.0 = Debug|Win32
 		{945CE534-FE3C-4849-B90E-359B753539E9}.Release|Win32.ActiveCfg = Release|Win32
 		{945CE534-FE3C-4849-B90E-359B753539E9}.Release|Win32.Build.0 = Release|Win32
+		{1512E25C-125B-4009-804D-89BF19F752B5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1512E25C-125B-4009-804D-89BF19F752B5}.Debug|Win32.Build.0 = Debug|Win32
+		{1512E25C-125B-4009-804D-89BF19F752B5}.Release|Win32.ActiveCfg = Release|Win32
+		{1512E25C-125B-4009-804D-89BF19F752B5}.Release|Win32.Build.0 = Release|Win32
+		{96B677B9-F811-467C-BE1E-E1C18E3504F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{96B677B9-F811-467C-BE1E-E1C18E3504F0}.Debug|Win32.Build.0 = Debug|Win32
+		{96B677B9-F811-467C-BE1E-E1C18E3504F0}.Release|Win32.ActiveCfg = Release|Win32
+		{96B677B9-F811-467C-BE1E-E1C18E3504F0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

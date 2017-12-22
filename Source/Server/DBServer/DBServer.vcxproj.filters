@@ -67,6 +67,12 @@
     <ClInclude Include="inc\DBServerMgr.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\IDBServerUIObserver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DBRecordSets.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp">
@@ -88,6 +94,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DBServerMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DBRecordSets.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

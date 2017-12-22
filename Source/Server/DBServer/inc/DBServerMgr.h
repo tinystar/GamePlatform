@@ -25,6 +25,8 @@ public:
 
 	unsigned short getPort() const { return m_tcpConfig.sPort; }
 
+	DBServer& getServer() { return m_server; }
+
 protected:
 	bool loadConfig();
 

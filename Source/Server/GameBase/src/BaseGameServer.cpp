@@ -14,24 +14,24 @@ BaseGameServer::~BaseGameServer()
 	EZ_SAFE_DELETE(m_pMsgEncryptor);
 }
 
-bool BaseGameServer::onInit(const ServerInitConfig&)
+bool BaseGameServer::onInit(const ServerInitConfig& serverConfig)
 {
-	return true;
+	return ServerTemplate::onInit(serverConfig);
 }
 
 bool BaseGameServer::onUninit()
 {
-	return true;
+	return ServerTemplate::onUninit();
 }
 
 bool BaseGameServer::onStart()
 {
-	return true;
+	return ServerTemplate::onStart();
 }
 
 bool BaseGameServer::onStop()
 {
-	return true;
+	return ServerTemplate::onStop();
 }
 
 void BaseGameServer::onTcpClientConnectMsg(ClientId id)

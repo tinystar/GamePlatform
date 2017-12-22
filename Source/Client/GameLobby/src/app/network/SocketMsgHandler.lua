@@ -8,14 +8,20 @@
 -- Date: 2017/8/9
 -- *********************************************************************
 
+require "app.network.NetMsgGlobalDefs"
 require "app.network.SocketMsgMapper"
 
 -- -----------------------------------------------------
 -- msg map entries
--- MainMsgId            SubMsgId            Handler
+-- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
-local globalMsgMaps = {
-    
+local mainSvrMsgMap = {
 }
 
-SocketMsgMapper.registerMsgHandler()
+function mapMainServerNetMsg(sockObj)
+    SocketMsgMapper.registerMsgHandler(sockObj, mainSvrMsgMap)
+end
+
+function unmapMainServerNetMsg(sockObj)
+    SocketMsgMapper.removeMsgHandler(sockObj, mainSvrMsgMap)
+end

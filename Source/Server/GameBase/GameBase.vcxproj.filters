@@ -24,12 +24,24 @@
     <ClInclude Include="inc\GameUserDefs.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\GameNode.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameNodeInfo.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\GameUserDefs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameNode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameNodeInfo.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

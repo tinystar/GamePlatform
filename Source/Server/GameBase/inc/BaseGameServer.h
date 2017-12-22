@@ -34,7 +34,7 @@ public:
 	virtual ~BaseGameServer();
 
 protected:
-	virtual bool onInit(const ServerInitConfig&);
+	virtual bool onInit(const ServerInitConfig& serverConfig);
 	virtual bool onUninit();
 	virtual bool onStart();
 	virtual bool onStop();

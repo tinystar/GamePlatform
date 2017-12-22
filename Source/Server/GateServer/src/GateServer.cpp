@@ -23,8 +23,11 @@ GateServer::~GateServer()
 
 }
 
-bool GateServer::onInit(const ServerInitConfig&)
+bool GateServer::onInit(const ServerInitConfig& serverConfig)
 {
+	if (!BaseGameServer::onInit(serverConfig))
+		return false;
+
 	registerMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	return true;
 }
@@ -32,17 +35,17 @@ bool GateServer::onInit(const ServerInitConfig&)
 bool GateServer::onUninit()
 {
 	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
-	return true;
+	return BaseGameServer::onUninit();
 }
 
 bool GateServer::onStart()
 {
-	return true;
+	return BaseGameServer::onStart();
 }
 
 bool GateServer::onStop()
 {
-	return true;
+	return BaseGameServer::onStop();
 }
 
 void GateServer::onRequestConfig(ClientId id, void* pData, size_t nDataLen)
@@ -107,7 +110,7 @@ void GateServer::onTcpClientCloseMsg(ClientId id)
 
 bool GateServer::setVersion(const char* pszVer)
 {
-	if (strlen(pszVer) > 15)
+	if (NULL == pszVer || strlen(pszVer) > (sizeof(m_szVersion) - 1))
 		return false;
 
 	strcpy(m_szVersion, pszVer);
@@ -116,7 +119,7 @@ bool GateServer::setVersion(const char* pszVer)
 
 bool GateServer::setUpdUrl(const char* pszUrl)
 {
-	if (strlen(pszUrl) > (sizeof(m_szUpdUrl) - 1))
+	if (NULL == pszUrl || strlen(pszUrl) > (sizeof(m_szUpdUrl) - 1))
 		return false;
 
 	strcpy(m_szUpdUrl, pszUrl);

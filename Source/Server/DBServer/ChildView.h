@@ -17,7 +17,7 @@ enum ServerStatus
 
 // CChildView 窗口
 
-class CChildView : public CWnd
+class CChildView : public CWnd, public IDBServerUIObserver
 {
 // 构造
 public:
@@ -38,6 +38,13 @@ public:
 public:
 	virtual ~CChildView();
 
+protected:
+	virtual void onUIDatabaseOpen(bool bSucc, const TCHAR* pszMsg);
+	virtual void onUIDatabaseClose();
+
+protected:
+	void AppendServerMsg(const TCHAR* pszMsg);
+
 	// 生成的消息映射函数
 protected:
 	afx_msg void OnPaint();
@@ -48,6 +55,8 @@ protected:
 	afx_msg void OnBtnOpenDirClick();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDatabaseOpenUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDatabaseCloseUIMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:
@@ -57,6 +66,7 @@ protected:
 	CButton					m_dumpBtn;
 	CButton					m_openDirBtn;
 	CButton					m_updCfgBtn;
+	CEdit					m_msgEdit;
 	CFont					m_font;
 	BOOL					m_bFirstStart;
 };

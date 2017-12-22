@@ -16,3 +16,7 @@ EXPORTS
 ?removeMsgHandler@BaseGameServer@@IAE_NQBUNetMsgMapEntry@@I@Z
 ?sendMsg@BaseGameServer@@IAE_NVClientId@@PAXI@Z
 ?sendMsg@BaseGameServer@@IAE_NVClientId@@GGI@Z
+?onInit@BaseGameServer@@MAE_NABUServerInitConfig@@@Z
+?onUninit@BaseGameServer@@MAE_NXZ
+?onStart@BaseGameServer@@MAE_NXZ
+?onStop@BaseGameServer@@MAE_NXZ

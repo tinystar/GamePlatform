@@ -9,16 +9,28 @@
 -- *********************************************************************
 
 MAINMSGID = {
-    MSG_MAINID_GATE                 = 1
+    MSG_MAINID_GATE                 = 1,
+    MSG_MAINID_USER                 = 10
 }
 
 SUBMSGID = {
-    -- GateServer Msg
+    -- **********GateServer Msg***********
+    -- Client -> Server
     MSG_SUBID_REQUEST_CONFIG        = 1,
     MSG_SUBID_REQUEST_MAINSVR_ADDR  = 2,
+    -- Server -> Client
     MSG_SUBID_CONFIG                = 1,
     MSG_SUBID_MAINSVR_ADDR          = 2,
-    MSG_SUBID_NO_MAINSVR            = 3
+    MSG_SUBID_NO_MAINSVR            = 3,
+
+    -- **********MainServer Msg***********
+    -- Client -> Server
+    MSG_SUBID_ACCOUNT_LOGIN         = 1,
+    MSG_SUBID_WECHAT_LOGIN          = 2,
+    -- Server -> Client
+    MSG_SUBID_LOGIN_SUCCESS         = 1,
+    MSG_SUBID_ACCOUNT_NOT_EXIST     = 2,
+    MSG_SUBID_WRONG_PASSWORD        = 3
 }
 
 function parseNetMsgHeader(data, len)
@@ -50,6 +62,19 @@ function parseGateConfigMsg(data, len)
     assert(144 == len, "Invalid Gate Config Msg!")
     local nextPos, ver, updUrl = string.unpack(data, "A16A128")
 
-    print(ver)
-    print(updUrl)
+    return {version = ver, updateUrl = updUrl}
+end
+
+function parseMainAddressMsg(data, len)
+    assert(22 == len, "Invalid Main Address Msg!")
+    local nextPos, addr, port = string.unpack(data, "A20H")
+
+    return {mainAddr = addr, mainPort = port}
+end
+
+function packAccountLoginMsg(account, password)
+    local header, headerLen = packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_ACCOUNT_LOGIN)
+
+    local msg = string.pack("AAA", header, paddingWith(account, 64), paddingWith(password, 16))
+    return msg, #msg
 end
