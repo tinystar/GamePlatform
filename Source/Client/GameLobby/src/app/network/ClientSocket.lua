@@ -14,13 +14,7 @@ local socket = require "socket"
 local ClientSocket = class("ClientSocket")
 
 function ClientSocket:ctor()
-    -- create tcp socket
-    local s, msg = socket.tcp()
-    if not s then
-        error(string.format("create tcp socket fails, error msg: (%s)", msg))
-    end
-    s:settimeout(0)
-    self.s_ = s
+    self.s_ = nil
 
     self.isConnected_ = false
 
@@ -42,6 +36,19 @@ end
 
 function ClientSocket:getOption(optname)
     return self.s_:getoption(optname)
+end
+
+function ClientSocket:createTcpSocket()
+    if self.s_ ~= nil then
+        return
+    end
+
+    local s, msg = socket.tcp()
+    if not s then
+        error(string.format("create tcp socket fails, error msg: (%s)", msg))
+    end
+    s:settimeout(0)
+    self.s_ = s
 end
 
 function ClientSocket:addConnectEventListener(func)
@@ -87,6 +94,11 @@ function ClientSocket:removeCloseEventListener(func)
 end
 
 function ClientSocket:connect(host, port)
+    self:createTcpSocket()
+    if self.isConnected_ then
+        return
+    end
+
     local status, msg = self.s_:connect(host, port)
     if status == 1 then
         self.isConnected_ = true
@@ -129,6 +141,7 @@ function ClientSocket:sendData(data, len)
     self.sendBuffer_ = self.sendBuffer_ .. sendPkg
 end
 
+-- 主动关闭时reason传入nil
 function ClientSocket:close(reason)
     for _, func in ipairs(self.closeListeners_) do
         func(self, reason)
@@ -138,11 +151,8 @@ function ClientSocket:close(reason)
     self.s_ = nil
 
     self.isConnected_ = false
-    self.connectListeners_ = nil
-    self.receiveListeners_ = nil
-    self.closeListeners_ = nil
-    self.recvBuffer_ = nil
-    self.sendBuffer_ = nil
+    self.recvBuffer_ = ""
+    self.sendBuffer_ = ""
 end
 
 function ClientSocket:onSocketRead()

@@ -34,9 +34,6 @@ function M.registerMsgHandler(sockObj, msgMapArray)
         return
     end
 
-    M.SockMsgMap_ = M.SockMsgMap_ or {}
-    M.SockMsgMap_[sockObj] = M.SockMsgMap_[sockObj] or {}
-
     for i = 1, #msgMapArray do
         local msgItem = msgMapArray[i]
         local mainId = msgItem.MainMsgId
@@ -44,8 +41,7 @@ function M.registerMsgHandler(sockObj, msgMapArray)
         local msghandler = msgItem.MsgHandler
         assert(msghandler, "message handler function must not be nil!")
 
-        M.SockMsgMap_[sockObj][mainId] = M.SockMsgMap_[sockObj][mainId] or {}
-        M.SockMsgMap_[sockObj][mainId][subId] = msghandler
+        M.registerAnMapEntry(sockObj, mainId, subId, msghandler)
     end
 end
 
@@ -63,9 +59,41 @@ function M.removeMsgHandler(sockObj, msgMapArray)
         local mainId = msgItem.MainMsgId
         local subId = msgItem.SubMsgId
 
-        if M.SockMsgMap_[sockObj][mainId] ~= nil then
-            M.SockMsgMap_[sockObj][mainId][subId] = nil
-        end
+        M.removeAnMapEntry(sockObj, mainId, subId)
+    end
+end
+
+function M.registerAnMapEntry(sockObj, mainId, subId, msgHandler)
+    if nil == sockObj then
+        return
+    end
+
+    if nil == mainId or nil == subId or nil == msgHandler then
+        return
+    end
+
+    M.SockMsgMap_ = M.SockMsgMap_ or {}
+    M.SockMsgMap_[sockObj] = M.SockMsgMap_[sockObj] or {}
+    M.SockMsgMap_[sockObj][mainId] = M.SockMsgMap_[sockObj][mainId] or {}
+    if M.SockMsgMap_[sockObj][mainId][subId] ~= nil then
+        print(string.format("message mapping already exists with main id = %d and sub id = %d", mainId, subId))
+        return
+    end
+
+    M.SockMsgMap_[sockObj][mainId][subId] = msgHandler
+end
+
+function M.removeAnMapEntry(sockObj, mainId, subId)
+    if nil == sockObj then
+        return
+    end
+
+    if nil == M.SockMsgMap_[sockObj] then
+        return
+    end
+
+    if M.SockMsgMap_[sockObj][mainId] ~= nil then
+        M.SockMsgMap_[sockObj][mainId][subId] = nil
     end
 end
 

@@ -10,9 +10,8 @@
 
 local PromptLayer = import(".PromptLayer")
 local AccountLoginLayer = import(".AccountLoginLayer")
-local ViewMainMsgMapper = import(".ViewMainMsgMapper")
 
-local LoginScene = class("LoginScene", cc.load("mvc").ViewBase, ViewMainMsgMapper)
+local LoginScene = class("LoginScene", cc.load("mvc").ViewBase)
 
 LoginScene.RESOURCE_FILENAME = "LoadScene.csb"
 LoginScene.RESOURCE_BINDING = {
@@ -43,6 +42,10 @@ function LoginScene:initEventListeners()
 
     local eventDispatcher = self:getEventDispatcher()
     local listener = cc.EventListenerCustom:create(CustEvents.PromptRemove, handler(self, self.onPromptLayerRemoved))
+    eventDispatcher:addEventListenerWithFixedPriority(listener, 1)
+    table.insert(self.eventListeners_, listener)
+
+    listener = cc.EventListenerCustom:create(CustEvents.ConnMainSucc, handler(self, self.onEventMainServerConnectSuccessful))
     eventDispatcher:addEventListenerWithFixedPriority(listener, 1)
     table.insert(self.eventListeners_, listener)
 
@@ -94,9 +97,23 @@ function LoginScene:stopConnectingAnimation()
     end
 end
 
+function LoginScene:initSocketMsgMap(sockObj, msgMap)
+    for _, entry in ipairs(msgMap) do
+        SocketMsgMapper.registerAnMapEntry(sockObj, entry.MainMsgId, entry.SubMsgId, handler(self, self[entry.MsgHandler]))
+    end
+end
+
+function LoginScene:unInitSocketMsgMap(sockObj, msgMap)
+    for _, entry in ipairs(msgMap) do
+        SocketMsgMapper.removeAnMapEntry(sockObj, entry.MainMsgId, entry.SubMsgId)
+    end
+end
+
 function LoginScene:onEnter()
     self:initEventListeners()
-    self:initMainMsgMap(LoginScene.MainMsgMap)
+
+    local mainSock = createMainSocket()
+    self:initSocketMsgMap(mainSock, LoginScene.MainMsgMap)
 
     -- connect to gate server
     self:connectGateServer()
@@ -104,7 +121,7 @@ function LoginScene:onEnter()
 end
 
 function LoginScene:onExit()
-    self:unInitMainMsgMap()
+    self:unInitSocketMsgMap(__GData__.MainSocket, LoginScene.MainMsgMap)
     self:cleanupEventListeners()
 end
 
@@ -121,11 +138,7 @@ function LoginScene:onPromptLayerRemoved(event)
     print("-----LoginScene:onPromptLayerRemoved-----")
 end
 
--- override ViewMainMsgMapper's method
 function LoginScene:onEventMainServerConnectSuccessful(event)
-    -- call super method
-    ViewMainMsgMapper.onEventMainServerConnectSuccessful(self, event)
-
     self:stopConnectingAnimation()
 
     self.LoginPanel:setVisible(true)

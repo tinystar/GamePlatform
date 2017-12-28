@@ -92,6 +92,8 @@ function M.closeAllSockets()
             clientsock:close()
         end
     end
+
+    M.clientSockets_ = {}
 end
 
 return M

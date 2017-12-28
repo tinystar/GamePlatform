@@ -19,14 +19,21 @@ end
 function PromptLayer:onCreate()
     self:initWithColor(cc.c4b(0,0,0,225))
 
+    local event = cc.EventCustom:new(CustEvents.PromptAdd)
+    self:getEventDispatcher():dispatchEvent(event)
+
     local rootNode = cc.CSLoader:createNodeWithVisibleSize("PromptLayer.csb")
     self:addChild(rootNode)
 
     local bgNode = rootNode:getChildByName("bg")
     local promptTxt = bgNode:getChildByName("Text_Prompt")
     local okBtn = bgNode:getChildByName("Button_OK")
+
     promptTxt:setString(self.promptMsg_)
     okBtn:addClickEventListener(function(sender)
+        local event = cc.EventCustom:new(CustEvents.PromptRemove)
+        self:getEventDispatcher():dispatchEvent(event)
+
         self:removeFromParent()
     end)
 end
