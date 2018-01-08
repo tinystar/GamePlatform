@@ -18,7 +18,7 @@ char* wideCharToUtf8(const wchar_t* pSrc)
 	int cLen = ::WideCharToMultiByte(CP_UTF8, 0, pSrc, -1, pszResult, len, NULL, NULL);
 	if (!EzVerify(cLen > 0))
 	{
-		delete pszResult;
+		delete[] pszResult;
 		return NULL;
 	}
 
@@ -38,7 +38,7 @@ char* wideCharToAnsi(const wchar_t* pSrc)
 	int cLen = ::WideCharToMultiByte(CP_ACP, 0, pSrc, -1, pszResult, len, NULL, NULL);
 	if (!EzVerify(cLen > 0))
 	{
-		delete pszResult;
+		delete[] pszResult;
 		return NULL;
 	}
 
@@ -58,7 +58,7 @@ wchar_t* ansiToWideChar(const char* pSrc)
 	int cLen = ::MultiByteToWideChar(CP_ACP, 0, pSrc, -1, pUnicode, len);
 	if (!EzVerify(cLen > 0))
 	{
-		delete pUnicode;
+		delete[] pUnicode;
 		return NULL;
 	}
 
@@ -78,7 +78,7 @@ wchar_t* utf8ToWideChar(const char* pSrc)
 	int cLen = ::MultiByteToWideChar(CP_UTF8, 0, pSrc, -1, pUnicode, len);
 	if (!EzVerify(cLen > 0))
 	{
-		delete pUnicode;
+		delete[] pUnicode;
 		return NULL;
 	}
 
@@ -92,7 +92,7 @@ char* ansiToUtf8(const char* pSrc)
 		return NULL;
 
 	char* pszResult = wideCharToUtf8(pUnicode);
-	delete pUnicode;
+	delete[] pUnicode;
 
 	return pszResult;
 }

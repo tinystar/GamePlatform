@@ -185,14 +185,15 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_mainSvrMgr.getGateSvrAddr(szAddr, 50, sPort);
 		wchar_t* pAddrW = EzText::utf8ToWideChar(szAddr);
 		m_gateAddrEdit.SetWindowText(pAddrW);
-		delete pAddrW;
+		delete[] pAddrW;
+		pAddrW = NULL;
 		strPort.Format(_T("%d"), sPort);
 		m_gatePortEdit.SetWindowText(strPort);
 
 		m_mainSvrMgr.getDBSvrAddr(szAddr, 50, sPort);
 		pAddrW = EzText::utf8ToWideChar(szAddr);
 		m_DBAddrEdit.SetWindowText(pAddrW);
-		delete pAddrW;
+		delete[] pAddrW;
 		strPort.Format(_T("%d"), sPort);
 		m_DBPortEdit.SetWindowText(strPort);
 #else
@@ -287,12 +288,13 @@ void CChildView::OnBtnStartClick()
 		char* pAddrA = EzText::wideCharToAnsi(sGateAddr.GetString());
 		unsigned short port = (unsigned short)_ttoi(sGatePort.GetString());
 		m_mainSvrMgr.setGateSvrAddr(pAddrA, port);
-		delete pAddrA;
+		delete[] pAddrA;
+		pAddrA = NULL;
 
 		pAddrA = EzText::wideCharToAnsi(sDBAddr.GetString());
 		port = (unsigned short)_ttoi(sDBPort.GetString());
 		m_mainSvrMgr.setDBSvrAddr(pAddrA, port);
-		delete pAddrA;
+		delete[] pAddrA;
 #else
 		unsigned short port = (unsigned short)_ttoi(sGatePort.GetString());
 		m_mainSvrMgr.setGateSvrAddr(sGateAddr.GetString(), port);

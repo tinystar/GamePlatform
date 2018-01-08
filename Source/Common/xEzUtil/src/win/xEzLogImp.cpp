@@ -231,16 +231,17 @@ bool EzLoggerImp::appendLog(TCHAR* pszLog)
 	if (!EzVerify(m_pCurBuffer != NULL))
 		return false;
 
-	auto_ptr<char> strUtf8(tcharToUtf8(pszLog));
-	int nRet = m_pCurBuffer->write( strUtf8.get(), strlen(strUtf8.get()) );
+	const char* pszUtf8 = tcharToUtf8(pszLog);
+	int nRet = m_pCurBuffer->write(pszUtf8, strlen(pszUtf8));
 	if (-1 == nRet)		// full
 	{
 		bool bRet = _flush();	// flush the buffer when it's full.
 		EzAssert(bRet && m_pCurBuffer);
 		// after flush, write to new buffer again.
-		nRet = m_pCurBuffer->write(strUtf8.get(), strlen(strUtf8.get()));
+		nRet = m_pCurBuffer->write(pszUtf8, strlen(pszUtf8));
 		EzAssert(nRet > 0);
 	}
+	delete[] pszUtf8;
 
 	return true;
 }

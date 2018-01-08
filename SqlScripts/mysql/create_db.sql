@@ -1,0 +1,69 @@
+##########################################################################
+# All rights reserved.
+# You can't use, copy or modify the file without the permission of the
+# author. Otherwise I will be held accountable under the law.
+#
+# Author: xiaoxin
+# Contact: 765392700(QQ)
+# Date: 2017/12/10
+##########################################################################
+
+# create card game database
+CREATE DATABASE IF NOT EXISTS xCardGame
+    CHARACTER SET = utf8;
+
+USE xCardGame;
+
+# create userinfo table
+CREATE TABLE IF NOT EXISTS userinfo
+(
+    userid        int               NOT NULL AUTO_INCREMENT,
+    account       char(16)          NOT NULL UNIQUE,
+    password      char(16)          NOT NULL,
+    username      varchar(64)      NOT NULL,
+    gender        boolean           NULL DEFAULT 0,
+    money         decimal(10,2)     NULL DEFAULT 0,
+    roomcardcount int unsigned      NULL DEFAULT 0,
+    phonenumber   char(15)          NULL,
+    flag          int unsigned      NULL DEFAULT 0,
+    PRIMARY KEY(userid)
+)ENGINE = InnoDB, AUTO_INCREMENT = 100000;
+
+# create game kind table
+CREATE TABLE IF NOT EXISTS gamekind
+(
+    kindid        int               NOT NULL AUTO_INCREMENT,
+    gamename      varchar(23)       NOT NULL UNIQUE,
+    clientmodule  varchar(23)       NOT NULL,
+    servermodule  varchar(23)       NULL,
+    version       char(15)          NOT NULL,
+    sortweight    int               NULL,
+    PRIMARY KEY(kindid)
+)ENGINE = InnoDB;
+
+# create game place table
+CREATE TABLE IF NOT EXISTS gameplace
+(
+    kindid        int               NOT NULL,
+    placeid       int               NOT NULL,
+    placename     varchar(23)       NOT NULL,
+    enterlimit    decimal(10,2)     NOT NULL,
+    basepoint     decimal(10,2)     NOT NULL,
+    PRIMARY KEY(kindid, placeid)
+)ENGINE = InnoDB;
+
+# create game room table
+CREATE TABLE IF NOT EXISTS gameroom
+(
+    kindid        int               NOT NULL,
+    placeid       int               NOT NULL,
+    roomid        int               NOT NULL,
+    roomname      varchar(23)       NULL,
+    serverip      char(19)          NOT NULL,
+    serverport    smallint unsigned NOT NULL,
+    PRIMARY KEY(kindid, placeid, roomid)
+)ENGINE = InnoDB;
+
+# create user
+CREATE USER dbserver IDENTIFIED BY 'xx.1314.z';
+GRANT ALL ON xCardGame.* TO dbserver;

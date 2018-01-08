@@ -23,7 +23,8 @@ LoginScene.RESOURCE_BINDING = {
 -- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
 LoginScene.MainMsgMap = {
-    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_LOGIN_SUCCESS, MsgHandler = "onUserLoginSuccessMsg"}
+    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_LOGIN_SUCCESS, MsgHandler = "onUserLoginSuccessMsg"},
+    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_CREATE_GUEST_FAIL, MsgHandler = "onCreateGuestFailMsg"}
 }
 
 
@@ -35,6 +36,8 @@ function LoginScene:onCreate()
     weChatLoginBtn:addClickEventListener(handler(self, self.onWeChatLoginBtnClicked))
     local accountLoginBtn = self.LoginPanel:getChildByName("Button_Account")
     accountLoginBtn:addClickEventListener(handler(self, self.onAccountLoginBtnClicked))
+    local quickLoginBtn = self.LoginPanel:getChildByName("Button_QuickLogin")
+    quickLoginBtn:addClickEventListener(handler(self, self.onQuickLoginBtnClicked))
 end
 
 function LoginScene:initEventListeners()
@@ -134,6 +137,17 @@ function LoginScene:onAccountLoginBtnClicked(sender)
     self:addChild(loginLayer)
 end
 
+function LoginScene:onQuickLoginBtnClicked(sender)
+    local account = cc.UserDefault:getInstance():getStringForKey("Account", "")
+    local password = cc.UserDefault:getInstance():getStringForKey("PassWord", "")
+
+    if account ~= "" and password ~= "" then
+        __GData__.MainSocket:sendData(packAccountLoginMsg(account, password))
+    else
+        __GData__.MainSocket:sendData(packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_QUICK_LOGIN))
+    end
+end
+
 function LoginScene:onPromptLayerRemoved(event)
     print("-----LoginScene:onPromptLayerRemoved-----")
 end
@@ -156,6 +170,23 @@ end
 -- -----------------------------------------------------
 function LoginScene:onUserLoginSuccessMsg(sockObj, msg, msgLen)
     print("-------onUserLoginSuccessMsg-------")
+    local userInfo = parseUserInfoMsg(msg, msgLen)
+    printf("user id = %d", userInfo.UserId)
+    printf("account = %s", userInfo.Account)
+    printf("user name = %s", userInfo.UserName)
+    printf("gender = %s", userInfo.Gender)
+    printf("money = %s", userInfo.Money)
+    printf("room card = %s", userInfo.RoomCard)
+    printf("phone number = %s", userInfo.PhoneNumber)
+    printf("flag = %s", userInfo.TypeFlag)
+
+    __GData__.GameUser = userInfo
+
+    self:getApp():enterScene("LobbyScene")
+end
+
+function LoginScene:onCreateGuestFailMsg(sockObj, msg, msgLen)
+    print("-------onCreateGuestFailMsg--------")
 end
 
 -- gate socket event handlers
@@ -171,6 +202,7 @@ function LoginScene:onSocketGateConnect(sockObj, success, errMsg)
 end
 
 function LoginScene:onGateConfigMsg(sockObj, msg, msgLen)
+    print("-------onGateConfigMsg--------")
     local gateConfig = parseGateConfigMsg(msg, msgLen)
     print("Gate Config Message:")
     printf("version = %s", gateConfig.version)
@@ -186,6 +218,7 @@ function LoginScene:onGateConfigMsg(sockObj, msg, msgLen)
 end
 
 function LoginScene:onMainAddressMsg(sockObj, msg, msgLen)
+    print("-------onMainAddressMsg--------")
     local mainAddr = parseMainAddressMsg(msg, msgLen)
     print("Main Address Message:")
     printf("ip = %s", mainAddr.mainAddr)
@@ -204,6 +237,7 @@ function LoginScene:onMainAddressMsg(sockObj, msg, msgLen)
 end
 
 function LoginScene:onNoMainServerMsg(sockObj, msg, msgLen)
+    print("-------onNoMainServerMsg--------")
     local promptLayer = PromptLayer:create(gres.str.NO_MAIN_SERVER)
     self:addChild(promptLayer)
 end

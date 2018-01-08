@@ -248,7 +248,7 @@ void CChildView::onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode)
 #ifdef _UNICODE
 	const wchar_t* pszMainIP = EzText::ansiToWideChar(svrNode.szMainAddr);
 	memcpy(pAddParam->szMainIP, pszMainIP, sizeof(pAddParam->szMainIP));
-	delete pszMainIP;
+	delete[] pszMainIP;
 #else
 	memcpy(pAddParam->szMainIP, svrNode.szMainAddr, sizeof(pAddParam->szMainIP));
 #endif

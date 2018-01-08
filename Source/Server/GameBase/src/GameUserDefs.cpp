@@ -5,13 +5,14 @@
 
 
 GameUser::GameUser()
-	: uUserId(0)
-	, genderType(eMale)
-	, dMoney(0)
-	, uTypeFlag(0)
+	: m_uUserId(0)
+	, m_genderType(eMale)
+	, m_dMoney(0)
+	, m_uTypeFlag(0)
 {
-	::memset(szName, 0, sizeof(szName));
-	::memset(szPhoneNumber, 0, sizeof(szPhoneNumber));
+	::memset(m_szAccount, 0, sizeof(m_szAccount));
+	::memset(m_szName, 0, sizeof(m_szName));
+	::memset(m_szPhoneNumber, 0, sizeof(m_szPhoneNumber));
 }
 
 bool GameUser::setUserId(EzUInt32 id)
@@ -19,7 +20,18 @@ bool GameUser::setUserId(EzUInt32 id)
 	if (!EzVerify(id > 0))
 		return false;
 
-	uUserId = id;
+	m_uUserId = id;
+	return true;
+}
+
+bool GameUser::setAccount(const char* pszAccount)
+{
+	if (NULL == pszAccount || 0 == *pszAccount)
+		return false;
+	if (strlen(pszAccount) > (sizeof(m_szAccount) - 1))
+		return false;
+
+	strcpy(m_szAccount, pszAccount);
 	return true;
 }
 
@@ -27,16 +39,22 @@ bool GameUser::setUserName(const char* pszName)
 {
 	if (NULL == pszName || 0 == *pszName)
 		return false;
-	if (strlen(pszName) > 255)
+	if (strlen(pszName) > (sizeof(m_szName) - 1))
 		return false;
 
-	strcpy(szName, pszName);
+	strcpy(m_szName, pszName);
 	return true;
 }
 
 bool GameUser::setMoney(double money)
 {
-	dMoney = money;
+	m_dMoney = money;
+	return true;
+}
+
+bool GameUser::setRoomCardCount(EzUInt32 count)
+{
+	m_uRoomCardCount = count;
 	return true;
 }
 
@@ -44,19 +62,19 @@ bool GameUser::setPhoneNumber(const char* pPhoneNum)
 {
 	if (NULL == pPhoneNum)
 		pPhoneNum = "";
-	if (strlen(pPhoneNum) > 15)
+	if (strlen(pPhoneNum) > (sizeof(m_szPhoneNumber) - 1))
 		return false;
 
-	strcpy(szPhoneNumber, pPhoneNum);
+	strcpy(m_szPhoneNumber, pPhoneNum);
 	return true;
 }
 
 bool GameUser::setRobot(bool bRobot)
 {
 	if (bRobot)
-		uTypeFlag |= kRobot;
+		m_uTypeFlag |= kRobot;
 	else
-		uTypeFlag &= ~kRobot;
+		m_uTypeFlag &= ~kRobot;
 
 	return true;
 }
@@ -64,9 +82,19 @@ bool GameUser::setRobot(bool bRobot)
 bool GameUser::setVip(bool bVip)
 {
 	if (bVip)
-		uTypeFlag |= kVip;
+		m_uTypeFlag |= kVip;
 	else
-		uTypeFlag &= ~kVip;
+		m_uTypeFlag &= ~kVip;
+
+	return true;
+}
+
+bool GameUser::setGuest(bool bGuest)
+{
+	if (bGuest)
+		m_uTypeFlag |= kGuest;
+	else
+		m_uTypeFlag &= ~kGuest;
 
 	return true;
 }

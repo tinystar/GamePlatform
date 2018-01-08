@@ -27,10 +27,12 @@ SUBMSGID = {
     -- Client -> Server
     MSG_SUBID_ACCOUNT_LOGIN         = 1,
     MSG_SUBID_WECHAT_LOGIN          = 2,
+    MSG_SUBID_QUICK_LOGIN           = 3,
     -- Server -> Client
     MSG_SUBID_LOGIN_SUCCESS         = 1,
     MSG_SUBID_ACCOUNT_NOT_EXIST     = 2,
-    MSG_SUBID_WRONG_PASSWORD        = 3
+    MSG_SUBID_WRONG_PASSWORD        = 3,
+    MSG_SUBID_CREATE_GUEST_FAIL     = 4
 }
 
 function parseNetMsgHeader(data, len)
@@ -77,4 +79,20 @@ function packAccountLoginMsg(account, password)
 
     local msg = string.pack("AAA", header, paddingWith(account, 64), paddingWith(password, 16))
     return msg, #msg
+end
+
+function parseUserInfoMsg(data, len)
+    assert(118 == len, "Invalid User Information Msg!")
+    local nextPos, userId, account, userName, gender, money, roomCard, phoneNumber, flag = string.unpack(data, "IA17A65iIIA16I")
+    money = money / 100
+
+    return {UserId = userId,
+            Account = account,
+            UserName = userName,
+            Gender = gender,
+            Money = money,
+            RoomCard = roomCard,
+            PhoneNumber = phoneNumber,
+            TypeFlag = flag
+            }
 end

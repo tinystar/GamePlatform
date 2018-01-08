@@ -15,3 +15,8 @@ CustEvents = {
     ConnMainFail    = "Connect.Main.Failed",
     MainSockClose   = "Main.Socket.Close"
 }
+
+GenderType = {
+    Male            = 0,
+    Female          = 1
+}

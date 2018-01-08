@@ -2,13 +2,15 @@
 #include "MainMsgDefs.h"
 #include <process.h>
 #include "GateMsgDefs.h"
+#include "DBMsgDefs.h"
 
 #define ITEM_ID_GATE		1
 #define ITEM_ID_DB			2
 
 
 NetMsgMapEntry MainServer::s_msgMapArray[] = {
-	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) }
+	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) },
+	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) }
 };
 
 
@@ -146,6 +148,21 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 	}
 }
 
+void MainServer::onTcpClientCloseMsg(ClientId id)
+{
+	ClientLoginQueue::iterator iter = m_quickLoginQueue.begin();
+	while (iter != m_quickLoginQueue.end())
+	{
+		if (id == iter->clientId)
+		{
+			m_quickLoginQueue.erase(iter);
+			break;
+		}
+
+		++iter;
+	}
+}
+
 void MainServer::onTimerMsg(EzUInt uTimerId)
 {
 	BaseGameServer::onTimerMsg(uTimerId);
@@ -169,6 +186,12 @@ unsigned __stdcall MainServer::clientSelectThread(void* pParam)
 	}
 
 	return 0;
+}
+
+EzULong MainServer::genQuickLoginStamp()
+{
+	static EzULong _s_ulStampSeed = 0;
+	return ++_s_ulStampSeed;
 }
 
 bool MainServer::connectToGate()
@@ -206,7 +229,26 @@ void MainServer::onGateServerMsg(void* pData, size_t nSize)
 
 void MainServer::onDBServerMsg(void* pData, size_t nSize)
 {
+	EzAssert(pData != NULL && nSize > 0);
+	GameMsgHeader* pHeader = (GameMsgHeader*)pData;
+	CSUINT16 uMainId = pHeader->uMainId;
+	CSUINT16 uSubId = pHeader->uSubId;
 
+	if (MSG_MAINID_DB == uMainId)
+	{
+		switch (uSubId)
+		{
+		case MSG_SUBID_GUEST_CREATE_FAIL:
+			onDBCreateGuestFail(pData, nSize);
+			break;
+		case MSG_SUBID_GUEST_CREATE_SUCC:
+			onDBCreateGuestSucc(pData, nSize);
+			break;
+		default:
+			EzAssert(false);
+			break;
+		}
+	}
 }
 
 bool MainServer::sendMsgToServer(TcpClientSocket* pClientSock, void* pData, size_t nDataLen)
@@ -237,6 +279,7 @@ bool MainServer::sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId,
 
 void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 {
+	EzAssert(sizeof(AccountLoginMsg) == nDataLen);
 	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
 
 	// Todo:
@@ -254,4 +297,61 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 	}
 
 	sendMsg(id, MSG_MAINID_USER, MSG_SUBID_LOGIN_SUCCESS);
+}
+
+void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
+{
+	ClientStampMsg stampMsg;
+	stampMsg.header.uMainId = MSG_MAINID_DB;
+	stampMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
+	stampMsg.clientId = id;
+	// 消息发送到DB服务器，在DB服务器处理过程中，id对应的客户端可能断开连接，由于底层id结构会重用，
+	// 所以在DB服务器处理完返回时，id对于的客户端可能发生了变化，不是之前请求DB服务器时的客户端，
+	// 所以不能只用ClientId来唯一确定一个客户端连接，增加ulStamp字段来唯一的标志每次请求以解决这个问题。
+	// 此问题只有在登录时会出现，登录成功以后id对于的客户端会被分配一个唯一的玩家Id，不会出现这种情况
+	stampMsg.ulStamp = genQuickLoginStamp();
+
+	if (sendMsgToServer(&m_clientToDB, &stampMsg, sizeof(stampMsg)))
+		m_quickLoginQueue.push_back(stampMsg);
+}
+
+void MainServer::onDBCreateGuestFail(void* pData, size_t nSize)
+{
+	EzAssert(sizeof(ClientStampMsg) == nSize);
+	ClientStampMsg* pStampMsg = (ClientStampMsg*)pData;
+
+	ClientStampMsg queueHead = m_quickLoginQueue.front();
+	if (queueHead.clientId == pStampMsg->clientId &&
+		queueHead.ulStamp == pStampMsg->ulStamp)
+	{
+		m_quickLoginQueue.pop_front();
+		sendMsg(queueHead.clientId, MSG_MAINID_USER, MSG_SUBID_CREATE_GUEST_FAIL);
+	}
+}
+
+void MainServer::onDBCreateGuestSucc(void* pData, size_t nSize)
+{
+	EzAssert(sizeof(UserInfoWithClientMsg) == nSize);
+	UserInfoWithClientMsg* pUserMsg = (UserInfoWithClientMsg*)pData;
+
+	ClientStampMsg queueHead = m_quickLoginQueue.front();
+	if (queueHead.clientId == pUserMsg->clientId &&
+		queueHead.ulStamp == pUserMsg->ulStamp)
+	{
+		m_quickLoginQueue.pop_front();
+
+		UserInfoMsg userMsg;
+		userMsg.header.uMainId = MSG_MAINID_USER;
+		userMsg.header.uSubId = MSG_SUBID_LOGIN_SUCCESS;
+		userMsg.userId = pUserMsg->userId;
+		strcpy(userMsg.szAccount, pUserMsg->szAccount);
+		strcpy(userMsg.szUserName, pUserMsg->szUserName);
+		userMsg.genderType = pUserMsg->genderType;
+		userMsg.uMoney = pUserMsg->uMoney;
+		userMsg.uRoomCard = pUserMsg->uRoomCard;
+		strcpy(userMsg.szPhoneNum, pUserMsg->szPhoneNum);
+		userMsg.uTypeFlag = pUserMsg->uTypeFlag;
+
+		sendMsg(queueHead.clientId, &userMsg, sizeof(userMsg));
+	}
 }

@@ -69,6 +69,10 @@ bool DBServerMgr::loadConfig()
 	m_bDebugMode = doc["debugMode"].GetBool();
 	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
 	const char* pszDSN = doc["DSN"].GetString();
+	const char* pszGuestName = doc["guestNamePrefix"].GetString();
+	const char* pszGuestPW = doc["guestPassword"].GetString();
+	double dInitMoney = doc["initMoney"].GetDouble();
+	unsigned int uInitRoomCard = doc["initRoomCard"].GetUint();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
 	m_tcpConfig.nSockThreadCnt = tcpCfg["threadCount"].GetUint();
@@ -77,6 +81,10 @@ bool DBServerMgr::loadConfig()
 
 	EzLogger::setLogLevel(logLevel);
 	m_server.setDSN(pszDSN);
+	m_server.setGuestName(pszGuestName);
+	m_server.setGuestPassword(pszGuestPW);
+	m_server.setInitMoney(dInitMoney);
+	m_server.setInitRoomCard(uInitRoomCard);
 
 	return true;
 }

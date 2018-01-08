@@ -74,9 +74,7 @@ end
 function AccountLoginLayer:onLoginBtnClicked(sender)
     local account = self.accountEdit_:getString()
     local password = self.passwordEdit_:getString()
-    if __GData__.MainSocket ~= nil then
-        __GData__.MainSocket:sendData(packAccountLoginMsg(account, password))
-    end
+    __GData__.MainSocket:sendData(packAccountLoginMsg(account, password))
 end
 
 -- -----------------------------------------------------

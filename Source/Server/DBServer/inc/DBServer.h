@@ -22,6 +22,10 @@ public:
 
 public:
 	bool setDSN(const char* pszDSN);
+	bool setGuestName(const char* pszNamePrefix);
+	bool setGuestPassword(const char* pszPassword);
+	bool setInitMoney(double dMoney);
+	bool setInitRoomCard(unsigned int uRoomCard);
 
 	void registerUIObserver(IDBServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
 
@@ -32,15 +36,23 @@ protected:
 	virtual bool onStop();
 
 protected:
+	void onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen);
+
 	void onQueryGameKinds(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGameRooms(ClientId id, void* pData, size_t nDataLen);
+
+	void testDBSP();
 
 protected:
 	static NetMsgMapEntry s_msgMapArray[];
 
 	CDatabase				m_database;
 	char					m_szDSN[256];
+	char					m_szGuestName[256];
+	char					m_szGuestPW[16];		// password
+	double					m_dInitMoney;
+	unsigned int			m_uInitRoomCard;
 	IDBServerUIObserver*	m_pUIObserver;
 };
 

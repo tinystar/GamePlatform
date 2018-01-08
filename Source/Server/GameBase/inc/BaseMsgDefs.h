@@ -27,6 +27,74 @@ struct GameMsgHeader
 	{}
 };
 
+
+// 唯一标志客户端连接的消息，主要用于玩家登录期间DB服务器返回消息时确定是哪个玩家
+struct ClientStampMsg
+{
+	GameMsgHeader	header;
+	ClientId		clientId;
+	CSULONG			ulStamp;
+
+	ClientStampMsg()
+		: ulStamp(0)
+	{
+	}
+};
+
+struct UserInfoMsg
+{
+	GameMsgHeader	header;
+	CSUINT32		userId;
+	char			szAccount[17];
+	char			szUserName[65];
+	CSINT32			genderType;
+	CSUINT32		uMoney;				// 金钱用double表示，但是在网络传输时采用整形（浮点型不同语言、编译器编码方式可能不一样，网络传输最好是整形）
+	CSUINT32		uRoomCard;
+	char			szPhoneNum[16];
+	CSUINT32		uTypeFlag;
+
+	UserInfoMsg()
+		: userId(0)
+		, genderType(0)
+		, uMoney(0)
+		, uRoomCard(0)
+		, uTypeFlag(0)
+	{
+		::memset(szAccount, 0, sizeof(szAccount));
+		::memset(szUserName, 0, sizeof(szUserName));
+		::memset(szPhoneNum, 0, sizeof(szPhoneNum));
+	}
+};
+
+struct UserInfoWithClientMsg
+{
+	GameMsgHeader	header;
+	CSUINT32		userId;
+	ClientId		clientId;
+	CSULONG			ulStamp;
+
+	char			szAccount[17];
+	char			szUserName[65];
+	CSINT32			genderType;
+	CSUINT32		uMoney;				// 金钱用double表示，但是在网络传输时采用整形（浮点型不同语言、编译器编码方式可能不一样，网络传输最好是整形）
+	CSUINT32		uRoomCard;
+	char			szPhoneNum[16];
+	CSUINT32		uTypeFlag;
+
+	UserInfoWithClientMsg()
+		: ulStamp(0)
+		, userId(0)
+		, genderType(0)
+		, uMoney(0)
+		, uRoomCard(0)
+		, uTypeFlag(0)
+	{
+		::memset(szAccount, 0, sizeof(szAccount));
+		::memset(szUserName, 0, sizeof(szUserName));
+		::memset(szPhoneNum, 0, sizeof(szPhoneNum));
+	}
+};
+
 #pragma pack(pop)
 
 #endif // __BASE_MSG_DEFS_H__

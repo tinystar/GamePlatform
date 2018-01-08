@@ -184,7 +184,7 @@ LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 #ifdef _UNICODE
 	wchar_t* pVer = EzText::utf8ToWideChar(gateMgr.getVersion());
 	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), pVer);
-	delete pVer;
+	delete[] pVer;
 #else
 	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), gateMgr.getVersion());
 #endif

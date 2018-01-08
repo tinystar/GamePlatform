@@ -78,6 +78,12 @@ int main()
 	for (int i = 0; i < 10; ++i)
 		testMemPerf();
 
+	time_t tArr[1000];
+	for (int i = 0; i < 1000; ++i)
+	{
+		tArr[i] = time(NULL);
+	}
+
 	_getch();
 	return 0;
 }

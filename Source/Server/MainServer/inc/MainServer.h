@@ -13,6 +13,7 @@
 #include "BaseGameServer.h"
 #include "TcpClientSocket.h"
 #include "IMainServerUIObserver.h"
+#include <list>
 
 class MainServer : public BaseGameServer, public ITcpClientSocketEventHandler
 {
@@ -44,6 +45,8 @@ protected:
 	virtual void onSocketRecved(TcpClientSocket* pClientSock, void* pPackage, size_t nSize);
 	virtual void onSocketClosed(TcpClientSocket* pClientSock, int nErrCode);
 
+	virtual void onTcpClientCloseMsg(ClientId id);
+
 	virtual void onTimerMsg(EzUInt uTimerId);
 
 	virtual void onUserItemMsg(int itemId, void* pData, size_t nSize);
@@ -61,10 +64,22 @@ protected:
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
+	static EzULong genQuickLoginStamp();
+
+	// client messages
 protected:
 	void onAccountLogin(ClientId id, void* pData, size_t nDataLen);
+	void onQuickLogin(ClientId id, void* pData, size_t nDataLen);
+
+	// DBServer messages
+protected:
+	void onDBCreateGuestFail(void* pData, size_t nSize);
+	void onDBCreateGuestSucc(void* pData, size_t nSize);
 
 protected:
+	typedef std::list<ClientStampMsg>	ClientOperQueue;
+	typedef ClientOperQueue				ClientLoginQueue;
+
 	static NetMsgMapEntry s_msgMapArray[];
 
 	char					m_szGateAddr[20];
@@ -79,6 +94,8 @@ protected:
 	TcpClientSocket			m_clientToDB;
 	HANDLE					m_hSelectThread;
 	bool					m_bStopServer;
+
+	ClientLoginQueue		m_quickLoginQueue;
 
 	IMainServerUIObserver*	m_pUIObserver;
 };

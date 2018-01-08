@@ -21,7 +21,8 @@ enum GenderType
 enum UserType
 {
 	kRobot	= 0x00000001,
-	kVip	= 0x00000002
+	kVip	= 0x00000002,
+	kGuest	= 0x00000004
 };
 
 class GameUser
@@ -29,34 +30,45 @@ class GameUser
 public:
 	GameUser();
 
-	EzUInt32 getUserId() const { return uUserId; }
+	EzUInt32 getUserId() const { return m_uUserId; }
 	bool setUserId(EzUInt32 id);
 
-	const char* getUserName() const { return szName; }
+	const char* getAccount() const { return m_szAccount; }
+	bool setAccount(const char* pszAccount);
+
+	const char* getUserName() const { return m_szName; }
 	bool setUserName(const char* pszName);
 
-	GenderType getGenderType() const { return genderType; }
-	bool setGenderType(GenderType type) { genderType = type; return true; }
+	GenderType getGenderType() const { return m_genderType; }
+	bool setGenderType(GenderType type) { m_genderType = type; return true; }
 
-	double getMoney() const { return dMoney; }
+	double getMoney() const { return m_dMoney; }
 	bool setMoney(double money);
 
-	const char* getPhoneNumber() const { return szPhoneNumber; }
+	EzUInt32 getRoomCardCount() const { return m_uRoomCardCount; }
+	bool setRoomCardCount(EzUInt32 count);
+
+	const char* getPhoneNumber() const { return m_szPhoneNumber; }
 	bool setPhoneNumber(const char* pPhoneNum);
 
-	bool isRobot() const { return !!(uTypeFlag & kRobot); }
+	bool isRobot() const { return !!(m_uTypeFlag & kRobot); }
 	bool setRobot(bool bRobot);
 
-	bool isVip() const { return !!(uTypeFlag & kVip); }
+	bool isVip() const { return !!(m_uTypeFlag & kVip); }
 	bool setVip(bool bVip);
 
+	bool isGuest() const { return !!(m_uTypeFlag & kGuest); }
+	bool setGuest(bool bGuest);
+
 protected:
-	EzUInt32			uUserId;
-	char				szName[256];
-	GenderType			genderType;
-	double				dMoney;
-	char				szPhoneNumber[16];
-	EzUInt32			uTypeFlag;
+	EzUInt32			m_uUserId;
+	char				m_szAccount[17];
+	char				m_szName[65];
+	GenderType			m_genderType;
+	double				m_dMoney;
+	EzUInt32			m_uRoomCardCount;
+	char				m_szPhoneNumber[16];
+	EzUInt32			m_uTypeFlag;
 };
 
 #endif // __GAME_USER_DEFS_H__

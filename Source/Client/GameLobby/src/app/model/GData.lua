@@ -12,7 +12,18 @@
 __GData__ = {
     MainSvrAddress = nil,
     MainSvrPort = nil,
-    MainSocket = nil
+    MainSocket = nil,
+
+    GameUser = {
+        UserId = nil,
+        Account = nil,
+        UserName = nil,
+        Gender = nil,
+        Money = nil,
+        RoomCard = nil,
+        PhoneNumber = nil,
+        TypeFlag = nil
+    },
 }
 
 return __GData__

@@ -17,11 +17,13 @@
 // client -> server
 #define MSG_SUBID_ACCOUNT_LOGIN				1
 #define MSG_SUBID_WECHAT_LOGIN				2
+#define MSG_SUBID_QUICK_LOGIN				3
 
 // server -> client
 #define MSG_SUBID_LOGIN_SUCCESS				1
 #define MSG_SUBID_ACCOUNT_NOT_EXIST			2
 #define MSG_SUBID_WRONG_PASSWORD			3
+#define MSG_SUBID_CREATE_GUEST_FAIL			4
 
 #pragma pack(push, 1)
 
