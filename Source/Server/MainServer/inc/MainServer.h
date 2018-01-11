@@ -77,8 +77,7 @@ protected:
 	void onDBCreateGuestSucc(void* pData, size_t nSize);
 
 protected:
-	typedef std::list<ClientStampMsg>	ClientOperQueue;
-	typedef ClientOperQueue				ClientLoginQueue;
+	typedef std::list<ClientStamp>			ClientStampQueue;
 
 	static NetMsgMapEntry s_msgMapArray[];
 
@@ -95,7 +94,7 @@ protected:
 	HANDLE					m_hSelectThread;
 	bool					m_bStopServer;
 
-	ClientLoginQueue		m_quickLoginQueue;
+	ClientStampQueue		m_reqToDBClientQueue;
 
 	IMainServerUIObserver*	m_pUIObserver;
 };

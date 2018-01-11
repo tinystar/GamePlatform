@@ -11,6 +11,7 @@
 #define __GAME_USER_DEFS_H__
 
 #include "xEzTypes.h"
+#include "BaseMsgDefs.h"
 
 enum GenderType
 {
@@ -29,6 +30,9 @@ class GameUser
 {
 public:
 	GameUser();
+	explicit GameUser(const UserInfo& userInfo);
+
+	void initWithUserInfo(const UserInfo& userInfo);
 
 	EzUInt32 getUserId() const { return m_uUserId; }
 	bool setUserId(EzUInt32 id);

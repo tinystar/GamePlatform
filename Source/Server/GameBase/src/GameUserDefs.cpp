@@ -15,6 +15,31 @@ GameUser::GameUser()
 	::memset(m_szPhoneNumber, 0, sizeof(m_szPhoneNumber));
 }
 
+GameUser::GameUser(const UserInfo& userInfo)
+	: m_uUserId(0)
+	, m_genderType(eMale)
+	, m_dMoney(0)
+	, m_uTypeFlag(0)
+{
+	::memset(m_szAccount, 0, sizeof(m_szAccount));
+	::memset(m_szName, 0, sizeof(m_szName));
+	::memset(m_szPhoneNumber, 0, sizeof(m_szPhoneNumber));
+
+	initWithUserInfo(userInfo);
+}
+
+void GameUser::initWithUserInfo(const UserInfo& userInfo)
+{
+	setUserId(userInfo.userId);
+	setAccount(userInfo.szAccount);
+	setUserName(userInfo.szUserName);
+	setGenderType((GenderType)userInfo.genderType);
+	setMoney(userInfo.uMoney / 100.0);
+	setRoomCardCount(userInfo.uRoomCard);
+	setPhoneNumber(userInfo.szPhoneNum);
+	m_uTypeFlag = userInfo.uTypeFlag;
+}
+
 bool GameUser::setUserId(EzUInt32 id)
 {
 	if (!EzVerify(id > 0))

@@ -150,12 +150,12 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 
 void MainServer::onTcpClientCloseMsg(ClientId id)
 {
-	ClientLoginQueue::iterator iter = m_quickLoginQueue.begin();
-	while (iter != m_quickLoginQueue.end())
+	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
+	while (iter != m_reqToDBClientQueue.end())
 	{
 		if (id == iter->clientId)
 		{
-			m_quickLoginQueue.erase(iter);
+			m_reqToDBClientQueue.erase(iter);
 			break;
 		}
 
@@ -301,18 +301,21 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 
 void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 {
-	ClientStampMsg stampMsg;
-	stampMsg.header.uMainId = MSG_MAINID_DB;
-	stampMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
-	stampMsg.clientId = id;
 	// 消息发送到DB服务器，在DB服务器处理过程中，id对应的客户端可能断开连接，由于底层id结构会重用，
 	// 所以在DB服务器处理完返回时，id对于的客户端可能发生了变化，不是之前请求DB服务器时的客户端，
 	// 所以不能只用ClientId来唯一确定一个客户端连接，增加ulStamp字段来唯一的标志每次请求以解决这个问题。
-	// 此问题只有在登录时会出现，登录成功以后id对于的客户端会被分配一个唯一的玩家Id，不会出现这种情况
-	stampMsg.ulStamp = genQuickLoginStamp();
+	// 此问题只有在登录时会出现，登录成功以后id对应的客户端会被分配一个唯一的玩家Id，不会出现这种情况
+	ClientStamp stampInfo;
+	stampInfo.clientId = id;
+	stampInfo.ulStamp = genQuickLoginStamp();
+
+	ClientStampMsg stampMsg;
+	stampMsg.header.uMainId = MSG_MAINID_DB;
+	stampMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
+	stampMsg.clientStamp = stampInfo;
 
 	if (sendMsgToServer(&m_clientToDB, &stampMsg, sizeof(stampMsg)))
-		m_quickLoginQueue.push_back(stampMsg);
+		m_reqToDBClientQueue.push_back(stampInfo);
 }
 
 void MainServer::onDBCreateGuestFail(void* pData, size_t nSize)
@@ -320,12 +323,11 @@ void MainServer::onDBCreateGuestFail(void* pData, size_t nSize)
 	EzAssert(sizeof(ClientStampMsg) == nSize);
 	ClientStampMsg* pStampMsg = (ClientStampMsg*)pData;
 
-	ClientStampMsg queueHead = m_quickLoginQueue.front();
-	if (queueHead.clientId == pStampMsg->clientId &&
-		queueHead.ulStamp == pStampMsg->ulStamp)
+	ClientStamp headStamp = m_reqToDBClientQueue.front();
+	if (headStamp == pStampMsg->clientStamp)
 	{
-		m_quickLoginQueue.pop_front();
-		sendMsg(queueHead.clientId, MSG_MAINID_USER, MSG_SUBID_CREATE_GUEST_FAIL);
+		m_reqToDBClientQueue.pop_front();
+		sendMsg(headStamp.clientId, MSG_MAINID_USER, MSG_SUBID_CREATE_GUEST_FAIL);
 	}
 }
 
@@ -334,24 +336,16 @@ void MainServer::onDBCreateGuestSucc(void* pData, size_t nSize)
 	EzAssert(sizeof(UserInfoWithClientMsg) == nSize);
 	UserInfoWithClientMsg* pUserMsg = (UserInfoWithClientMsg*)pData;
 
-	ClientStampMsg queueHead = m_quickLoginQueue.front();
-	if (queueHead.clientId == pUserMsg->clientId &&
-		queueHead.ulStamp == pUserMsg->ulStamp)
+	ClientStamp headStamp = m_reqToDBClientQueue.front();
+	if (headStamp == pUserMsg->clientStamp)
 	{
-		m_quickLoginQueue.pop_front();
+		m_reqToDBClientQueue.pop_front();
 
 		UserInfoMsg userMsg;
 		userMsg.header.uMainId = MSG_MAINID_USER;
 		userMsg.header.uSubId = MSG_SUBID_LOGIN_SUCCESS;
-		userMsg.userId = pUserMsg->userId;
-		strcpy(userMsg.szAccount, pUserMsg->szAccount);
-		strcpy(userMsg.szUserName, pUserMsg->szUserName);
-		userMsg.genderType = pUserMsg->genderType;
-		userMsg.uMoney = pUserMsg->uMoney;
-		userMsg.uRoomCard = pUserMsg->uRoomCard;
-		strcpy(userMsg.szPhoneNum, pUserMsg->szPhoneNum);
-		userMsg.uTypeFlag = pUserMsg->uTypeFlag;
+		userMsg.userInfo = pUserMsg->userInfo;
 
-		sendMsg(queueHead.clientId, &userMsg, sizeof(userMsg));
+		sendMsg(headStamp.clientId, &userMsg, sizeof(userMsg));
 	}
 }

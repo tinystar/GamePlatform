@@ -147,6 +147,7 @@ bool DBServer::setInitRoomCard(unsigned int uRoomCard)
 	return true;
 }
 
+// DB服务器应该在消息处理函数中所有分支返回处理结果，否则可能造成其它服务器数据的堆积或者造成客户端的等待
 void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 {
 	EzAssert(sizeof(ClientStampMsg) == nDataLen);
@@ -238,16 +239,15 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 		UserInfoWithClientMsg userMsg;
 		userMsg.header.uMainId = MSG_MAINID_DB;
 		userMsg.header.uSubId = MSG_SUBID_GUEST_CREATE_SUCC;
-		userMsg.clientId = pStampMsg->clientId;
-		userMsg.ulStamp = pStampMsg->ulStamp;
-		userMsg.userId = userSet.m_nUserId;
-		strncpy(userMsg.szAccount, pszAccount, sizeof(userMsg.szAccount) - 1);
-		strncpy(userMsg.szUserName, pszUserName, sizeof(userMsg.szUserName) - 1);
-		userMsg.genderType = userSet.m_nGenderType;
-		userMsg.uMoney = (CSUINT32)(userSet.m_dMoney * 100);	// 转为整形传输
-		userMsg.uRoomCard = userSet.m_nRoomCard;
-		strncpy(userMsg.szPhoneNum, pszPhoneNum, sizeof(userMsg.szPhoneNum) - 1);
-		userMsg.uTypeFlag = userSet.m_nUserFlag;
+		userMsg.clientStamp = pStampMsg->clientStamp;
+		userMsg.userInfo.userId = (CSUINT32)userSet.m_nUserId;
+		strncpy(userMsg.userInfo.szAccount, pszAccount, sizeof(userMsg.userInfo.szAccount) - 1);
+		strncpy(userMsg.userInfo.szUserName, pszUserName, sizeof(userMsg.userInfo.szUserName) - 1);
+		userMsg.userInfo.genderType = userSet.m_nGenderType;
+		userMsg.userInfo.uMoney = (CSUINT32)(userSet.m_dMoney * 100);	// 转为整形传输
+		userMsg.userInfo.uRoomCard = userSet.m_nRoomCard;
+		strncpy(userMsg.userInfo.szPhoneNum, pszPhoneNum, sizeof(userMsg.userInfo.szPhoneNum) - 1);
+		userMsg.userInfo.uTypeFlag = userSet.m_nUserFlag;
 
 #ifdef _UNICODE
 		delete[] pszAccount;
