@@ -35,6 +35,12 @@ SUBMSGID = {
     MSG_SUBID_CREATE_GUEST_FAIL     = 4
 }
 
+-- -----------------------------------------------------
+-- GameMsgHeader
+--     uMainId      -   UINT16
+--     uSubId       -   UINT16
+--     uReserved    -   UINT32
+-- -----------------------------------------------------
 function parseNetMsgHeader(data, len)
     -- the msg header size is 8.
     if len < 8 then
@@ -60,6 +66,11 @@ function packNetMsgHeader(mainId, subId, reserved)
     return header, #header
 end
 
+-- -----------------------------------------------------
+-- GateConfigMsg
+--     szVersion    -   char[16]
+--     szUpdUrl     -   char[128]
+-- -----------------------------------------------------
 function parseGateConfigMsg(data, len)
     assert(144 == len, "Invalid Gate Config Msg!")
     local nextPos, ver, updUrl = string.unpack(data, "A16A128")
@@ -67,6 +78,11 @@ function parseGateConfigMsg(data, len)
     return {version = ver, updateUrl = updUrl}
 end
 
+-- -----------------------------------------------------
+-- MainAddressMsg
+--     szIP         -   char[20]
+--     sPort        -   UINT16
+-- -----------------------------------------------------
 function parseMainAddressMsg(data, len)
     assert(22 == len, "Invalid Main Address Msg!")
     local nextPos, addr, port = string.unpack(data, "A20H")
@@ -74,6 +90,11 @@ function parseMainAddressMsg(data, len)
     return {mainAddr = addr, mainPort = port}
 end
 
+-- -----------------------------------------------------
+-- AccountLoginMsg
+--     szAccount    -   char[64]
+--     szPassword   -   char[16]
+-- -----------------------------------------------------
 function packAccountLoginMsg(account, password)
     local header, headerLen = packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_ACCOUNT_LOGIN)
 
@@ -81,6 +102,17 @@ function packAccountLoginMsg(account, password)
     return msg, #msg
 end
 
+-- -----------------------------------------------------
+-- UserInfoMsg
+--     userId       -   UINT32
+--     szAccount    -   char[17]
+--     szUserName   -   char[65]
+--     genderType   -   INT32
+--     uMoney       -   UINT32
+--     uRoomCard    -   UINT32
+--     szPhoneNum   -   char[16]
+--     uTypeFlag    -   UINT32
+-- -----------------------------------------------------
 function parseUserInfoMsg(data, len)
     assert(118 == len, "Invalid User Information Msg!")
     local nextPos, userId, account, userName, gender, money, roomCard, phoneNumber, flag = string.unpack(data, "IA17A65iIIA16I")
