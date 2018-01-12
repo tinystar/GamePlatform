@@ -14,6 +14,7 @@
 #include "TcpClientSocket.h"
 #include "IMainServerUIObserver.h"
 #include <list>
+#include <map>
 
 class MainServer : public BaseGameServer, public ITcpClientSocketEventHandler
 {
@@ -61,6 +62,13 @@ protected:
 	bool sendMsgToServer(TcpClientSocket* pClientSock, void* pData, size_t nDataLen);
 	bool sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved = 0);
 
+	bool addLoginUser(ClientId cId, const UserInfo& userInfo);
+	bool removeLoginUser(ClientId cId);
+
+	ClientId findClientByUserId(EzUInt32 userId) const;
+
+	bool removeClientFromDBReqQueue(ClientId id);
+
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
@@ -78,6 +86,7 @@ protected:
 
 protected:
 	typedef std::list<ClientStamp>			ClientStampQueue;
+	typedef std::map<EzUInt32, ClientId>	UserId2ClientIdMap;
 
 	static NetMsgMapEntry s_msgMapArray[];
 
@@ -95,6 +104,8 @@ protected:
 	bool					m_bStopServer;
 
 	ClientStampQueue		m_reqToDBClientQueue;
+
+	UserId2ClientIdMap		m_userIdToClientMap;
 
 	IMainServerUIObserver*	m_pUIObserver;
 };

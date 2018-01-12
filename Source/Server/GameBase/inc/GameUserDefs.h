@@ -12,6 +12,7 @@
 
 #include "xEzTypes.h"
 #include "BaseMsgDefs.h"
+#include "GameBase.h"
 
 enum GenderType
 {
@@ -26,7 +27,7 @@ enum UserType
 	kGuest	= 0x00000004
 };
 
-class GameUser
+class GB_DLL_SPEC GameUser
 {
 public:
 	GameUser();

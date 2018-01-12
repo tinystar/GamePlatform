@@ -3,6 +3,7 @@
 #include <process.h>
 #include "GateMsgDefs.h"
 #include "DBMsgDefs.h"
+#include "GameUserDefs.h"
 
 #define ITEM_ID_GATE		1
 #define ITEM_ID_DB			2
@@ -150,16 +151,13 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 
 void MainServer::onTcpClientCloseMsg(ClientId id)
 {
-	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
-	while (iter != m_reqToDBClientQueue.end())
+	if (id.getUserData() != NULL)		// user already login
 	{
-		if (id == iter->clientId)
-		{
-			m_reqToDBClientQueue.erase(iter);
-			break;
-		}
-
-		++iter;
+		removeLoginUser(id);
+	}
+	else
+	{
+		removeClientFromDBReqQueue(id);
 	}
 }
 
@@ -347,5 +345,73 @@ void MainServer::onDBCreateGuestSucc(void* pData, size_t nSize)
 		userMsg.userInfo = pUserMsg->userInfo;
 
 		sendMsg(headStamp.clientId, &userMsg, sizeof(userMsg));
+
+		bool bAdded = addLoginUser(headStamp.clientId, pUserMsg->userInfo);
+		if (!EzVerify(bAdded))
+			EzLogInfo(_T("Add Login User Failed!\n"));
 	}
+}
+
+bool MainServer::addLoginUser(ClientId cId, const UserInfo& userInfo)
+{
+	if (!EzVerify(cId.isValid() && userInfo.userId > 0))
+		return false;
+
+	GameUser* pGameUser = new GameUser(userInfo);
+	if (NULL == pGameUser)
+		return false;
+
+	EzAssert(NULL == cId.getUserData());
+	cId.setUserData(pGameUser);
+
+	EzAssert(m_userIdToClientMap.find(pGameUser->getUserId()) == m_userIdToClientMap.end());
+	m_userIdToClientMap.insert(UserId2ClientIdMap::value_type(pGameUser->getUserId(), cId));
+	return true;
+}
+
+bool MainServer::removeLoginUser(ClientId cId)
+{
+	if (cId.isNull())
+		return false;
+
+	void* pUserData = cId.getUserData();
+	if (NULL == pUserData)
+		return false;
+
+	GameUser* pGameUser = (GameUser*)pUserData;
+	
+	cId.setUserData(NULL);
+	UserId2ClientIdMap::iterator iter = m_userIdToClientMap.find(pGameUser->getUserId());
+	EzAssert(iter != m_userIdToClientMap.end());
+	if (iter != m_userIdToClientMap.end())
+		m_userIdToClientMap.erase(iter);
+
+	delete pGameUser;
+	return true;
+}
+
+ClientId MainServer::findClientByUserId(EzUInt32 userId) const
+{
+	UserId2ClientIdMap::const_iterator iter = m_userIdToClientMap.find(userId);
+	if (iter == m_userIdToClientMap.end())
+		return ClientId::kNull;
+
+	return iter->second;
+}
+
+bool MainServer::removeClientFromDBReqQueue(ClientId id)
+{
+	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
+	while (iter != m_reqToDBClientQueue.end())
+	{
+		if (id == iter->clientId)
+		{
+			m_reqToDBClientQueue.erase(iter);
+			return true;
+		}
+
+		++iter;
+	}
+
+	return false;
 }
