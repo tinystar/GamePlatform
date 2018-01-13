@@ -186,7 +186,7 @@ unsigned __stdcall MainServer::clientSelectThread(void* pParam)
 	return 0;
 }
 
-EzULong MainServer::genQuickLoginStamp()
+EzULong MainServer::genDBRequestStamp()
 {
 	static EzULong _s_ulStampSeed = 0;
 	return ++_s_ulStampSeed;
@@ -236,11 +236,11 @@ void MainServer::onDBServerMsg(void* pData, size_t nSize)
 	{
 		switch (uSubId)
 		{
-		case MSG_SUBID_GUEST_CREATE_FAIL:
-			onDBCreateGuestFail(pData, nSize);
+		case MSG_SUBID_DB_LOGIN_SUCCESS:
+			onDBLoginSuccess(pData, nSize);
 			break;
-		case MSG_SUBID_GUEST_CREATE_SUCC:
-			onDBCreateGuestSucc(pData, nSize);
+		case MSG_SUBID_DB_LOGIN_FAILURE:
+			onDBLoginFailure(pData, nSize);
 			break;
 		default:
 			EzAssert(false);
@@ -280,21 +280,20 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 	EzAssert(sizeof(AccountLoginMsg) == nDataLen);
 	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
 
-	// Todo:
+	ValidateAcctLoginMsg validateMsg;
 
-	// test
-	if (strcmp(pAccountLoginMsg->szAccount, "whx") != 0)
-	{
-		sendMsg(id, MSG_MAINID_USER, MSG_SUBID_ACCOUNT_NOT_EXIST);
-		return;
-	}
-	if (strcmp(pAccountLoginMsg->szPassword, "123456") != 0)
-	{
-		sendMsg(id, MSG_MAINID_USER, MSG_SUBID_WRONG_PASSWORD);
-		return;
-	}
+	ClientStamp stampInfo;
+	stampInfo.clientId = id;
+	stampInfo.ulStamp = genDBRequestStamp();
 
-	sendMsg(id, MSG_MAINID_USER, MSG_SUBID_LOGIN_SUCCESS);
+	validateMsg.header.uMainId = MSG_MAINID_DB;
+	validateMsg.header.uSubId = MSG_SUBID_VALIDATE_ACCOUNT_LOGIN;
+	validateMsg.clientStamp = stampInfo;
+	memcpy(validateMsg.szAccount, pAccountLoginMsg->szAccount, sizeof(validateMsg.szAccount));
+	memcpy(validateMsg.szPassword, pAccountLoginMsg->szPassword, sizeof(validateMsg.szPassword));
+
+	if (sendMsgToServer(&m_clientToDB, &validateMsg, sizeof(validateMsg)))
+		m_reqToDBClientQueue.push_back(stampInfo);
 }
 
 void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
@@ -305,7 +304,7 @@ void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 	// 此问题只有在登录时会出现，登录成功以后id对应的客户端会被分配一个唯一的玩家Id，不会出现这种情况
 	ClientStamp stampInfo;
 	stampInfo.clientId = id;
-	stampInfo.ulStamp = genQuickLoginStamp();
+	stampInfo.ulStamp = genDBRequestStamp();
 
 	ClientStampMsg stampMsg;
 	stampMsg.header.uMainId = MSG_MAINID_DB;
@@ -316,20 +315,7 @@ void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 		m_reqToDBClientQueue.push_back(stampInfo);
 }
 
-void MainServer::onDBCreateGuestFail(void* pData, size_t nSize)
-{
-	EzAssert(sizeof(ClientStampMsg) == nSize);
-	ClientStampMsg* pStampMsg = (ClientStampMsg*)pData;
-
-	ClientStamp headStamp = m_reqToDBClientQueue.front();
-	if (headStamp == pStampMsg->clientStamp)
-	{
-		m_reqToDBClientQueue.pop_front();
-		sendMsg(headStamp.clientId, MSG_MAINID_USER, MSG_SUBID_CREATE_GUEST_FAIL);
-	}
-}
-
-void MainServer::onDBCreateGuestSucc(void* pData, size_t nSize)
+void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
 {
 	EzAssert(sizeof(UserInfoWithClientMsg) == nSize);
 	UserInfoWithClientMsg* pUserMsg = (UserInfoWithClientMsg*)pData;
@@ -349,6 +335,24 @@ void MainServer::onDBCreateGuestSucc(void* pData, size_t nSize)
 		bool bAdded = addLoginUser(headStamp.clientId, pUserMsg->userInfo);
 		if (!EzVerify(bAdded))
 			EzLogInfo(_T("Add Login User Failed!\n"));
+	}
+}
+
+void MainServer::onDBLoginFailure(void* pData, size_t nSize)
+{
+	EzAssert(sizeof(DBAcctLoginFailMsg) == nSize);
+	DBAcctLoginFailMsg* pLoginFailMsg = (DBAcctLoginFailMsg*)pData;
+
+	ClientStamp headStamp = m_reqToDBClientQueue.front();
+	if (headStamp == pLoginFailMsg->clientStamp)
+	{
+		m_reqToDBClientQueue.pop_front();
+
+		LoginFailMsg failMsg;
+		failMsg.header.uMainId = MSG_MAINID_USER;
+		failMsg.header.uSubId = MSG_SUBID_LOGIN_FAILURE;
+		failMsg.nFailReason = pLoginFailMsg->nFailReason;
+		sendMsg(headStamp.clientId, &failMsg, sizeof(failMsg));
 	}
 }
 

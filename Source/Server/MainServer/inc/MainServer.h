@@ -72,7 +72,7 @@ protected:
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
-	static EzULong genQuickLoginStamp();
+	static EzULong genDBRequestStamp();
 
 	// client messages
 protected:
@@ -81,8 +81,8 @@ protected:
 
 	// DBServer messages
 protected:
-	void onDBCreateGuestFail(void* pData, size_t nSize);
-	void onDBCreateGuestSucc(void* pData, size_t nSize);
+	void onDBLoginSuccess(void* pData, size_t nSize);
+	void onDBLoginFailure(void* pData, size_t nSize);
 
 protected:
 	typedef std::list<ClientStamp>			ClientStampQueue;

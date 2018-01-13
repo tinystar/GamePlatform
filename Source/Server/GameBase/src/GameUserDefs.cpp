@@ -6,6 +6,7 @@
 
 GameUser::GameUser()
 	: m_uUserId(0)
+	, m_nHeadIndex(eHeadDefault)
 	, m_genderType(eMale)
 	, m_dMoney(0)
 	, m_uTypeFlag(0)
@@ -17,6 +18,7 @@ GameUser::GameUser()
 
 GameUser::GameUser(const UserInfo& userInfo)
 	: m_uUserId(0)
+	, m_nHeadIndex(eHeadDefault)
 	, m_genderType(eMale)
 	, m_dMoney(0)
 	, m_uTypeFlag(0)
@@ -33,6 +35,7 @@ void GameUser::initWithUserInfo(const UserInfo& userInfo)
 	setUserId(userInfo.userId);
 	setAccount(userInfo.szAccount);
 	setUserName(userInfo.szUserName);
+	setUserHeadIdx(userInfo.headIdx);
 	setGenderType((GenderType)userInfo.genderType);
 	setMoney(userInfo.uMoney / 100.0);
 	setRoomCardCount(userInfo.uRoomCard);

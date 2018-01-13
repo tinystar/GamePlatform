@@ -13,6 +13,7 @@
 #include <afxdb.h>
 #include "BaseGameServer.h"
 #include "IDBServerUIObserver.h"
+#include "DBRecordSets.h"
 
 class DBServer : public BaseGameServer
 {
@@ -24,6 +25,8 @@ public:
 	bool setDSN(const char* pszDSN);
 	bool setGuestName(const char* pszNamePrefix);
 	bool setGuestPassword(const char* pszPassword);
+	bool setDefHeadIdx(int nIdx);
+	bool setDefGender(int nGender);
 	bool setInitMoney(double dMoney);
 	bool setInitRoomCard(unsigned int uRoomCard);
 
@@ -37,12 +40,15 @@ protected:
 
 protected:
 	void onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen);
+	void onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen);
+	void onValidateUserIdLogin(ClientId id, void* pData, size_t nDataLen);
 
 	void onQueryGameKinds(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGameRooms(ClientId id, void* pData, size_t nDataLen);
 
-	void testDBSP();
+protected:
+	void sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStamp& cliStamp, const UserInfoSet& userSet);
 
 protected:
 	static NetMsgMapEntry s_msgMapArray[];
@@ -51,6 +57,8 @@ protected:
 	char					m_szDSN[256];
 	char					m_szGuestName[256];
 	char					m_szGuestPW[16];		// password
+	int						m_nDefHeadIdx;			// default head index
+	int						m_nDefGender;			// default gender
 	double					m_dInitMoney;
 	unsigned int			m_uInitRoomCard;
 	IDBServerUIObserver*	m_pUIObserver;

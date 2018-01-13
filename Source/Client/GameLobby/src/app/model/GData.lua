@@ -18,6 +18,7 @@ __GData__ = {
         UserId = nil,
         Account = nil,
         UserName = nil,
+        HeadIndex = nil,
         Gender = nil,
         Money = nil,
         RoomCard = nil,

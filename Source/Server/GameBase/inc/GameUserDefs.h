@@ -27,6 +27,13 @@ enum UserType
 	kGuest	= 0x00000004
 };
 
+enum UserHeadIdx
+{
+	eHeadCustom		= -1,
+	eHeadDefault	= 0,
+	eHeadIdxBase	= eHeadDefault
+};
+
 class GB_DLL_SPEC GameUser
 {
 public:
@@ -43,6 +50,9 @@ public:
 
 	const char* getUserName() const { return m_szName; }
 	bool setUserName(const char* pszName);
+
+	int getUserHeadIdx() const { return m_nHeadIndex; }
+	bool setUserHeadIdx(int idx) { m_nHeadIndex = idx; return true; }
 
 	GenderType getGenderType() const { return m_genderType; }
 	bool setGenderType(GenderType type) { m_genderType = type; return true; }
@@ -69,6 +79,7 @@ protected:
 	EzUInt32			m_uUserId;
 	char				m_szAccount[17];
 	char				m_szName[65];
+	int					m_nHeadIndex;
 	GenderType			m_genderType;
 	double				m_dMoney;
 	EzUInt32			m_uRoomCardCount;

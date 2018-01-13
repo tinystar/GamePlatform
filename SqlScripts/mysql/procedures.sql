@@ -23,6 +23,8 @@ DELIMITER ;;
 CREATE PROCEDURE create_guest_account(
     IN  pusername   varchar(255),
     IN  ppassword   char(16),
+    IN  pheadIdx    int,
+    IN  pgender     boolean,
     IN  pmoney      decimal(10,2),
     IN  pRmCardCnt  int unsigned,
     IN  pflag       int unsigned,
@@ -57,6 +59,8 @@ BEGIN
 		account,
 		password,
 		username,
+		headIndex,
+		gender,
 		money,
 		roomcardcount,
 		flag)
@@ -64,6 +68,8 @@ BEGIN
 		acctName,
 		ppassword,
 		usrName,
+		pheadIdx,
+		pgender,
 		pmoney,
 		pRmCardCnt,
 		pflag);

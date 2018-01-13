@@ -14,8 +14,7 @@ local AccountLoginLayer = class("AccountLoginLayer", cc.LayerColor)
 -- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
 AccountLoginLayer.MainMsgMap = {
-    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_ACCOUNT_NOT_EXIST, MsgHandler = "onUserAccountNotExistMsg"},
-    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_WRONG_PASSWORD, MsgHandler = "onUserWrongPasswordMsg"}
+    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_LOGIN_FAILURE, MsgHandler = "onUserLoginFailMsg"}
 }
 
 function AccountLoginLayer:ctor()
@@ -80,12 +79,8 @@ end
 -- -----------------------------------------------------
 -- MainServer msg callback functions
 -- -----------------------------------------------------
-function AccountLoginLayer:onUserAccountNotExistMsg(sockObj, msg, msgLen)
-    print("-------onUserAccountNotExistMsg-------")
-end
-
-function AccountLoginLayer:onUserWrongPasswordMsg(sockObj, msg, msgLen)
-    print("-------onUserWrongPasswordMsg-------")
+function AccountLoginLayer:onUserLoginFailMsg(sockObj, msg, msgLen)
+    print("-------onUserLoginFailMsg-------")
 end
 
 return AccountLoginLayer

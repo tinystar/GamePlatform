@@ -24,6 +24,7 @@ struct UserInfo
 	CSUINT32		userId;
 	char			szAccount[17];
 	char			szUserName[65];
+	CSINT32			headIdx;
 	CSINT32			genderType;
 	CSUINT32		uMoney;				// 金钱用double表示，但是在网络传输时采用整形（浮点型不同语言、编译器编码方式可能不一样，网络传输最好是整形）
 	CSUINT32		uRoomCard;
@@ -32,6 +33,7 @@ struct UserInfo
 
 	UserInfo()
 		: userId(0)
+		, headIdx(0)
 		, genderType(0)
 		, uMoney(0)
 		, uRoomCard(0)

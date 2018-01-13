@@ -20,14 +20,15 @@ CREATE TABLE IF NOT EXISTS userinfo
     userid        int               NOT NULL AUTO_INCREMENT,
     account       char(16)          NOT NULL UNIQUE,
     password      char(16)          NOT NULL,
-    username      varchar(64)      NOT NULL,
+    username      varchar(64)       NOT NULL,
+    headIndex     int               NULL DEFAULT 0,
     gender        boolean           NULL DEFAULT 0,
     money         decimal(10,2)     NULL DEFAULT 0,
     roomcardcount int unsigned      NULL DEFAULT 0,
     phonenumber   char(15)          NULL,
     flag          int unsigned      NULL DEFAULT 0,
     PRIMARY KEY(userid)
-)ENGINE = InnoDB, AUTO_INCREMENT = 100000;
+)ENGINE = InnoDB, AUTO_INCREMENT = 100001;
 
 # create game kind table
 CREATE TABLE IF NOT EXISTS gamekind

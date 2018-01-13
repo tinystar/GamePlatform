@@ -21,9 +21,16 @@
 
 // server -> client
 #define MSG_SUBID_LOGIN_SUCCESS				1
-#define MSG_SUBID_ACCOUNT_NOT_EXIST			2
-#define MSG_SUBID_WRONG_PASSWORD			3
-#define MSG_SUBID_CREATE_GUEST_FAIL			4
+#define MSG_SUBID_LOGIN_FAILURE				2
+
+
+enum LoginFailReason
+{
+	eUnknownReason		= 0,
+	eAccountNotExist	= 1,
+	ePasswordWrong		= 2,
+	eGuestCreateFail	= 3
+};
 
 #pragma pack(push, 1)
 
@@ -38,6 +45,16 @@ struct AccountLoginMsg
 		::memset(szAccount, 0, sizeof(szAccount));
 		::memset(szPassword, 0, sizeof(szPassword));
 	}
+};
+
+struct LoginFailMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nFailReason;
+
+	LoginFailMsg()
+		: nFailReason(0)
+	{}
 };
 
 #pragma pack(pop)

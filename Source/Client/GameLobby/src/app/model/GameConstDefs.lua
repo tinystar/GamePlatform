@@ -20,3 +20,27 @@ GenderType = {
     Male            = 0,
     Female          = 1
 }
+
+UserHeadIndex = {
+    HeadCustom      = -1,
+    HeadDefault     = 0
+}
+
+PreDefHeadImg = {
+    [0]             = "head/head0.png",
+    [1]             = "head/head1.png",
+    [2]             = "head/head2.png",
+    [3]             = "head/head3.png",
+    [4]             = "head/head4.png",
+    [5]             = "head/head5.png",
+    [6]             = "head/head6.png",
+    [7]             = "head/head7.png",
+    [8]             = "head/head8.png"
+}
+
+LoginFailReason = {
+    UnknownReason   = 0,
+    AccountNotExist = 1,
+    PasswordWrong   = 2,
+    GuestCreateFail = 3
+}

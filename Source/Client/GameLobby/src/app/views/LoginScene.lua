@@ -24,7 +24,7 @@ LoginScene.RESOURCE_BINDING = {
 -- -----------------------------------------------------
 LoginScene.MainMsgMap = {
     {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_LOGIN_SUCCESS, MsgHandler = "onUserLoginSuccessMsg"},
-    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_CREATE_GUEST_FAIL, MsgHandler = "onCreateGuestFailMsg"}
+    {MainMsgId = MAINMSGID.MSG_MAINID_USER, SubMsgId = SUBMSGID.MSG_SUBID_LOGIN_FAILURE, MsgHandler = "onUserLoginFailureMsg"}
 }
 
 
@@ -174,6 +174,7 @@ function LoginScene:onUserLoginSuccessMsg(sockObj, msg, msgLen)
     printf("user id = %d", userInfo.UserId)
     printf("account = %s", userInfo.Account)
     printf("user name = %s", userInfo.UserName)
+    printf("head index = %s", userInfo.HeadIndex)
     printf("gender = %s", userInfo.Gender)
     printf("money = %s", userInfo.Money)
     printf("room card = %s", userInfo.RoomCard)
@@ -182,11 +183,18 @@ function LoginScene:onUserLoginSuccessMsg(sockObj, msg, msgLen)
 
     __GData__.GameUser = userInfo
 
+    cc.UserDefault:getInstance():setStringForKey("Account", userInfo.Account)
+    cc.UserDefault:getInstance():setStringForKey("PassWord", "123456")
+
     self:getApp():enterScene("LobbyScene")
 end
 
-function LoginScene:onCreateGuestFailMsg(sockObj, msg, msgLen)
-    print("-------onCreateGuestFailMsg--------")
+function LoginScene:onUserLoginFailureMsg(sockObj, msg, msgLen)
+    print("-------onUserLoginFailureMsg--------")
+    local loginFailMsg = parseLoginFailMsg(msg, msgLen)
+    printf("login fail reason = %s", loginFailMsg.FailReason)
+    
+    -- Todo
 end
 
 -- gate socket event handlers

@@ -71,6 +71,8 @@ bool DBServerMgr::loadConfig()
 	const char* pszDSN = doc["DSN"].GetString();
 	const char* pszGuestName = doc["guestNamePrefix"].GetString();
 	const char* pszGuestPW = doc["guestPassword"].GetString();
+	int nHeadIndex = doc["headIndex"].GetInt();
+	const char* pszGender = doc["defaultGender"].GetString();
 	double dInitMoney = doc["initMoney"].GetDouble();
 	unsigned int uInitRoomCard = doc["initRoomCard"].GetUint();
 	const Value& tcpCfg = doc["tcpConfig"];
@@ -79,10 +81,14 @@ bool DBServerMgr::loadConfig()
 	m_tcpConfig.nMaxAcceptCnt = tcpCfg["acceptCount"].GetUint();
 	m_tcpConfig.nMaxPackageSize = tcpCfg["pkgSize"].GetUint();
 
+	int nGender = (0 == _stricmp(pszGender, "female")) ? 1 : 0;
+
 	EzLogger::setLogLevel(logLevel);
 	m_server.setDSN(pszDSN);
 	m_server.setGuestName(pszGuestName);
 	m_server.setGuestPassword(pszGuestPW);
+	m_server.setDefHeadIdx(nHeadIndex);
+	m_server.setDefGender(nGender);
 	m_server.setInitMoney(dInitMoney);
 	m_server.setInitRoomCard(uInitRoomCard);
 

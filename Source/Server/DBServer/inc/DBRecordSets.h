@@ -22,6 +22,7 @@ public:
 	CString	m_sAccount;
 	CString	m_sPassword;
 	CString	m_sUserName;
+	int		m_nHeadIdx;
 	int		m_nGenderType;
 	double	m_dMoney;
 	int		m_nRoomCard;

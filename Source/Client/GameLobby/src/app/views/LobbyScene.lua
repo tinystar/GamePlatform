@@ -14,7 +14,8 @@ LobbyScene.RESOURCE_FILENAME = "LobbyScene.csb"
 LobbyScene.RESOURCE_BINDING = {
     ["Panel_UserInfo"] = {["varname"] = "UserInfoPanel"},
     ["GoldBox_Money"] = {["varname"] = "MoneyBg"},
-    ["GoldBox_Card"] = {["varname"] = "CardBg"}
+    ["GoldBox_Card"] = {["varname"] = "CardBg"},
+    ["HeadBox"] = {["varname"] = "HeadBox"}
 }
 
 -- -----------------------------------------------------
@@ -27,12 +28,18 @@ LobbyScene.MainMsgMap = {
 function LobbyScene:onCreate()
     local userNameText = self.UserInfoPanel:getChildByName("Text_UserName")
     local userIdText = self.UserInfoPanel:getChildByName("Text_UserId")
+    local headImage = self.HeadBox:getChildByName("HeadImg")
     local moneyText = self.MoneyBg:getChildByName("Text_Money")
     local cardText = self.CardBg:getChildByName("Text_Card")
+
     userNameText:setString(__GData__.GameUser.UserName)
     userIdText:setString(__GData__.GameUser.UserId)
     moneyText:setString(__GData__.GameUser.Money)
     cardText:setString(__GData__.GameUser.RoomCard)
+
+    if __GData__.GameUser.HeadIndex ~= UserHeadIndex.HeadCustom then
+        headImage:setTexture(PreDefHeadImg[__GData__.GameUser.HeadIndex])
+    end
 end
 
 function LobbyScene:onEnter()
