@@ -46,6 +46,8 @@ protected:
 	virtual void onUIConnToDBFail(int nErrCode);
 	virtual void onUIConnToDBClosed();
 
+	virtual void onUIGetGameInfoFail(int nGameInfoType, const char* pszDetailMsg);
+
 protected:
 	void AppendServerMsg(const TCHAR* pszMsg);
 
@@ -65,6 +67,7 @@ protected:
 	afx_msg LRESULT OnConnToDBSuccessUIMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnConnToDBFailUIMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnConnToDBClosedUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGetGameInfoFailUIMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:

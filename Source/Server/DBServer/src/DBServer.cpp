@@ -278,8 +278,7 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 
 		sSql.Format(_T("SELECT * FROM userinfo WHERE account = '%s'"), sRetGuest);
 		UserInfoSet userSet(&m_database);
-		if (!userSet.Open(CRecordset::snapshot, sSql) ||
-			userSet.GetRowsFetched() <= 0)
+		if (!userSet.Open(CRecordset::snapshot, sSql) || userSet.IsEOF())
 		{
 			EzLogError(_T("Failed to get user information of %s.\n"), sRetGuest.GetString());
 			loginFailMsg.nFailReason = eAccountNotExist;
@@ -332,8 +331,7 @@ void DBServer::onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen)
 	{
 		sSql.Format(_T("SELECT * FROM userinfo WHERE account = '%s'"), sAccount);
 		UserInfoSet userSet(&m_database);
-		if (!userSet.Open(CRecordset::snapshot, sSql) ||
-			userSet.GetRowsFetched() <= 0)
+		if (!userSet.Open(CRecordset::snapshot, sSql) || userSet.IsEOF())
 		{
 			loginFailMsg.nFailReason = eAccountNotExist;
 			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
@@ -369,42 +367,322 @@ void DBServer::onValidateUserIdLogin(ClientId id, void* pData, size_t nDataLen)
 
 }
 
+void DBServer::fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet)
+{
+#ifdef _UNICODE
+	const char* pszGameName = EzText::wideCharToUtf8(kindSet.m_sGameName);
+	const char* pszCliModName = EzText::wideCharToUtf8(kindSet.m_sClientModule);
+	const char* pszSvrModName = EzText::wideCharToUtf8(kindSet.m_sServerModule);
+	const char* pszVersion = EzText::wideCharToUtf8(kindSet.m_sGameVersion);
+#else
+	const char* pszGameName = kindSet.m_sGameName;
+	const char* pszCliModName = kindSet.m_sClientModule;
+	const char* pszSvrModName = kindSet.m_sServerModule;
+	const char* pszVersion = kindSet.m_sGameVersion;
+#endif
+
+	kindInfo.nKindId = kindSet.m_nKindId;
+	strncpy(kindInfo.szGameName, pszGameName, EzCountOf(kindInfo.szGameName) - 1);
+	strncpy(kindInfo.szCliModInfo, pszCliModName, EzCountOf(kindInfo.szCliModInfo) - 1);
+	strncpy(kindInfo.szSvrModInfo, pszSvrModName, EzCountOf(kindInfo.szSvrModInfo) - 1);
+	strncpy(kindInfo.szVersion, pszVersion, EzCountOf(kindInfo.szVersion) - 1);
+
+#ifdef _UNICODE
+	delete[] pszGameName;
+	delete[] pszCliModName;
+	delete[] pszSvrModName;
+	delete[] pszVersion;
+#endif
+}
+
 void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
 {
+	GetGameInfoFailMsg failMsg;
+	failMsg.header.uMainId = MSG_MAINID_DB;
+	failMsg.header.uSubId = MSG_SUBID_GET_GAMEINFO_FAIL;
+
 	try
 	{
-		GameKindSet kindSet(&m_database);
-		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM gamekind ORDER BY sortweight DESC")))
+		long nKindCount = 0;
+		CRecordset rsCount(&m_database);
+		if (rsCount.Open(CRecordset::forwardOnly, _T("SELECT COUNT(*) FROM gamekind"), CRecordset::executeDirect))
 		{
-			EzLogError(_T("Failed to execute sql that query game kinds from gamekind table.\n"));
+			CString sCount = _T("0");
+			if (!rsCount.IsEOF())
+				rsCount.GetFieldValue((short)0, sCount);
+			nKindCount = _ttol(sCount);
+			rsCount.Close();
+		}
+
+		if (0 == nKindCount)
+		{
+			EzLogInfo(_T("There is no game kind record in gamekind table.\n"));
+			failMsg.nInfoType = kGameKind;
+			strcpy(failMsg.szDetail, "There is no game kind record in gamekind table.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
 			return;
 		}
 
-		if (kindSet.GetRowsFetched() <= 0)
+		GameKindSet kindSet(&m_database);
+		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM gamekind ORDER BY sortweight DESC")))
+		{
+			EzLogError(_T("Failed to get game kind list.\n"));
+			failMsg.nInfoType = kGameKind;
+			sendMsg(id, &failMsg, sizeof(failMsg));
 			return;
+		}
+
+		size_t uMsgSize = sizeof(GameKindListMsg) + sizeof(GameKindMsgInfo) * (nKindCount - 1);
+		GameKindListMsg* pKindListMsg = (GameKindListMsg*)::malloc(uMsgSize);
+		if (NULL == pKindListMsg)
+		{
+			EzLogError(_T("Failed to allocate structure of GameKindListMsg.\n"));
+			failMsg.nInfoType = kGameKind;
+			strcpy(failMsg.szDetail, "Allocate message structure failure.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+		::memset(pKindListMsg, 0, uMsgSize);
+
+		pKindListMsg->header.uMainId = MSG_MAINID_DB;
+		pKindListMsg->header.uSubId = MSG_SUBID_GET_GAMEKIND_SUCC;
 
 		kindSet.MoveFirst();
 		while (!kindSet.IsEOF())
 		{
+			fillGameKindInfo(pKindListMsg->kinds[pKindListMsg->uCount++], kindSet);
 			kindSet.MoveNext();
 		}
+		EzAssert(pKindListMsg->uCount == nKindCount);
+
+		sendMsg(id, pKindListMsg, uMsgSize);
+		::free(pKindListMsg);
 	}
 	catch (CDBException* pDBException)
 	{
 		EzLogError(_T("Error occur in onQueryGameKinds, error message: %s.\n"), pDBException->m_strError);
+		failMsg.nInfoType = kGameKind;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game kinds.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
 	}
 	catch (...)
 	{
 		EzLogError(_T("Unknown error occur in onQueryGameKinds.\n"));
+		failMsg.nInfoType = kGameKind;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game kinds.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
 	}
+}
+
+void DBServer::fillGamePlaceInfo(GamePlaceMsgInfo& placeInfo, const GamePlaceSet& placeSet)
+{
+#ifdef _UNICODE
+	const char* pszPlaceName = EzText::wideCharToUtf8(placeSet.m_sPlaceName);
+#else
+	const char* pszPlaceName = placeSet.m_sPlaceName;
+#endif
+
+	placeInfo.nKindId = placeSet.m_nKindId;
+	placeInfo.nPlaceId = placeSet.m_nPlaceId;
+	strncpy(placeInfo.szPlaceName, pszPlaceName, EzCountOf(placeInfo.szPlaceName) - 1);
+	placeInfo.nPlaceType = placeSet.m_nPlaceType;
+	placeInfo.uEnterLimit = placeSet.m_dEnterLimit * 100;
+	placeInfo.uBasePoint = placeSet.m_dBasePoint * 100;
+
+#ifdef _UNICODE
+	delete[] pszPlaceName;
+#endif
 }
 
 void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
 {
+	EzAssert(sizeof(QueryGamePlaceMsg) == nDataLen);
+	QueryGamePlaceMsg* pQueryPlaceMsg = (QueryGamePlaceMsg*)pData;
 
+	GetGameInfoFailMsg failMsg;
+	failMsg.header.uMainId = MSG_MAINID_DB;
+	failMsg.header.uSubId = MSG_SUBID_GET_GAMEINFO_FAIL;
+
+	try
+	{
+		long nPlaceCount = 0;
+		CRecordset rsCount(&m_database);
+		CString sSql;
+		sSql.Format(_T("SELECT COUNT(*) FROM gameplace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
+		if (rsCount.Open(CRecordset::forwardOnly, sSql, CRecordset::executeDirect))
+		{
+			CString sCount = _T("0");
+			if (!rsCount.IsEOF())
+				rsCount.GetFieldValue((short)0, sCount);
+			nPlaceCount = _ttol(sCount);
+			rsCount.Close();
+		}
+
+		if (0 == nPlaceCount)
+		{
+			EzLogInfo(_T("There is no game place record where kindid = %d.\n"), pQueryPlaceMsg->nKindId);
+			failMsg.nInfoType = kGamePlace;
+			strcpy(failMsg.szDetail, "There is no game place record.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+
+		GamePlaceSet placeSet(&m_database);
+		sSql.Format(_T("SELECT * FROM gameplace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
+		if (!placeSet.Open(CRecordset::snapshot, sSql))
+		{
+			EzLogError(_T("Failed to get game place list.\n"));
+			failMsg.nInfoType = kGamePlace;
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+
+		size_t uMsgSize = sizeof(GamePlaceListMsg) + sizeof(GamePlaceMsgInfo) * (nPlaceCount - 1);
+		GamePlaceListMsg* pPlaceListMsg = (GamePlaceListMsg*)::malloc(uMsgSize);
+		if (NULL == pPlaceListMsg)
+		{
+			EzLogError(_T("Failed to allocate structure of GamePlaceListMsg.\n"));
+			failMsg.nInfoType = kGamePlace;
+			strcpy(failMsg.szDetail, "Allocate message structure failure.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+		::memset(pPlaceListMsg, 0, uMsgSize);
+
+		pPlaceListMsg->header.uMainId = MSG_MAINID_DB;
+		pPlaceListMsg->header.uSubId = MSG_SUBID_GET_GAMEPLACE_SUCC;
+
+		placeSet.MoveFirst();
+		while (!placeSet.IsEOF())
+		{
+			fillGamePlaceInfo(pPlaceListMsg->places[pPlaceListMsg->uCount++], placeSet);
+			placeSet.MoveNext();
+		}
+		EzAssert(pPlaceListMsg->uCount == nPlaceCount);
+
+		sendMsg(id, pPlaceListMsg, uMsgSize);
+		::free(pPlaceListMsg);
+	}
+	catch (CDBException* pDBException)
+	{
+		EzLogError(_T("Error occur in onQueryGamePlaces, error message: %s.\n"), pDBException->m_strError);
+		failMsg.nInfoType = kGamePlace;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game places.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
+	}
+	catch (...)
+	{
+		EzLogError(_T("Unknown error occur in onQueryGamePlaces.\n"));
+		failMsg.nInfoType = kGamePlace;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game places.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
+	}
+}
+
+void DBServer::fillGameRoomInfo(GameRoomMsgInfo& roomInfo, const GameRoomSet& roomSet)
+{
+#ifdef _UNICODE
+	const char* pszRoomName = EzText::wideCharToUtf8(roomSet.m_sRoomName);
+	const char* pszServerIp = EzText::wideCharToUtf8(roomSet.m_sServerIp);
+#else
+	const char* pszRoomName = roomSet.m_sRoomName;
+	const char* pszServerIp = roomSet.m_sServerIp;
+#endif
+
+	roomInfo.nKindId = roomSet.m_nKindId;
+	roomInfo.nPlaceId = roomSet.m_nPlaceId;
+	roomInfo.nRoomId = roomSet.m_nRoomId;
+	strncpy(roomInfo.szRoomName, pszRoomName, EzCountOf(roomInfo.szRoomName) - 1);
+	strncpy(roomInfo.szServerIp, pszServerIp, EzCountOf(roomInfo.szServerIp) - 1);
+	roomInfo.sServerPort = (CSUINT16)roomSet.m_nServerPort;
+
+#ifdef _UNICODE
+	delete[] pszRoomName;
+	delete[] pszServerIp;
+#endif
 }
 
 void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
 {
+	EzAssert(sizeof(QueryGameRoomMsg) == nDataLen);
+	QueryGameRoomMsg* pQueryRoomMsg = (QueryGameRoomMsg*)pData;
 
+	GetGameInfoFailMsg failMsg;
+	failMsg.header.uMainId = MSG_MAINID_DB;
+	failMsg.header.uSubId = MSG_SUBID_GET_GAMEINFO_FAIL;
+
+	try
+	{
+		long nRoomCount = 0;
+		CRecordset rsCount(&m_database);
+		CString sSql;
+		sSql.Format(_T("SELECT COUNT(*) FROM gameroom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
+		if (rsCount.Open(CRecordset::forwardOnly, sSql, CRecordset::executeDirect))
+		{
+			CString sCount = _T("0");
+			if (!rsCount.IsEOF())
+				rsCount.GetFieldValue((short)0, sCount);
+			nRoomCount = _ttol(sCount);
+			rsCount.Close();
+		}
+
+		if (0 == nRoomCount)
+		{
+			EzLogInfo(_T("There is no game room record where kindid = %d and placeid = %d.\n"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
+			failMsg.nInfoType = kGameRoom;
+			strcpy(failMsg.szDetail, "There is no game room record.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+
+		GameRoomSet roomSet(&m_database);
+		sSql.Format(_T("SELECT * FROM gameroom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
+		if (!roomSet.Open(CRecordset::snapshot, sSql))
+		{
+			EzLogError(_T("Failed to get game room list.\n"));
+			failMsg.nInfoType = kGameRoom;
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+
+		size_t uMsgSize = sizeof(GameRoomListMsg) + sizeof(GameRoomMsgInfo) * (nRoomCount - 1);
+		GameRoomListMsg* pRoomListMsg = (GameRoomListMsg*)::malloc(uMsgSize);
+		if (NULL == pRoomListMsg)
+		{
+			EzLogError(_T("Failed to allocate structure of GameRoomListMsg.\n"));
+			failMsg.nInfoType = kGameRoom;
+			strcpy(failMsg.szDetail, "Allocate message structure failure.");
+			sendMsg(id, &failMsg, sizeof(failMsg));
+			return;
+		}
+		::memset(pRoomListMsg, 0, uMsgSize);
+
+		pRoomListMsg->header.uMainId = MSG_MAINID_DB;
+		pRoomListMsg->header.uSubId = MSG_SUBID_GET_GAMEROOM_SUCC;
+
+		roomSet.MoveFirst();
+		while (!roomSet.IsEOF())
+		{
+			fillGameRoomInfo(pRoomListMsg->rooms[pRoomListMsg->uCount++], roomSet);
+			roomSet.MoveNext();
+		}
+		EzAssert(pRoomListMsg->uCount == nRoomCount);
+
+		sendMsg(id, pRoomListMsg, uMsgSize);
+		::free(pRoomListMsg);
+	}
+	catch (CDBException* pDBException)
+	{
+		EzLogError(_T("Error occur in onQueryGameRooms, error message: %s.\n"), pDBException->m_strError);
+		failMsg.nInfoType = kGameRoom;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game rooms.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
+	}
+	catch (...)
+	{
+		EzLogError(_T("Unknown error occur in onQueryGameRooms.\n"));
+		failMsg.nInfoType = kGameRoom;
+		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game rooms.");
+		sendMsg(id, &failMsg, sizeof(failMsg));
+	}
 }

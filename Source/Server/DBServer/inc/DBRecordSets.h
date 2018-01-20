@@ -47,4 +47,34 @@ public:
 	virtual void DoFieldExchange(CFieldExchange* pFX);
 };
 
+class GamePlaceSet : public CRecordset
+{
+public:
+	explicit GamePlaceSet(CDatabase* pDatabase = NULL);
+
+	int		m_nKindId;
+	int		m_nPlaceId;
+	CString	m_sPlaceName;
+	int		m_nPlaceType;
+	double	m_dEnterLimit;
+	double	m_dBasePoint;
+
+	virtual void DoFieldExchange(CFieldExchange* pFX);
+};
+
+class GameRoomSet : public CRecordset
+{
+public:
+	explicit GameRoomSet(CDatabase* pDatabase = NULL);
+
+	int		m_nKindId;
+	int		m_nPlaceId;
+	int		m_nRoomId;
+	CString	m_sRoomName;
+	CString m_sServerIp;
+	int		m_nServerPort;
+
+	virtual void DoFieldExchange(CFieldExchange* pFX);
+};
+
 #endif // __DB_RECORDSETS_H__

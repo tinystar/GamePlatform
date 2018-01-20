@@ -15,6 +15,7 @@
 #include "IMainServerUIObserver.h"
 #include <list>
 #include <map>
+#include "GameNode.h"
 
 class MainServer : public BaseGameServer, public ITcpClientSocketEventHandler
 {
@@ -84,6 +85,11 @@ protected:
 	void onDBLoginSuccess(void* pData, size_t nSize);
 	void onDBLoginFailure(void* pData, size_t nSize);
 
+	void onDBQueryGameInfoFail(void* pData, size_t nSize);
+	void onDBQueryGameKinds(void* pData, size_t nSize);
+	void onDBQueryGamePlaces(void* pData, size_t nSize);
+	void onDBQueryGameRooms(void* pData, size_t nSize);
+
 protected:
 	typedef std::list<ClientStamp>			ClientStampQueue;
 	typedef std::map<EzUInt32, ClientId>	UserId2ClientIdMap;
@@ -106,6 +112,8 @@ protected:
 	ClientStampQueue		m_reqToDBClientQueue;
 
 	UserId2ClientIdMap		m_userIdToClientMap;
+
+	GameRoot				m_gameList;
 
 	IMainServerUIObserver*	m_pUIObserver;
 };

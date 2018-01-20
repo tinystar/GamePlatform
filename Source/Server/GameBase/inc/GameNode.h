@@ -11,9 +11,13 @@
 #define __GAME_NODE_H__
 
 #include "xEzUtil.h"
+#include "GameNodeInfo.h"
+#include "GameBase.h"
 
+class GameNode;
 
-class GameNode
+template class GB_DLL_SPEC EzArray < GameNode* >;	// avoid warning C4251
+class GB_DLL_SPEC GameNode
 {
 public:
 	enum NodeType
@@ -36,10 +40,13 @@ public:
 public:
 	// pNode must be allocated on the heap
 	virtual bool addChild(GameNode* pNode);
+	virtual bool insertChild(int idx, GameNode* pNode);
 	// pNode will be deleted if it been removed from the list
 	virtual bool deleteChild(GameNode* pNode);
 	virtual void deleteAllChildren();
+
 	virtual GameNode* getAt(int idx) { return m_children.at(idx); }
+	virtual GameNode* findChildById(EzInt32 nodId) { return NULL; }
 
 protected:
 	GameNode();			// can't be instantiated
@@ -51,16 +58,19 @@ protected:
 };
 
 // a placeholder as the root node for contain GameKind nodes
-class GameRoot : public GameNode
+class GB_DLL_SPEC GameRoot : public GameNode
 {
 public:
 #ifdef _DEBUG
 	// for type-safe add in debug mode. Only GameKind type can be add to GameRoot.
 	virtual bool addChild(GameNode* pNode);
+	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
+
+	virtual GameNode* findChildById(EzInt32 nodId);
 };
 
-class GameKind : public GameNode
+class GB_DLL_SPEC GameKind : public GameNode
 {
 public:
 	GameKind();
@@ -68,10 +78,16 @@ public:
 #ifdef _DEBUG
 	// for type-safe add in debug mode. Only GamePlace type node can be add to GameKind.
 	virtual bool addChild(GameNode* pNode);
+	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
+
+	virtual GameNode* findChildById(EzInt32 nodId);
+
+public:
+	GameKindInfo	m_kindInfo;
 };
 
-class GamePlace : public GameNode
+class GB_DLL_SPEC GamePlace : public GameNode
 {
 public:
 	GamePlace();
@@ -79,13 +95,22 @@ public:
 #ifdef _DEBUG
 	// for type-safe add in debug mode. Only GameRoom type node can be add to GamePlace.
 	virtual bool addChild(GameNode* pNode);
+	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
+
+	virtual GameNode* findChildById(EzInt32 nodId);
+
+public:
+	GamePlaceInfo	m_placeInfo;
 };
 
-class GameRoom : public GameNode
+class GB_DLL_SPEC GameRoom : public GameNode
 {
 public:
 	GameRoom();
+
+public:
+	GameRoomInfo	m_roomInfo;
 };
 
 #endif // __GAME_NODE_H__

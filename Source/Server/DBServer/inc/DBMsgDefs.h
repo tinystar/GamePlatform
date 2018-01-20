@@ -23,6 +23,19 @@
 #define MSG_SUBID_QUERY_GAMEKINDS			11
 #define MSG_SUBID_QUERY_GAMEPLACES			12
 #define MSG_SUBID_QUERY_GAMEROOMS			13
+#define MSG_SUBID_GET_GAMEINFO_FAIL			14
+#define	MSG_SUBID_GET_GAMEKIND_SUCC			15
+#define	MSG_SUBID_GET_GAMEPLACE_SUCC		16
+#define MSG_SUBID_GET_GAMEROOM_SUCC			17
+
+
+enum GameInfoType
+{
+	kInfoNone	= 0,
+	kGameKind	= 1,
+	kGamePlace	= 2,
+	kGameRoom	= 3
+};
 
 #pragma pack(push, 1)
 
@@ -48,6 +61,41 @@ struct DBAcctLoginFailMsg
 
 	DBAcctLoginFailMsg()
 		: nFailReason(0)
+	{}
+};
+
+struct GetGameInfoFailMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nInfoType;
+	char			szDetail[120];
+
+	GetGameInfoFailMsg()
+		: nInfoType(kInfoNone)
+	{
+		::memset(szDetail, 0, sizeof(szDetail));
+	}
+};
+
+struct QueryGamePlaceMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nKindId;
+
+	QueryGamePlaceMsg()
+		: nKindId(-1)
+	{}
+};
+
+struct QueryGameRoomMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nKindId;
+	CSINT32			nPlaceId;
+
+	QueryGameRoomMsg()
+		: nKindId(-1)
+		, nPlaceId(-1)
 	{}
 };
 

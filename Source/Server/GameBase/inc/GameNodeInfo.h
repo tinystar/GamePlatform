@@ -11,31 +11,73 @@
 #define __GAME_NODE_INFO_H__
 
 #include "xEzTypes.h"
+#include <memory.h>
+#include "BaseMsgDefs.h"
+#include "GameBase.h"
 
-
-struct GameKindInfo
+enum PlaceType
 {
-	EzUInt32		uKindId;
+	kPlaceNormal	= 0,
+	kPlaceFriend	= 1
+};
+
+
+struct GB_DLL_SPEC GameKindInfo
+{
+	EzInt32			nKindId;
 	char			szGameName[24];
 	char			szClientModule[24];
 	char			szServerModule[24];
 	char			szVersion[16];
+
+	GameKindInfo()
+		: nKindId(-1)
+	{
+		::memset(szGameName, 0, sizeof(szGameName));
+		::memset(szClientModule, 0, sizeof(szClientModule));
+		::memset(szServerModule, 0, sizeof(szServerModule));
+		::memset(szVersion, 0, sizeof(szVersion));
+	}
+
+	void initWithGameKindInfo(const GameKindMsgInfo& kindInfo);
 };
 
-struct GamePlaceInfo
+struct GB_DLL_SPEC GamePlaceInfo
 {
-	EzUInt32		uPlaceId;
+	EzInt32			nPlaceId;
 	char			szPlaceName[24];
+	PlaceType		placeType;
 	double			dEnterLimit;
 	double			dBasePoint;
+
+	GamePlaceInfo()
+		: nPlaceId(-1)
+		, placeType(kPlaceNormal)
+		, dEnterLimit(0.0)
+		, dBasePoint(0.0)
+	{
+		::memset(szPlaceName, 0, sizeof(szPlaceName));
+	}
+
+	void initWithGamePlaceInfo(const GamePlaceMsgInfo& placeInfo);
 };
 
-struct GameRoomInfo
+struct GB_DLL_SPEC GameRoomInfo
 {
-	EzUInt32		uRoomId;
+	EzInt32			nRoomId;
 	char			szRoomName[24];
 	char			szServerIp[20];
 	unsigned short	sServerPort;
+
+	GameRoomInfo()
+		: nRoomId(-1)
+		, sServerPort(0)
+	{
+		::memset(szRoomName, 0, sizeof(szRoomName));
+		::memset(szServerIp, 0, sizeof(szServerIp));
+	}
+
+	void initWithGameRoomInfo(const GameRoomMsgInfo& roomInfo);
 };
 
 #endif // __GAME_NODE_INFO_H__

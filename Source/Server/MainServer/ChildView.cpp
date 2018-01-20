@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "MainServerApp.h"
 #include "ChildView.h"
+#include "DBMsgDefs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -25,6 +26,17 @@
 #define WM_CONNTO_DB_SUCCESS			(WM_USER + 4)
 #define WM_CONNTO_DB_FAIL				(WM_USER + 5)
 #define WM_CONNTO_DB_CLOSED				(WM_USER + 6)
+#define WM_GET_GAMEINFO_FAIL			(WM_USER + 7)
+
+struct GameInfoFailUIMsg
+{
+	int		nInfoType;
+	CString	sDetailMsg;
+
+	GameInfoFailUIMsg()
+		: nInfoType(0)
+	{}
+};
 
 
 // CChildView
@@ -56,6 +68,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_MESSAGE(WM_CONNTO_DB_SUCCESS, &CChildView::OnConnToDBSuccessUIMsg)
 	ON_MESSAGE(WM_CONNTO_DB_FAIL, &CChildView::OnConnToDBFailUIMsg)
 	ON_MESSAGE(WM_CONNTO_DB_CLOSED, &CChildView::OnConnToDBClosedUIMsg)
+	ON_MESSAGE(WM_GET_GAMEINFO_FAIL, &CChildView::OnGetGameInfoFailUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -398,6 +411,18 @@ void CChildView::onUIConnToDBClosed()
 	this->PostMessage(WM_CONNTO_DB_CLOSED);
 }
 
+void CChildView::onUIGetGameInfoFail(int nGameInfoType, const char* pszDetailMsg)
+{
+	const wchar_t* pwchDetail = EzText::ansiToWideChar(pszDetailMsg);
+
+	GameInfoFailUIMsg* pFailUIMsg = new GameInfoFailUIMsg();
+	pFailUIMsg->nInfoType = nGameInfoType;
+	pFailUIMsg->sDetailMsg = pwchDetail;
+	delete[] pwchDetail;
+
+	this->PostMessage(WM_GET_GAMEINFO_FAIL, 0, (LPARAM)pFailUIMsg);
+}
+
 LRESULT CChildView::OnConnToGateSuccessUIMsg(WPARAM wParam, LPARAM lParam)
 {
 	AppendServerMsg(_T("连接GateServer成功！\r\n"));
@@ -439,6 +464,34 @@ LRESULT CChildView::OnConnToDBFailUIMsg(WPARAM wParam, LPARAM lParam)
 LRESULT CChildView::OnConnToDBClosedUIMsg(WPARAM wParam, LPARAM lParam)
 {
 	AppendServerMsg(_T("已断开和DBServer的连接！\r\n"));
+	return 0;
+}
+
+const TCHAR* GameInfoTypeToString(int nInfoType)
+{
+	switch (nInfoType)
+	{
+	case kGameKind:
+		return _T("游戏列表");
+	case kGamePlace:
+		return _T("游戏场");
+	case kGameRoom:
+		return _T("游戏房间");
+	default:
+		return _T("未知类型");
+	}
+
+	return _T("未知类型");
+}
+
+LRESULT CChildView::OnGetGameInfoFailUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	GameInfoFailUIMsg* pFailUIMsg = (GameInfoFailUIMsg*)(lParam);
+
+	CString sMsgBuf;
+	sMsgBuf.Format(_T("获取%s失败！更多信息：%s\r\n"), GameInfoTypeToString(pFailUIMsg->nInfoType), pFailUIMsg->sDetailMsg);
+	AppendServerMsg(sMsgBuf);
+	delete pFailUIMsg;
 	return 0;
 }
 

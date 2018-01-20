@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS gameplace
     kindid        int               NOT NULL,
     placeid       int               NOT NULL,
     placename     varchar(23)       NOT NULL,
+    placetype     int               NOT NULL,
     enterlimit    decimal(10,2)     NOT NULL,
     basepoint     decimal(10,2)     NOT NULL,
     PRIMARY KEY(kindid, placeid)
@@ -64,6 +65,20 @@ CREATE TABLE IF NOT EXISTS gameroom
     serverport    smallint unsigned NOT NULL,
     PRIMARY KEY(kindid, placeid, roomid)
 )ENGINE = InnoDB;
+
+# add foreign keys
+ALTER TABLE gameplace
+ADD CONSTRAINT fk_gameplace_kind
+FOREIGN KEY(kindid) REFERENCES gamekind(kindid)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+ALTER TABLE gameroom
+ADD CONSTRAINT fk_gameroom_place
+FOREIGN KEY(kindid, placeid) REFERENCES gameplace(kindid, placeid)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
 
 # create user
 CREATE USER dbserver IDENTIFIED BY 'xx.1314.z';

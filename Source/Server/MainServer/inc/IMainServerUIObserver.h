@@ -22,6 +22,8 @@ public:
 	virtual void onUIConnToDBSuccess() = 0;
 	virtual void onUIConnToDBFail(int nErrCode) = 0;
 	virtual void onUIConnToDBClosed() = 0;
+
+	virtual void onUIGetGameInfoFail(int nGameInfoType, const char* pszDetailMsg) = 0;
 };
 
 #endif // __IMAINSERVER_UI_OBSERVER_H__

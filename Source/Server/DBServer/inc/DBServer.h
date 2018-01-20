@@ -49,6 +49,9 @@ protected:
 
 protected:
 	void sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStamp& cliStamp, const UserInfoSet& userSet);
+	void fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet);
+	void fillGamePlaceInfo(GamePlaceMsgInfo& placeInfo, const GamePlaceSet& placeSet);
+	void fillGameRoomInfo(GameRoomMsgInfo& roomInfo, const GameRoomSet& roomSet);
 
 protected:
 	static NetMsgMapEntry s_msgMapArray[];

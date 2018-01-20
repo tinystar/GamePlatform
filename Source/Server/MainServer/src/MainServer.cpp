@@ -116,6 +116,8 @@ void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
+		sendMsgToServer(pClientSock, MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS);
+
 		if (m_pUIObserver != NULL)
 			m_pUIObserver->onUIConnToDBSuccess();
 	}
@@ -241,6 +243,18 @@ void MainServer::onDBServerMsg(void* pData, size_t nSize)
 			break;
 		case MSG_SUBID_DB_LOGIN_FAILURE:
 			onDBLoginFailure(pData, nSize);
+			break;
+		case MSG_SUBID_GET_GAMEINFO_FAIL:
+			onDBQueryGameInfoFail(pData, nSize);
+			break;
+		case MSG_SUBID_GET_GAMEKIND_SUCC:
+			onDBQueryGameKinds(pData, nSize);
+			break;
+		case MSG_SUBID_GET_GAMEPLACE_SUCC:
+			onDBQueryGamePlaces(pData, nSize);
+			break;
+		case MSG_SUBID_GET_GAMEROOM_SUCC:
+			onDBQueryGameRooms(pData, nSize);
 			break;
 		default:
 			EzAssert(false);
@@ -418,4 +432,70 @@ bool MainServer::removeClientFromDBReqQueue(ClientId id)
 	}
 
 	return false;
+}
+
+void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
+{
+	GameKindListMsg* pKindListMsg = (GameKindListMsg*)pData;
+
+	for (CSUINT32 i = 0; i < pKindListMsg->uCount; ++i)
+	{
+		GameKind* pKind = new GameKind();
+		pKind->m_kindInfo.initWithGameKindInfo(pKindListMsg->kinds[i]);
+		m_gameList.addChild(pKind);
+
+		QueryGamePlaceMsg queryPlaceMsg;
+		queryPlaceMsg.header.uMainId = MSG_MAINID_DB;
+		queryPlaceMsg.header.uSubId = MSG_SUBID_QUERY_GAMEPLACES;
+		queryPlaceMsg.nKindId = pKindListMsg->kinds[i].nKindId;
+		sendMsgToServer(&m_clientToDB, &queryPlaceMsg, sizeof(queryPlaceMsg));
+	}
+}
+
+void MainServer::onDBQueryGamePlaces(void* pData, size_t nSize)
+{
+	GamePlaceListMsg* pPlaceListMsg = (GamePlaceListMsg*)pData;
+
+	for (CSUINT32 i = 0; i < pPlaceListMsg->uCount; ++i)
+	{
+		GamePlace* pPlace = new GamePlace();
+		pPlace->m_placeInfo.initWithGamePlaceInfo(pPlaceListMsg->places[i]);
+		GameNode* pKind = m_gameList.findChildById(pPlaceListMsg->places[i].nKindId);
+		if (EzVerify(pKind != NULL))
+			pKind->addChild(pPlace);
+
+		QueryGameRoomMsg queryRoomMsg;
+		queryRoomMsg.header.uMainId = MSG_MAINID_DB;
+		queryRoomMsg.header.uSubId = MSG_SUBID_QUERY_GAMEROOMS;
+		queryRoomMsg.nKindId = pPlaceListMsg->places[i].nKindId;
+		queryRoomMsg.nPlaceId = pPlaceListMsg->places[i].nPlaceId;
+		sendMsgToServer(&m_clientToDB, &queryRoomMsg, sizeof(queryRoomMsg));
+	}
+}
+
+void MainServer::onDBQueryGameRooms(void* pData, size_t nSize)
+{
+	GameRoomListMsg* pRoomListMsg = (GameRoomListMsg*)pData;
+
+	for (CSUINT32 i = 0; i < pRoomListMsg->uCount; ++i)
+	{
+		GameRoom* pRoom = new GameRoom();
+		pRoom->m_roomInfo.initWithGameRoomInfo(pRoomListMsg->rooms[i]);
+		GameNode* pKind = m_gameList.findChildById(pRoomListMsg->rooms[i].nKindId);
+		if (EzVerify(pKind != NULL))
+		{
+			GameNode* pPlace = pKind->findChildById(pRoomListMsg->rooms[i].nPlaceId);
+			if (EzVerify(pPlace != NULL))
+				pPlace->addChild(pRoom);
+		}
+	}
+}
+
+void MainServer::onDBQueryGameInfoFail(void* pData, size_t nSize)
+{
+	EzAssert(sizeof(GetGameInfoFailMsg) == nSize);
+	GetGameInfoFailMsg* pGetFailMsg = (GetGameInfoFailMsg*)pData;
+
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onUIGetGameInfoFail(pGetFailMsg->nInfoType, pGetFailMsg->szDetail);
 }

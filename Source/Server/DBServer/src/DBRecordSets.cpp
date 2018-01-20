@@ -54,3 +54,54 @@ void GameKindSet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Text(pFX, _T("version"), m_sGameVersion);
 	RFX_Int(pFX, _T("sortweight"), m_nSortWeight);
 }
+
+
+//-------------------------------------------------------------------------------
+// GamePlaceSet
+//-------------------------------------------------------------------------------
+GamePlaceSet::GamePlaceSet(CDatabase* pDatabase /*= NULL*/)
+	: CRecordset(pDatabase)
+	, m_nKindId(-1)
+	, m_nPlaceId(-1)
+	, m_nPlaceType(0)
+	, m_dEnterLimit(0.0)
+	, m_dBasePoint(0.0)
+{
+	m_nFields = 6;
+}
+
+void GamePlaceSet::DoFieldExchange(CFieldExchange* pFX)
+{
+	pFX->SetFieldType(CFieldExchange::outputColumn);
+	RFX_Int(pFX, _T("kindid"), m_nKindId);
+	RFX_Int(pFX, _T("placeid"), m_nPlaceId);
+	RFX_Text(pFX, _T("placename"), m_sPlaceName);
+	RFX_Int(pFX, _T("placetype"), m_nPlaceType);
+	RFX_Double(pFX, _T("enterlimit"), m_dEnterLimit);
+	RFX_Double(pFX, _T("basepoint"), m_dBasePoint);
+}
+
+
+//-------------------------------------------------------------------------------
+// GameRoomSet
+//-------------------------------------------------------------------------------
+GameRoomSet::GameRoomSet(CDatabase* pDatabase /*= NULL*/)
+	: CRecordset(pDatabase)
+	, m_nKindId(-1)
+	, m_nPlaceId(-1)
+	, m_nRoomId(-1)
+	, m_nServerPort(0)
+{
+	m_nFields = 6;
+}
+
+void GameRoomSet::DoFieldExchange(CFieldExchange* pFX)
+{
+	pFX->SetFieldType(CFieldExchange::outputColumn);
+	RFX_Int(pFX, _T("kindid"), m_nKindId);
+	RFX_Int(pFX, _T("placeid"), m_nPlaceId);
+	RFX_Int(pFX, _T("roomid"), m_nRoomId);
+	RFX_Text(pFX, _T("roomname"), m_sRoomName);
+	RFX_Text(pFX, _T("serverip"), m_sServerIp);
+	RFX_Int(pFX, _T("serverport"), m_nServerPort);
+}
