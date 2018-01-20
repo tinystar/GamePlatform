@@ -39,7 +39,7 @@ void UserInfoSet::DoFieldExchange(CFieldExchange* pFX)
 GameKindSet::GameKindSet(CDatabase* pDatabase /*= NULL*/)
 	: CRecordset(pDatabase)
 	, m_nKindId(-1)
-	, m_nSortWeight(0)
+	, m_nSortField(0)
 {
 	m_nFields = 6;
 }
@@ -52,7 +52,7 @@ void GameKindSet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Text(pFX, _T("clientmodule"), m_sClientModule);
 	RFX_Text(pFX, _T("servermodule"), m_sServerModule);
 	RFX_Text(pFX, _T("version"), m_sGameVersion);
-	RFX_Int(pFX, _T("sortweight"), m_nSortWeight);
+	RFX_Int(pFX, _T("sortfield"), m_nSortField);
 }
 
 

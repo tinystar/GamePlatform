@@ -42,7 +42,7 @@ public:
 	CString	m_sClientModule;
 	CString	m_sServerModule;
 	CString	m_sGameVersion;
-	int		m_nSortWeight;
+	int		m_nSortField;
 
 	virtual void DoFieldExchange(CFieldExchange* pFX);
 };

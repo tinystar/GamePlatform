@@ -11,13 +11,13 @@
 USE xCardGame;
 
 # add games data
-INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortweight)
+INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortfield)
 VALUES(1, "经典斗地主", "landlord.lua", "landlord.dll", "1.0.0", 0);
-INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortweight)
+INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortfield)
 VALUES(2, "诈金花", "zjh.lua", "zjh.dll", "1.0.0", 0);
-INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortweight)
+INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortfield)
 VALUES(3, "武汉麻将", "whmj.lua", "whmj.dll", "1.0.0", 0);
-INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortweight)
+INSERT INTO gamekind(kindid, gamename, clientmodule, servermodule, version, sortfield)
 VALUES(4, "捕鱼", "FishingJoy.lua", "FishingJoy.dll", "1.0.0", 0);
 
 # 经典斗地主

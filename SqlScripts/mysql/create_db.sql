@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS gamekind
     clientmodule  varchar(23)       NOT NULL,
     servermodule  varchar(23)       NULL,
     version       char(15)          NOT NULL,
-    sortweight    int               NULL,
+    sortfield     int               NULL DEFAULT 0,
     PRIMARY KEY(kindid)
 )ENGINE = InnoDB;
 

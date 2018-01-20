@@ -424,7 +424,7 @@ void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
 		}
 
 		GameKindSet kindSet(&m_database);
-		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM gamekind ORDER BY sortweight DESC")))
+		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM gamekind ORDER BY sortfield ASC")))
 		{
 			EzLogError(_T("Failed to get game kind list.\n"));
 			failMsg.nInfoType = kGameKind;
