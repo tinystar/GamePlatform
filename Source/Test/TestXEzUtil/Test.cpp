@@ -7,6 +7,7 @@
 #include <xmemory>
 #include <sstream>
 #include <map>
+#include "xEzStringImp.h"
 
 using namespace std;
 using namespace EzText;
@@ -577,6 +578,118 @@ void testMemPerf()
 	EzTrace(_T("-------system malloc alloc total time: %f-------"), watch2.stop());
 }
 
+void testEzString()
+{
+	StringBuffer<char> cEmpty;
+	StringBuffer<char> cEmpty1(NULL, 0);
+	StringBuffer<char> testS("123", 3);
+	StringBuffer<wchar_t> testWS(L"123", 3);
+	StringBuffer<char> testS1(testS);
+	StringBuffer<wchar_t> testWS1(L"abcdef");
+
+	const char* pszEmpt = cEmpty;
+	cEmpty += "hello";
+	cEmpty.copyStrData('A', 0);
+	cEmpty.reset();
+	cEmpty = testS + testS1;
+	cEmpty = "123" + cEmpty;
+	pszEmpt = cEmpty;
+
+	if (testS == testS1)
+	{
+		if ("123" == testS)
+			testS += "456";
+		testS += testS;
+	}
+
+	testWS = testWS1;
+	testWS = L"AAAA";
+	testWS += L"BBB";
+	if (testWS == L"AAAABBB")
+		testWS = testWS1 + L"111";
+	else
+		testWS = testWS1 + L"222";
+
+	if (testWS1.compareNoCase(L"AbcDEF"))
+		testWS1.reset();
+
+	const wchar_t* pTestWS1 = testWS;
+
+	EzString strEmpty;
+	EzString strW1 = L"仗剑走天涯，何处是我家？";
+	EzString strA1("仗剑走天涯，何处是我家？", kAnsi);
+	EzString strW2(L'A', 5);
+	EzString strA2('A', 5);
+
+	const wchar_t* pWRet = NULL;
+	const char* pRet = NULL;
+	strEmpty = strW1;
+	strEmpty += L"abc";
+	strEmpty = L"new string";
+	EzString strEmpt1;
+	strEmpt1 = L"ttt";
+	EzString strEmpt2;
+	strEmpt2 += L"aaa";
+	EzString strW3 = strW1;
+	pWRet = strW1.kwcharPtr();
+	pRet = strW1.kcharPtr(kAnsi);
+	pRet = strW3.kcharPtr(kUtf8);
+
+	strW1 += pWRet;
+	strW1 += strA1;
+	strW1 += strW3;
+	EzString strT = strW1 + strW3 + strA1;
+	EzString strT1 = strW1 + strEmpty;
+
+	strT = L"abc";
+	if (strT == strW1)
+	{
+		strT = L"";
+	}
+	else if (strT == L"123")
+	{
+		strT = L"";
+	}
+	else if (L"abc" == strT)
+	{
+		strT.kcharPtr(kUtf8);
+		strT = L"";
+	}
+
+	TextEncoding enc = strW1.getEncoding();
+	enc = strW3.getEncoding();
+	unsigned int uLen = strW3.chLength();
+	uLen = strW3.strLength();
+	uLen = strW3.wstrLength();
+	strW3.kcharPtr(kAnsi);
+	uLen = strA1.chLength();
+	uLen = strA1.strLength();
+}
+
+void testSmartPtr()
+{
+	EzSharedPtr<int> ptrTest1(new int(5));
+	EzSharedPtr<int> ptrTest2;
+	ptrTest2 = ptrTest1;
+	EzSharedPtr<int> ptrTest3(ptrTest2);
+
+	ptrTest2 = new int(0);
+
+	int nRet = *ptrTest1;
+	nRet = *ptrTest2;
+
+	if (ptrTest2)
+	{
+		EzSharedPtr<std::string> ptrStr(new std::string("abc"));
+		char ch = ptrStr->operator[](1);
+		const char* psz = ptrStr->c_str();
+		ptrStr.reset();
+		ptrStr.refCount();
+	}
+
+	ptrTest1.refCount();
+}
+
 void testEntry()
 {
 	// debug
@@ -605,4 +718,7 @@ void testEntry()
 	// test Memory Allocate
 	//testMemory();
  	//testMemPerf();
+
+	testEzString();
+	testSmartPtr();
 }
