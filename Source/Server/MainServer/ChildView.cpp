@@ -194,32 +194,18 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		char szAddr[50] = { 0 };
 		unsigned short sPort = 0;
-#ifdef _UNICODE
+
 		m_mainSvrMgr.getGateSvrAddr(szAddr, 50, sPort);
-		wchar_t* pAddrW = EzText::utf8ToWideChar(szAddr);
-		m_gateAddrEdit.SetWindowText(pAddrW);
-		delete[] pAddrW;
-		pAddrW = NULL;
+		EzString sAddr(szAddr, kUtf8);
+		m_gateAddrEdit.SetWindowText(sAddr.kwcharPtr());
 		strPort.Format(_T("%d"), sPort);
 		m_gatePortEdit.SetWindowText(strPort);
 
 		m_mainSvrMgr.getDBSvrAddr(szAddr, 50, sPort);
-		pAddrW = EzText::utf8ToWideChar(szAddr);
-		m_DBAddrEdit.SetWindowText(pAddrW);
-		delete[] pAddrW;
+		EzString sDBAddr(szAddr, kUtf8);
+		m_DBAddrEdit.SetWindowText(sDBAddr.kwcharPtr());
 		strPort.Format(_T("%d"), sPort);
 		m_DBPortEdit.SetWindowText(strPort);
-#else
-		m_mainSvrMgr.getGateSvrAddr(szAddr, 50, sPort);
-		m_gateAddrEdit.SetWindowText(szAddr);
-		strPort.Format(_T("%d"), sPort);
-		m_gatePortEdit.SetWindowText(strPort);
-
-		m_mainSvrMgr.getDBSvrAddr(szAddr, 50, sPort);
-		m_DBAddrEdit.SetWindowText(szAddr);
-		strPort.Format(_T("%d"), sPort);
-		m_DBPortEdit.SetWindowText(strPort);
-#endif
 	}
 
 	return 0;
@@ -297,24 +283,13 @@ void CChildView::OnBtnStartClick()
 			return;
 		}
 
-#ifdef _UNICODE
-		char* pAddrA = EzText::wideCharToAnsi(sGateAddr.GetString());
-		unsigned short port = (unsigned short)_ttoi(sGatePort.GetString());
-		m_mainSvrMgr.setGateSvrAddr(pAddrA, port);
-		delete[] pAddrA;
-		pAddrA = NULL;
+		EzString sAddr(sGateAddr);
+		EzString sPort(sGatePort);
+		m_mainSvrMgr.setGateSvrAddr(sAddr.kcharPtr(kAnsi), _wtoi(sPort.kwcharPtr()));
 
-		pAddrA = EzText::wideCharToAnsi(sDBAddr.GetString());
-		port = (unsigned short)_ttoi(sDBPort.GetString());
-		m_mainSvrMgr.setDBSvrAddr(pAddrA, port);
-		delete[] pAddrA;
-#else
-		unsigned short port = (unsigned short)_ttoi(sGatePort.GetString());
-		m_mainSvrMgr.setGateSvrAddr(sGateAddr.GetString(), port);
-
-		port = (unsigned short)_ttoi(sDBPort.GetString());
-		m_mainSvrMgr.setDBSvrAddr(sDBAddr.GetString(), port);
-#endif
+		sAddr = sDBAddr;
+		sPort = sDBPort;
+		m_mainSvrMgr.setDBSvrAddr(sAddr.kcharPtr(kAnsi), _wtoi(sPort.kwcharPtr()));
 
 		if ((ec = m_mainSvrMgr.startServer()) != eOk)
 		{
@@ -413,12 +388,11 @@ void CChildView::onUIConnToDBClosed()
 
 void CChildView::onUIGetGameInfoFail(int nGameInfoType, const char* pszDetailMsg)
 {
-	const wchar_t* pwchDetail = EzText::ansiToWideChar(pszDetailMsg);
+	EzString sDetail(pszDetailMsg, kAnsi);
 
 	GameInfoFailUIMsg* pFailUIMsg = new GameInfoFailUIMsg();
 	pFailUIMsg->nInfoType = nGameInfoType;
-	pFailUIMsg->sDetailMsg = pwchDetail;
-	delete[] pwchDetail;
+	pFailUIMsg->sDetailMsg = sDetail.kwcharPtr();
 
 	this->PostMessage(WM_GET_GAMEINFO_FAIL, 0, (LPARAM)pFailUIMsg);
 }

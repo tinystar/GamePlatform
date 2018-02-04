@@ -181,13 +181,9 @@ LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 
 	GateServerMgr& gateMgr = m_wndView.getServerMgr();
 	TCHAR szInfo[256] = { 0 };
-#ifdef _UNICODE
-	wchar_t* pVer = EzText::utf8ToWideChar(gateMgr.getVersion());
-	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), pVer);
-	delete[] pVer;
-#else
-	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), gateMgr.getVersion());
-#endif
+	EzString sVer(gateMgr.getVersion(), kUtf8);
+	_stprintf_s(szInfo, 255, _T("Port: %d, Version: %s"), gateMgr.getPort(), sVer.kwcharPtr());
+
 	m_wndStatusBar.SetPaneText(1, szInfo);
 	return 1;
 }

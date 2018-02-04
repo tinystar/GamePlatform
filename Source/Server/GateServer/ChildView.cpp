@@ -245,13 +245,9 @@ void CChildView::OnDestroy()
 void CChildView::onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode)
 {
 	AddServerParam* pAddParam = new AddServerParam();
-#ifdef _UNICODE
-	const wchar_t* pszMainIP = EzText::ansiToWideChar(svrNode.szMainAddr);
-	memcpy(pAddParam->szMainIP, pszMainIP, sizeof(pAddParam->szMainIP));
-	delete[] pszMainIP;
-#else
-	memcpy(pAddParam->szMainIP, svrNode.szMainAddr, sizeof(pAddParam->szMainIP));
-#endif
+	EzString sMainIP(svrNode.szMainAddr, kAnsi);
+	memcpy(pAddParam->szMainIP, sMainIP.kwcharPtr(), sizeof(pAddParam->szMainIP));
+
 	pAddParam->id = id;
 	pAddParam->sMainPort = svrNode.sMainPort;
 	pAddParam->uMaxUser = svrNode.uMaxUser;

@@ -241,7 +241,7 @@ bool EzLoggerImp::appendLog(TCHAR* pszLog)
 		nRet = m_pCurBuffer->write(pszUtf8, strlen(pszUtf8));
 		EzAssert(nRet > 0);
 	}
-	delete[] pszUtf8;
+	::free((void*)pszUtf8);
 
 	return true;
 }

@@ -46,14 +46,8 @@ bool DBServer::onInit(const ServerInitConfig& serverConfig)
 	BOOL bRet = false;
  	try
 	{
-		CString sDSN;
-#ifdef _UNICODE
-		const wchar_t* pszDSN = EzText::utf8ToWideChar(m_szDSN);
-		sDSN = pszDSN;
-		delete[] pszDSN;
-#else
-		sDSN = m_szDSN;
-#endif
+		EzString sDSNConv(m_szDSN, kUtf8);
+		CString sDSN = sDSNConv.kwcharPtr();
 
 		bRet = m_database.Open(sDSN);
 		if (bRet)
@@ -174,35 +168,23 @@ bool DBServer::setInitRoomCard(unsigned int uRoomCard)
 
 void DBServer::sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStamp& cliStamp, const UserInfoSet& userSet)
 {
-#ifdef _UNICODE
-	const char* pszAccount = EzText::wideCharToUtf8(userSet.m_sAccount);
-	const char* pszUserName = EzText::wideCharToUtf8(userSet.m_sUserName);
-	const char* pszPhoneNum = EzText::wideCharToUtf8(userSet.m_sPhoneNum);
-#else
-	const char* pszAccount = userSet.m_sAccount.GetString();
-	const char* pszUserName = userSet.m_sUserName.GetString();
-	const char* pszPhoneNum = userSet.m_sPhoneNum.GetString();
-#endif
+	EzString sAccount(userSet.m_sAccount);
+	EzString sUserName(userSet.m_sUserName);
+	EzString sPhoneNum(userSet.m_sPhoneNum);
 
 	UserInfoWithClientMsg userMsg;
 	userMsg.header.uMainId = MSG_MAINID_DB;
 	userMsg.header.uSubId = uSubMsgId;
 	userMsg.clientStamp = cliStamp;
 	userMsg.userInfo.userId = (CSUINT32)userSet.m_nUserId;
-	strncpy(userMsg.userInfo.szAccount, pszAccount, sizeof(userMsg.userInfo.szAccount) - 1);
-	strncpy(userMsg.userInfo.szUserName, pszUserName, sizeof(userMsg.userInfo.szUserName) - 1);
+	strncpy(userMsg.userInfo.szAccount, sAccount.kcharPtr(kUtf8), sizeof(userMsg.userInfo.szAccount) - 1);
+	strncpy(userMsg.userInfo.szUserName, sUserName.kcharPtr(kUtf8), sizeof(userMsg.userInfo.szUserName) - 1);
 	userMsg.userInfo.headIdx = userSet.m_nHeadIdx;
 	userMsg.userInfo.genderType = userSet.m_nGenderType;
 	userMsg.userInfo.uMoney = (CSUINT32)(userSet.m_dMoney * 100);	// 转为整形传输
 	userMsg.userInfo.uRoomCard = userSet.m_nRoomCard;
-	strncpy(userMsg.userInfo.szPhoneNum, pszPhoneNum, sizeof(userMsg.userInfo.szPhoneNum) - 1);
+	strncpy(userMsg.userInfo.szPhoneNum, sPhoneNum.kcharPtr(kUtf8), sizeof(userMsg.userInfo.szPhoneNum) - 1);
 	userMsg.userInfo.uTypeFlag = userSet.m_nUserFlag;
-
-#ifdef _UNICODE
-	delete[] pszAccount;
-	delete[] pszUserName;
-	delete[] pszPhoneNum;
-#endif
 
 	sendMsg(id, &userMsg, sizeof(userMsg));
 }
@@ -213,21 +195,13 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 	EzAssert(sizeof(ClientStampMsg) == nDataLen);
 	ClientStampMsg* pStampMsg = (ClientStampMsg*)pData;
 
+	EzString sNameConvt(m_szGuestName, kUtf8);
+	EzString sPWConvt(m_szGuestPW, kUtf8);
+
 	CRecordset rs(&m_database);
 	CString sSql;
-	CString sGuestName;
-	CString sGuestPW;
-#ifdef _UNICODE
-	const wchar_t* pszGuestName = EzText::utf8ToWideChar(m_szGuestName);
-	sGuestName = pszGuestName;
-	delete[] pszGuestName;
-	const wchar_t* pszGuestPW = EzText::utf8ToWideChar(m_szGuestPW);
-	sGuestPW = pszGuestPW;
-	delete[] pszGuestPW;
-#else
-	sGuestName = m_szGuestName;
-	sGuestPW = m_szGuestPW;
-#endif
+	CString sGuestName = sNameConvt.kwcharPtr();
+	CString sGuestPW = sPWConvt.kwcharPtr();
 
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
@@ -307,20 +281,12 @@ void DBServer::onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen)
 	EzAssert(sizeof(ValidateAcctLoginMsg) == nDataLen);
 	ValidateAcctLoginMsg* pValidateMsg = (ValidateAcctLoginMsg*)pData;
 
+	EzString sAcctConvt(pValidateMsg->szAccount, kUtf8);
+	EzString sPwConvt(pValidateMsg->szPassword, kUtf8);
+
 	CString sSql;
-	CString sAccount;
-	CString sPassword;
-#ifdef _UNICODE
-	const wchar_t* pszAccount = EzText::utf8ToWideChar(pValidateMsg->szAccount);
-	sAccount = pszAccount;
-	delete[] pszAccount;
-	const wchar_t* pszPassword = EzText::utf8ToWideChar(pValidateMsg->szPassword);
-	sPassword = pszPassword;
-	delete[] pszPassword;
-#else
-	sAccount = pValidateMsg->szAccount;
-	sPassword = pValidateMsg->szPassword;
-#endif
+	CString sAccount = sAcctConvt.kwcharPtr();
+	CString sPassword = sPwConvt.kwcharPtr();
 
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
@@ -369,30 +335,16 @@ void DBServer::onValidateUserIdLogin(ClientId id, void* pData, size_t nDataLen)
 
 void DBServer::fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet)
 {
-#ifdef _UNICODE
-	const char* pszGameName = EzText::wideCharToUtf8(kindSet.m_sGameName);
-	const char* pszCliModName = EzText::wideCharToUtf8(kindSet.m_sClientModule);
-	const char* pszSvrModName = EzText::wideCharToUtf8(kindSet.m_sServerModule);
-	const char* pszVersion = EzText::wideCharToUtf8(kindSet.m_sGameVersion);
-#else
-	const char* pszGameName = kindSet.m_sGameName;
-	const char* pszCliModName = kindSet.m_sClientModule;
-	const char* pszSvrModName = kindSet.m_sServerModule;
-	const char* pszVersion = kindSet.m_sGameVersion;
-#endif
+	EzString sGameName(kindSet.m_sGameName);
+	EzString sCliModName(kindSet.m_sClientModule);
+	EzString sSvrModName(kindSet.m_sServerModule);
+	EzString sVersion(kindSet.m_sGameVersion);
 
 	kindInfo.nKindId = kindSet.m_nKindId;
-	strncpy(kindInfo.szGameName, pszGameName, EzCountOf(kindInfo.szGameName) - 1);
-	strncpy(kindInfo.szCliModInfo, pszCliModName, EzCountOf(kindInfo.szCliModInfo) - 1);
-	strncpy(kindInfo.szSvrModInfo, pszSvrModName, EzCountOf(kindInfo.szSvrModInfo) - 1);
-	strncpy(kindInfo.szVersion, pszVersion, EzCountOf(kindInfo.szVersion) - 1);
-
-#ifdef _UNICODE
-	delete[] pszGameName;
-	delete[] pszCliModName;
-	delete[] pszSvrModName;
-	delete[] pszVersion;
-#endif
+	strncpy(kindInfo.szGameName, sGameName.kcharPtr(kUtf8), EzCountOf(kindInfo.szGameName) - 1);
+	strncpy(kindInfo.szCliModInfo, sCliModName.kcharPtr(kUtf8), EzCountOf(kindInfo.szCliModInfo) - 1);
+	strncpy(kindInfo.szSvrModInfo, sSvrModName.kcharPtr(kUtf8), EzCountOf(kindInfo.szSvrModInfo) - 1);
+	strncpy(kindInfo.szVersion, sVersion.kcharPtr(kUtf8), EzCountOf(kindInfo.szVersion) - 1);
 }
 
 void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
@@ -476,22 +428,14 @@ void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
 
 void DBServer::fillGamePlaceInfo(GamePlaceMsgInfo& placeInfo, const GamePlaceSet& placeSet)
 {
-#ifdef _UNICODE
-	const char* pszPlaceName = EzText::wideCharToUtf8(placeSet.m_sPlaceName);
-#else
-	const char* pszPlaceName = placeSet.m_sPlaceName;
-#endif
+	EzString sPlaceName(placeSet.m_sPlaceName);
 
 	placeInfo.nKindId = placeSet.m_nKindId;
 	placeInfo.nPlaceId = placeSet.m_nPlaceId;
-	strncpy(placeInfo.szPlaceName, pszPlaceName, EzCountOf(placeInfo.szPlaceName) - 1);
+	strncpy(placeInfo.szPlaceName, sPlaceName.kcharPtr(kUtf8), EzCountOf(placeInfo.szPlaceName) - 1);
 	placeInfo.nPlaceType = placeSet.m_nPlaceType;
 	placeInfo.uEnterLimit = placeSet.m_dEnterLimit * 100;
 	placeInfo.uBasePoint = placeSet.m_dBasePoint * 100;
-
-#ifdef _UNICODE
-	delete[] pszPlaceName;
-#endif
 }
 
 void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
@@ -581,25 +525,15 @@ void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
 
 void DBServer::fillGameRoomInfo(GameRoomMsgInfo& roomInfo, const GameRoomSet& roomSet)
 {
-#ifdef _UNICODE
-	const char* pszRoomName = EzText::wideCharToUtf8(roomSet.m_sRoomName);
-	const char* pszServerIp = EzText::wideCharToUtf8(roomSet.m_sServerIp);
-#else
-	const char* pszRoomName = roomSet.m_sRoomName;
-	const char* pszServerIp = roomSet.m_sServerIp;
-#endif
+	EzString sRoomName(roomSet.m_sRoomName);
+	EzString sServerIp(roomSet.m_sServerIp);
 
 	roomInfo.nKindId = roomSet.m_nKindId;
 	roomInfo.nPlaceId = roomSet.m_nPlaceId;
 	roomInfo.nRoomId = roomSet.m_nRoomId;
-	strncpy(roomInfo.szRoomName, pszRoomName, EzCountOf(roomInfo.szRoomName) - 1);
-	strncpy(roomInfo.szServerIp, pszServerIp, EzCountOf(roomInfo.szServerIp) - 1);
+	strncpy(roomInfo.szRoomName, sRoomName.kcharPtr(kUtf8), EzCountOf(roomInfo.szRoomName) - 1);
+	strncpy(roomInfo.szServerIp, sServerIp.kcharPtr(kUtf8), EzCountOf(roomInfo.szServerIp) - 1);
 	roomInfo.sServerPort = (CSUINT16)roomSet.m_nServerPort;
-
-#ifdef _UNICODE
-	delete[] pszRoomName;
-	delete[] pszServerIp;
-#endif
 }
 
 void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
