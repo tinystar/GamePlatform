@@ -70,6 +70,8 @@ protected:
 
 	bool removeClientFromDBReqQueue(ClientId id);
 
+	void notifyClientWhenDBClosed();
+
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 

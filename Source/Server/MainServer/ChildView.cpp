@@ -176,7 +176,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_DBPortEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
 
 	rcControl.SetRect(20, 10, 610, 280);
-	m_svrMsgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY, rcControl, this, -1);
+	m_svrMsgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL, rcControl, this, -1);
 
 	if (!m_mainSvrMgr.loadConfig())
 	{

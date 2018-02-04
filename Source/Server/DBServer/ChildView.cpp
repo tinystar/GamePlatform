@@ -107,7 +107,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_openDirBtn.SetFont(&m_font);
 
 	rcControl.SetRect(10, 10, 575, 280);
-	m_msgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY, rcControl, this, -1);
+	m_msgEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_WANTRETURN | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL, rcControl, this, -1);
 
 	SVCErrorCode ec = eOk;
 	if ((ec = m_dbSvrMgr.initServer()) != eOk)

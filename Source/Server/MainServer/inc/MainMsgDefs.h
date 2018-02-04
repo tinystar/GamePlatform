@@ -29,7 +29,8 @@ enum LoginFailReason
 	eUnknownReason		= 0,
 	eAccountNotExist	= 1,
 	ePasswordWrong		= 2,
-	eGuestCreateFail	= 3
+	eGuestCreateFail	= 3,
+	eDBServerClosed		= 4
 };
 
 #pragma pack(push, 1)

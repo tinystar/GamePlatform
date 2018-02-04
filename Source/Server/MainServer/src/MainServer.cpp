@@ -116,7 +116,8 @@ void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
-		sendMsgToServer(pClientSock, MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS);
+		if (0 == m_gameList.getChildCount())
+			sendMsgToServer(pClientSock, MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS);
 
 		if (m_pUIObserver != NULL)
 			m_pUIObserver->onUIConnToDBSuccess();
@@ -143,6 +144,8 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
+		notifyClientWhenDBClosed();
+
 		if (m_pUIObserver != NULL)
 			m_pUIObserver->onUIConnToDBClosed();
 
@@ -432,6 +435,22 @@ bool MainServer::removeClientFromDBReqQueue(ClientId id)
 	}
 
 	return false;
+}
+
+void MainServer::notifyClientWhenDBClosed()
+{
+	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
+	while (iter != m_reqToDBClientQueue.end())
+	{
+		LoginFailMsg failMsg;
+		failMsg.header.uMainId = MSG_MAINID_USER;
+		failMsg.header.uSubId = MSG_SUBID_LOGIN_FAILURE;
+		failMsg.nFailReason = eDBServerClosed;
+		sendMsg(iter->clientId, &failMsg, sizeof(failMsg));
+
+		++iter;
+	}
+	m_reqToDBClientQueue.clear();
 }
 
 void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
