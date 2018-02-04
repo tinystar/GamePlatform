@@ -16,12 +16,13 @@
 
 EZ_NAMESPACE_BEGIN(EzText)
 
-// return values need to be deleted
+// The caller needs to free the return value by using ::free()
 EZ_DLL_C_SPEC char* wideCharToUtf8(const wchar_t* pSrc);
 EZ_DLL_C_SPEC char* wideCharToAnsi(const wchar_t* pSrc);
 EZ_DLL_C_SPEC wchar_t* ansiToWideChar(const char* pSrc);
 EZ_DLL_C_SPEC wchar_t* utf8ToWideChar(const char* pSrc);
 EZ_DLL_C_SPEC char* ansiToUtf8(const char* pSrc);
+EZ_DLL_C_SPEC char* utf8ToAnsi(const char* pSrc);
 /**
  * convert wchar_t to utf8 if _UNICODE defined
  * otherwise convert ansi to utf8

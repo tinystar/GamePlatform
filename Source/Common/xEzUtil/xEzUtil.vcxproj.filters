@@ -81,6 +81,18 @@
     <ClInclude Include="inc\xEzEncryptor.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\xEzString.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzSmartPtr.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\xEzMisc.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\xEzStringImp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\xEzLog.cpp">
@@ -117,6 +129,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\xEzEncryptor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzString.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xEzSmartPtr.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

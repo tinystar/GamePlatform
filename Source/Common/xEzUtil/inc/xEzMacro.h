@@ -59,6 +59,17 @@
 	}while(0)
 #endif
 
+#ifndef EZ_SAFE_FREE
+#define EZ_SAFE_FREE(pointer)			\
+	do{									\
+		if(pointer)						\
+		{								\
+			free(pointer);				\
+			pointer = NULL;				\
+		}								\
+	}while(0)
+#endif
+
 
 #define EzCountOf(array)	(sizeof(array)/sizeof(array[0]))
 

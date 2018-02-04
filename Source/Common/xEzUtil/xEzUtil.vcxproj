@@ -55,7 +55,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -74,7 +74,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XEZ_UTIL_EXPORTS;WIN32_LEAN_AND_MEAN;XEZ_USE_MEMORY_POOL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -103,9 +103,12 @@
     <ClInclude Include="inc\xEzLog.h" />
     <ClInclude Include="inc\xEzMacro.h" />
     <ClInclude Include="inc\xEzMemory.h" />
+    <ClInclude Include="inc\xEzMisc.h" />
     <ClInclude Include="inc\xEzNet.h" />
     <ClInclude Include="inc\xEzPlatform.h" />
     <ClInclude Include="inc\xEzProfile.h" />
+    <ClInclude Include="inc\xEzSmartPtr.h" />
+    <ClInclude Include="inc\xEzString.h" />
     <ClInclude Include="inc\xEzSystem.h" />
     <ClInclude Include="inc\xEzTextConvertor.h" />
     <ClInclude Include="inc\xEzTime.h" />
@@ -113,6 +116,7 @@
     <ClInclude Include="inc\xEzUtil.h" />
     <ClInclude Include="src\win\xEzLogImp.h" />
     <ClInclude Include="src\xEzMemoryPool.h" />
+    <ClInclude Include="src\xEzStringImp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\win\xEzLock.cpp" />
@@ -126,6 +130,8 @@
     <ClCompile Include="src\xEzLog.cpp" />
     <ClCompile Include="src\xEzMemory.cpp" />
     <ClCompile Include="src\xEzMemoryPool.cpp" />
+    <ClCompile Include="src\xEzSmartPtr.cpp" />
+    <ClCompile Include="src\xEzString.cpp" />
     <ClCompile Include="src\xEzTime.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
