@@ -99,21 +99,6 @@ bool GameRoot::insertChild(int idx, GameNode* pNode)
 }
 #endif
 
-GameNode* GameRoot::findChildById(EzInt32 nodId)
-{
-	for (int i = 0; i < m_children.logicalLength(); ++i)
-	{
-		if (EzVerify(kTypeKind == m_children[i]->type()))
-		{
-			GameKind* pKind = (GameKind*)m_children[i];
-			if (pKind->m_kindInfo.nKindId == nodId)
-				return pKind;
-		}
-	}
-
-	return NULL;
-}
-
 
 //-------------------------------------------------------------------------------
 // GameKind
@@ -146,21 +131,6 @@ bool GameKind::insertChild(int idx, GameNode* pNode)
 	return GameNode::insertChild(idx, pNode);
 }
 #endif
-
-GameNode* GameKind::findChildById(EzInt32 nodId)
-{
-	for (int i = 0; i < m_children.logicalLength(); ++i)
-	{
-		if (EzVerify(kTypePlace == m_children[i]->type()))
-		{
-			GamePlace* pPlace = (GamePlace*)m_children[i];
-			if (pPlace->m_placeInfo.nPlaceId == nodId)
-				return pPlace;
-		}
-	}
-
-	return NULL;
-}
 
 
 //-------------------------------------------------------------------------------
@@ -195,21 +165,6 @@ bool GamePlace::insertChild(int idx, GameNode* pNode)
 }
 #endif
 
-GameNode* GamePlace::findChildById(EzInt32 nodId)
-{
-	for (int i = 0; i < m_children.logicalLength(); ++i)
-	{
-		if (EzVerify(kTypeRoom == m_children[i]->type()))
-		{
-			GameRoom* pRoom = (GameRoom*)m_children[i];
-			if (pRoom->m_roomInfo.nRoomId == nodId)
-				return pRoom;
-		}
-	}
-
-	return NULL;
-}
-
 
 //-------------------------------------------------------------------------------
 // GameRoom
@@ -217,4 +172,87 @@ GameNode* GamePlace::findChildById(EzInt32 nodId)
 GameRoom::GameRoom()
 {
 	m_type = kTypeRoom;
+}
+
+
+//-------------------------------------------------------------------------------
+// GameListTree
+//-------------------------------------------------------------------------------
+bool GameListTree::addGameKind(GameKind* pKind)
+{
+	return m_rootNode.addChild(pKind);
+}
+
+bool GameListTree::addGamePlace(EzInt32 nKindId, GamePlace* pPlace)
+{
+	GameKind* pKind = findGameKindById(nKindId);
+	if (pKind != NULL)
+		return pKind->addChild(pPlace);
+
+	return false;
+}
+
+bool GameListTree::addGameRoom(EzInt32 nKindId, EzInt32 nPlaceId, GameRoom* pRoom)
+{
+	GamePlace* pPlace = findGamePlaceById(nKindId, nPlaceId);
+	if (pPlace != NULL)
+		return pPlace->addChild(pRoom);
+
+	return false;
+}
+
+GameKind* GameListTree::findGameKindById(EzInt32 nKindId) const
+{
+	for (int i = 0; i < m_rootNode.getChildCount(); ++i)
+	{
+		GameNode* pNode = m_rootNode.getAt(i);
+		if (pNode != NULL && GameNode::kTypeKind == pNode->type())
+		{
+			GameKind* pKind = (GameKind*)pNode;
+			if (pKind->m_kindInfo.nKindId == nKindId)
+				return pKind;
+		}
+	}
+
+	return NULL;
+}
+
+GamePlace* GameListTree::findGamePlaceById(EzInt32 nKindId, EzInt32 nPlaceId) const
+{
+	GameKind* pKind = findGameKindById(nKindId);
+	if (pKind != NULL)
+	{
+		for (int i = 0; i < pKind->getChildCount(); ++i)
+		{
+			GameNode* pNode = pKind->getAt(i);
+			if (pNode != NULL && GameNode::kTypePlace == pNode->type())
+			{
+				GamePlace* pPlace = (GamePlace*)pNode;
+				if (pPlace->m_placeInfo.nPlaceId == nPlaceId)
+					return pPlace;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+GameRoom* GameListTree::findGameRoomById(EzInt32 nKindId, EzInt32 nPlaceId, EzInt32 nRoomId) const
+{
+	GamePlace* pPlace = findGamePlaceById(nKindId, nPlaceId);
+	if (pPlace != NULL)
+	{
+		for (int i = 0; i < pPlace->getChildCount(); ++i)
+		{
+			GameNode* pNode = pPlace->getAt(i);
+			if (pNode != NULL && GameNode::kTypeRoom == pNode->type())
+			{
+				GameRoom* pRoom = (GameRoom*)pNode;
+				if (pRoom->m_roomInfo.nRoomId == nRoomId)
+					return pRoom;
+			}
+		}
+	}
+
+	return NULL;
 }

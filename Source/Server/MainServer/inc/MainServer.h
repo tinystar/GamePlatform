@@ -115,7 +115,7 @@ protected:
 
 	UserId2ClientIdMap		m_userIdToClientMap;
 
-	GameRoot				m_gameList;
+	GameListTree			m_gameList;
 
 	IMainServerUIObserver*	m_pUIObserver;
 };

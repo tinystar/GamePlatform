@@ -116,7 +116,7 @@ void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
-		if (0 == m_gameList.getChildCount())
+		if (m_gameList.isEmpty())
 			sendMsgToServer(pClientSock, MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS);
 
 		if (m_pUIObserver != NULL)
@@ -461,7 +461,7 @@ void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
 	{
 		GameKind* pKind = new GameKind();
 		pKind->m_kindInfo.initWithGameKindInfo(pKindListMsg->kinds[i]);
-		m_gameList.addChild(pKind);
+		m_gameList.addGameKind(pKind);
 
 		QueryGamePlaceMsg queryPlaceMsg;
 		queryPlaceMsg.header.uMainId = MSG_MAINID_DB;
@@ -479,9 +479,7 @@ void MainServer::onDBQueryGamePlaces(void* pData, size_t nSize)
 	{
 		GamePlace* pPlace = new GamePlace();
 		pPlace->m_placeInfo.initWithGamePlaceInfo(pPlaceListMsg->places[i]);
-		GameNode* pKind = m_gameList.findChildById(pPlaceListMsg->places[i].nKindId);
-		if (EzVerify(pKind != NULL))
-			pKind->addChild(pPlace);
+		m_gameList.addGamePlace(pPlaceListMsg->places[i].nKindId, pPlace);
 
 		QueryGameRoomMsg queryRoomMsg;
 		queryRoomMsg.header.uMainId = MSG_MAINID_DB;
@@ -500,13 +498,7 @@ void MainServer::onDBQueryGameRooms(void* pData, size_t nSize)
 	{
 		GameRoom* pRoom = new GameRoom();
 		pRoom->m_roomInfo.initWithGameRoomInfo(pRoomListMsg->rooms[i]);
-		GameNode* pKind = m_gameList.findChildById(pRoomListMsg->rooms[i].nKindId);
-		if (EzVerify(pKind != NULL))
-		{
-			GameNode* pPlace = pKind->findChildById(pRoomListMsg->rooms[i].nPlaceId);
-			if (EzVerify(pPlace != NULL))
-				pPlace->addChild(pRoom);
-		}
+		m_gameList.addGameRoom(pRoomListMsg->rooms[i].nKindId, pRoomListMsg->rooms[i].nPlaceId, pRoom);
 	}
 }
 

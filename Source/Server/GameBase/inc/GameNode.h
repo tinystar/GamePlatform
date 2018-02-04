@@ -45,8 +45,7 @@ public:
 	virtual bool deleteChild(GameNode* pNode);
 	virtual void deleteAllChildren();
 
-	virtual GameNode* getAt(int idx) { return m_children.at(idx); }
-	virtual GameNode* findChildById(EzInt32 nodId) { return NULL; }
+	virtual GameNode* getAt(int idx) const { return m_children.at(idx); }
 
 protected:
 	GameNode();			// can't be instantiated
@@ -66,8 +65,6 @@ public:
 	virtual bool addChild(GameNode* pNode);
 	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
-
-	virtual GameNode* findChildById(EzInt32 nodId);
 };
 
 class GB_DLL_SPEC GameKind : public GameNode
@@ -80,8 +77,6 @@ public:
 	virtual bool addChild(GameNode* pNode);
 	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
-
-	virtual GameNode* findChildById(EzInt32 nodId);
 
 public:
 	GameKindInfo	m_kindInfo;
@@ -98,8 +93,6 @@ public:
 	virtual bool insertChild(int idx, GameNode* pNode);
 #endif
 
-	virtual GameNode* findChildById(EzInt32 nodId);
-
 public:
 	GamePlaceInfo	m_placeInfo;
 };
@@ -111,6 +104,24 @@ public:
 
 public:
 	GameRoomInfo	m_roomInfo;
+};
+
+class GB_DLL_SPEC GameListTree
+{
+public:
+	int getGameCount() const { return m_rootNode.getChildCount(); }
+	bool isEmpty() const { return 0 == getGameCount(); }
+
+	bool addGameKind(GameKind* pKind);
+	bool addGamePlace(EzInt32 nKindId, GamePlace* pPlace);
+	bool addGameRoom(EzInt32 nKindId, EzInt32 nPlaceId, GameRoom* pRoom);
+
+	GameKind* findGameKindById(EzInt32 nKindId) const;
+	GamePlace* findGamePlaceById(EzInt32 nKindId, EzInt32 nPlaceId) const;
+	GameRoom* findGameRoomById(EzInt32 nKindId, EzInt32 nPlaceId, EzInt32 nRoomId) const;
+
+protected:
+	GameRoot	m_rootNode;
 };
 
 #endif // __GAME_NODE_H__
