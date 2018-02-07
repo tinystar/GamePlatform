@@ -22,6 +22,7 @@ LobbyScene.RESOURCE_BINDING = {
 -- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
 LobbyScene.MainMsgMap = {
+    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_REQ_GAMEKINDS_SUCC, MsgHandler = "onRequestGameKindsSuccessMsg"}
 }
 
 
@@ -42,10 +43,38 @@ function LobbyScene:onCreate()
     end
 end
 
+function LobbyScene:initSocketMsgMap(sockObj, msgMap)
+    for _, entry in ipairs(msgMap) do
+        SocketMsgMapper.registerAnMapEntry(sockObj, entry.MainMsgId, entry.SubMsgId, handler(self, self[entry.MsgHandler]))
+    end
+end
+
+function LobbyScene:unInitSocketMsgMap(sockObj, msgMap)
+    for _, entry in ipairs(msgMap) do
+        SocketMsgMapper.removeAnMapEntry(sockObj, entry.MainMsgId, entry.SubMsgId)
+    end
+end
+
 function LobbyScene:onEnter()
+    self:initSocketMsgMap(__GData__.MainSocket, LobbyScene.MainMsgMap)
+
+    __GData__.MainSocket:sendData(packNetMsgHeader(MAINMSGID.MSG_MAINID_GAMELIST, SUBMSGID.MSG_SUBID_REQUEST_GAMEKINDS))
 end
 
 function LobbyScene:onExit()
+    self:unInitSocketMsgMap(__GData__.MainSocket, LobbyScene.MainMsgMap)
+end
+
+function LobbyScene:onRequestGameKindsSuccessMsg(sockObj, msg, msgLen)
+    print("-------onRequestGameKindsSuccessMsg-------")
+    __GData__.GameList = parseGameKindListMsg(msg, msgLen)
+
+    for i = 1, #__GData__.GameList do
+        print(__GData__.GameList[i].KindId)
+        print(__GData__.GameList[i].GameName)
+        print(__GData__.GameList[i].ClientMod)
+        print(__GData__.GameList[i].GameVer)
+    end
 end
 
 return LobbyScene

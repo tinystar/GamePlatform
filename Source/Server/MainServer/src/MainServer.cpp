@@ -11,7 +11,8 @@
 
 NetMsgMapEntry MainServer::s_msgMapArray[] = {
 	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) },
-	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) }
+	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) },
+	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, static_cast<NetMsgHandler>(&MainServer::onRequestGameKinds) }
 };
 
 
@@ -460,7 +461,7 @@ void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
 	for (CSUINT32 i = 0; i < pKindListMsg->uCount; ++i)
 	{
 		GameKind* pKind = new GameKind();
-		pKind->m_kindInfo.initWithGameKindInfo(pKindListMsg->kinds[i]);
+		pKind->m_kindInfo.initWithGameKindMsg(pKindListMsg->kinds[i]);
 		m_gameList.addGameKind(pKind);
 
 		QueryGamePlaceMsg queryPlaceMsg;
@@ -478,7 +479,7 @@ void MainServer::onDBQueryGamePlaces(void* pData, size_t nSize)
 	for (CSUINT32 i = 0; i < pPlaceListMsg->uCount; ++i)
 	{
 		GamePlace* pPlace = new GamePlace();
-		pPlace->m_placeInfo.initWithGamePlaceInfo(pPlaceListMsg->places[i]);
+		pPlace->m_placeInfo.initWithGamePlaceMsg(pPlaceListMsg->places[i]);
 		m_gameList.addGamePlace(pPlaceListMsg->places[i].nKindId, pPlace);
 
 		QueryGameRoomMsg queryRoomMsg;
@@ -497,7 +498,7 @@ void MainServer::onDBQueryGameRooms(void* pData, size_t nSize)
 	for (CSUINT32 i = 0; i < pRoomListMsg->uCount; ++i)
 	{
 		GameRoom* pRoom = new GameRoom();
-		pRoom->m_roomInfo.initWithGameRoomInfo(pRoomListMsg->rooms[i]);
+		pRoom->m_roomInfo.initWithGameRoomMsg(pRoomListMsg->rooms[i]);
 		m_gameList.addGameRoom(pRoomListMsg->rooms[i].nKindId, pRoomListMsg->rooms[i].nPlaceId, pRoom);
 	}
 }
@@ -509,4 +510,37 @@ void MainServer::onDBQueryGameInfoFail(void* pData, size_t nSize)
 
 	if (m_pUIObserver != NULL)
 		m_pUIObserver->onUIGetGameInfoFail(pGetFailMsg->nInfoType, pGetFailMsg->szDetail);
+}
+
+void MainServer::onRequestGameKinds(ClientId id, void* pData, size_t nDataLen)
+{
+	if (m_gameList.isEmpty())
+	{
+		// Todo: send failed msg
+	}
+
+	size_t uMsgSize = sizeof(GameKindListMsg) + sizeof(GameKindMsgInfo) * (m_gameList.getGameCount() - 1);
+	GameKindListMsg* pKindListMsg = (GameKindListMsg*)::malloc(uMsgSize);
+	if (NULL == pKindListMsg)
+	{
+		EzLogError(_T("Failed to allocate structure of GameKindListMsg.\n"));
+		// Todo: send failed msg
+		return;
+	}
+	::memset(pKindListMsg, 0, uMsgSize);
+
+	pKindListMsg->header.uMainId = MSG_MAINID_GAMELIST;
+	pKindListMsg->header.uSubId = MSG_SUBID_REQ_GAMEKINDS_SUCC;
+
+	for (int i = 0; i < m_gameList.getGameCount(); ++i)
+	{
+		GameKind* pKind = m_gameList.gameKindAt(i);
+		if (NULL == pKind)
+			continue;
+
+		pKind->m_kindInfo.setGameKindMsg(pKindListMsg->kinds[pKindListMsg->uCount++]);
+	}
+
+	sendMsg(id, pKindListMsg, uMsgSize);
+	::free(pKindListMsg);
 }

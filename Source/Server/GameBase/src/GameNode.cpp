@@ -178,6 +178,15 @@ GameRoom::GameRoom()
 //-------------------------------------------------------------------------------
 // GameListTree
 //-------------------------------------------------------------------------------
+GameKind* GameListTree::gameKindAt(int idx) const
+{
+	GameNode* pNode = m_rootNode.getAt(idx);
+	if (pNode != NULL && GameNode::kTypeKind == pNode->type())
+		return (GameKind*)pNode;
+
+	return NULL;
+}
+
 bool GameListTree::addGameKind(GameKind* pKind)
 {
 	return m_rootNode.addChild(pKind);

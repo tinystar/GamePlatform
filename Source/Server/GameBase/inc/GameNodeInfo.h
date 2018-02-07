@@ -39,7 +39,8 @@ struct GB_DLL_SPEC GameKindInfo
 		::memset(szVersion, 0, sizeof(szVersion));
 	}
 
-	void initWithGameKindInfo(const GameKindMsgInfo& kindInfo);
+	void initWithGameKindMsg(const GameKindMsgInfo& kindInfo);
+	void setGameKindMsg(GameKindMsgInfo& kindInfo);
 };
 
 struct GB_DLL_SPEC GamePlaceInfo
@@ -59,7 +60,8 @@ struct GB_DLL_SPEC GamePlaceInfo
 		::memset(szPlaceName, 0, sizeof(szPlaceName));
 	}
 
-	void initWithGamePlaceInfo(const GamePlaceMsgInfo& placeInfo);
+	void initWithGamePlaceMsg(const GamePlaceMsgInfo& placeInfo);
+	void setGamePlaceMsg(GamePlaceMsgInfo& placeInfo);
 };
 
 struct GB_DLL_SPEC GameRoomInfo
@@ -77,7 +79,8 @@ struct GB_DLL_SPEC GameRoomInfo
 		::memset(szServerIp, 0, sizeof(szServerIp));
 	}
 
-	void initWithGameRoomInfo(const GameRoomMsgInfo& roomInfo);
+	void initWithGameRoomMsg(const GameRoomMsgInfo& roomInfo);
+	void setGameRoomMsg(GameRoomMsgInfo& roomInfo);
 };
 
 #endif // __GAME_NODE_INFO_H__

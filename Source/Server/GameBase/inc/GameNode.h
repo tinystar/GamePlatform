@@ -112,6 +112,8 @@ public:
 	int getGameCount() const { return m_rootNode.getChildCount(); }
 	bool isEmpty() const { return 0 == getGameCount(); }
 
+	GameKind* gameKindAt(int idx) const;
+
 	bool addGameKind(GameKind* pKind);
 	bool addGamePlace(EzInt32 nKindId, GamePlace* pPlace);
 	bool addGameRoom(EzInt32 nKindId, EzInt32 nPlaceId, GameRoom* pRoom);

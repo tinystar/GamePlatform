@@ -175,6 +175,7 @@ function ClientSocket:onSocketRead()
         local nextPos, pkgSize = string.unpack(self.recvBuffer_, "I")
         if nil == pkgSize then break end
 
+        -- 不足一个包
         if pkgSize + 4 > #self.recvBuffer_ then
             break
         end
@@ -185,7 +186,7 @@ function ClientSocket:onSocketRead()
         end
 
         -- 可能会在消息通知函数里面调用close关闭连接，close中会将接收缓冲置空
-        if nil == self.recvBuffer_ then break end
+        if "" == self.recvBuffer_ then break end
 
         self.recvBuffer_ = string.sub(self.recvBuffer_, nextPos + pkgSize)
     end

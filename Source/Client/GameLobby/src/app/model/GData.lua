@@ -25,6 +25,24 @@ __GData__ = {
         PhoneNumber = nil,
         TypeFlag = nil
     },
+
+    -- 游戏类型列表，为一个数组
+    -- 每一个元素类型为：
+    --     {
+    --       KindId,
+    --       GameName,
+    --       ClientMod,         -- 客户端游戏启动文件
+    --       GameVer,
+    --       PlaceList =        -- 场次列表，每个元素类型为：
+    --                   {
+    --                      PlaceId,
+    --                      PlaceName,
+    --                      PlaceType,
+    --                      EnterLimit,
+    --                      BasePoint,
+    --                   }
+    --     }
+    GameList = {},
 }
 
 return __GData__

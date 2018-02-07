@@ -10,7 +10,8 @@
 
 MAINMSGID = {
     MSG_MAINID_GATE                 = 1,
-    MSG_MAINID_USER                 = 10
+    MSG_MAINID_USER                 = 10,
+    MSG_MAINID_GAMELIST             = 11
 }
 
 SUBMSGID = {
@@ -28,9 +29,15 @@ SUBMSGID = {
     MSG_SUBID_ACCOUNT_LOGIN         = 1,
     MSG_SUBID_WECHAT_LOGIN          = 2,
     MSG_SUBID_QUICK_LOGIN           = 3,
+    MSG_SUBID_REQUEST_GAMEKINDS     = 1,
+    MSG_SUBID_REQUEST_GAMEPLACES    = 2,
     -- Server -> Client
     MSG_SUBID_LOGIN_SUCCESS         = 1,
-    MSG_SUBID_LOGIN_FAILURE         = 2
+    MSG_SUBID_LOGIN_FAILURE         = 2,
+    MSG_SUBID_REQ_GAMEKINDS_SUCC    = 1,
+    MSG_SUBID_REQ_GAMEKINDS_FAIL    = 2,
+    MSG_SUBID_REQ_GAMEPLACES_SUCC   = 3,
+    MSG_SUBID_REQ_GAMEPLACES_FAIL   = 4
 }
 
 -- -----------------------------------------------------
@@ -135,7 +142,35 @@ end
 -- -----------------------------------------------------
 function parseLoginFailMsg(data, len)
     assert(4 == len, "Invalid Login Fail Msg!")
-    local nextPos, reason = string.unpack(data, "iA")
+    local nextPos, reason = string.unpack(data, "i")
 
     return {FailReason = reason}
+end
+
+-- -----------------------------------------------------
+-- GameKindListMsg
+--     uCount       -   INT32
+--     kinds        -   GameKindMsgInfo
+--                          nKindId         -   INT32
+--                          szGameName      -   char[24]
+--                          szCliModInfo    -   char[24]
+--                          szSvrModInfo    -   char[24]
+--                          szVersion       -   char[16]
+-- -----------------------------------------------------
+function parseGameKindListMsg(data, len)
+    local nextPos, count = string.unpack(data, "i")
+
+    local gameList = {}
+    for i = 1, count do
+        local _next, kindId, gameName, cliModeInfo, svrModInfo, version = string.unpack(data, "iA24A24A24A16", nextPos)
+        nextPos = _next
+
+        gameList[i] = {KindId = kindId,
+                       GameName = gameName,
+                       ClientMod = cliModeInfo,
+                       GameVer = version
+                      }
+    end
+
+    return gameList;
 end
