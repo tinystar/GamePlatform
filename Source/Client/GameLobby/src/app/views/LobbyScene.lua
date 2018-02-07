@@ -22,7 +22,8 @@ LobbyScene.RESOURCE_BINDING = {
 -- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
 LobbyScene.MainMsgMap = {
-    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_REQ_GAMEKINDS_SUCC, MsgHandler = "onRequestGameKindsSuccessMsg"}
+    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_REQ_GAMEKINDS_SUCC, MsgHandler = "onRequestGameKindsSuccessMsg"},
+    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_REQ_GAMEKINDS_FAIL, MsgHandler = "onRequestGameKindsFailureMsg"}
 }
 
 
@@ -75,6 +76,10 @@ function LobbyScene:onRequestGameKindsSuccessMsg(sockObj, msg, msgLen)
         print(__GData__.GameList[i].ClientMod)
         print(__GData__.GameList[i].GameVer)
     end
+end
+
+function LobbyScene:onRequestGameKindsFailureMsg(sockObj, msg, msgLen)
+    print("-------onRequestGameKindsFailureMsg-------")
 end
 
 return LobbyScene

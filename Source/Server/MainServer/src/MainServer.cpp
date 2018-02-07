@@ -523,7 +523,8 @@ void MainServer::onRequestGameKinds(ClientId id, void* pData, size_t nDataLen)
 {
 	if (m_gameList.isEmpty())
 	{
-		// Todo: send failed msg
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_REQ_GAMEKINDS_FAIL);
+		return;
 	}
 
 	size_t uMsgSize = sizeof(GameKindListMsg) + sizeof(GameKindMsgInfo) * (m_gameList.getGameCount() - 1);
@@ -531,7 +532,7 @@ void MainServer::onRequestGameKinds(ClientId id, void* pData, size_t nDataLen)
 	if (NULL == pKindListMsg)
 	{
 		EzLogError(_T("Failed to allocate structure of GameKindListMsg.\n"));
-		// Todo: send failed msg
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_REQ_GAMEKINDS_FAIL);
 		return;
 	}
 	::memset(pKindListMsg, 0, uMsgSize);
