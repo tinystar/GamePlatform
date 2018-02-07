@@ -295,6 +295,9 @@ bool MainServer::sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId,
 
 void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 {
+	if (isClientLoginInProgress(id))
+		return;
+
 	EzAssert(sizeof(AccountLoginMsg) == nDataLen);
 	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
 
@@ -316,6 +319,10 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 
 void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 {
+	// 避免重复请求登录
+	if (isClientLoginInProgress(id))
+		return;
+
 	// 消息发送到DB服务器，在DB服务器处理过程中，id对应的客户端可能断开连接，由于底层id结构会重用，
 	// 所以在DB服务器处理完返回时，id对于的客户端可能发生了变化，不是之前请求DB服务器时的客户端，
 	// 所以不能只用ClientId来唯一确定一个客户端连接，增加ulStamp字段来唯一的标志每次请求以解决这个问题。
@@ -543,4 +550,18 @@ void MainServer::onRequestGameKinds(ClientId id, void* pData, size_t nDataLen)
 
 	sendMsg(id, pKindListMsg, uMsgSize);
 	::free(pKindListMsg);
+}
+
+bool MainServer::isClientLoginInProgress(ClientId id)
+{
+	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
+	while (iter != m_reqToDBClientQueue.end())
+	{
+		if (id == iter->clientId)
+			return true;
+
+		++iter;
+	}
+
+	return false;
 }

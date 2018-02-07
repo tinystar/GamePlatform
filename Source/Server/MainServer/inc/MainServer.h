@@ -72,6 +72,8 @@ protected:
 
 	void notifyClientWhenDBClosed();
 
+	bool isClientLoginInProgress(ClientId id);
+
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 

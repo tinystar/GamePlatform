@@ -146,6 +146,9 @@ function LoginScene:onQuickLoginBtnClicked(sender)
     else
         __GData__.MainSocket:sendData(packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_QUICK_LOGIN))
     end
+
+    -- 禁用按钮，避免重复点击
+    sender:setEnabled(false)
 end
 
 function LoginScene:onPromptLayerRemoved(event)
@@ -195,6 +198,9 @@ function LoginScene:onUserLoginFailureMsg(sockObj, msg, msgLen)
     printf("login fail reason = %s", loginFailMsg.FailReason)
     
     -- Todo
+
+    local quickLoginBtn = self.LoginPanel:getChildByName("Button_QuickLogin")
+    quickLoginBtn:setEnabled(true)
 end
 
 -- gate socket event handlers
