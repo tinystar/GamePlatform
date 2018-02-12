@@ -64,6 +64,7 @@
     <Compile Include="app\views\AccountLoginLayer.lua" />
     <Compile Include="app\views\LobbyScene.lua" />
     <Compile Include="app\views\LoginScene.lua" />
+    <Compile Include="app\views\PlaceScene.lua" />
     <Compile Include="app\views\PromptLayer.lua" />
     <Compile Include="cocos\3d\3dConstants.lua" />
     <Compile Include="cocos\cocos2d\bitExtend.lua" />

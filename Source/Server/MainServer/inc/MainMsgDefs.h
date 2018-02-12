@@ -68,6 +68,12 @@ struct LoginFailMsg
 	{}
 };
 
+struct ReqGamePlacesMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nKindId;
+};
+
 #pragma pack(pop)
 
 #endif // __MAIN_MSG_DEFS_H__

@@ -85,6 +85,7 @@ protected:
 	void onQuickLogin(ClientId id, void* pData, size_t nDataLen);
 
 	void onRequestGameKinds(ClientId id, void* pData, size_t nDataLen);
+	void onRequestGamePlaces(ClientId id, void* pData, size_t nDataLen);
 
 	// DBServer messages
 protected:

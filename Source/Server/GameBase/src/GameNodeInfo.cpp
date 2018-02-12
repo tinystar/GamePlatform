@@ -28,8 +28,9 @@ void GamePlaceInfo::initWithGamePlaceMsg(const GamePlaceMsgInfo& placeInfo)
 	dBasePoint = placeInfo.uBasePoint / 100.0;
 }
 
-void GamePlaceInfo::setGamePlaceMsg(GamePlaceMsgInfo& placeInfo)
+void GamePlaceInfo::setGamePlaceMsg(GamePlaceMsgInfo& placeInfo, EzInt32 nKindId)
 {
+	placeInfo.nKindId = nKindId;
 	placeInfo.nPlaceId = nPlaceId;
 	strcpy(placeInfo.szPlaceName, szPlaceName);
 	placeInfo.nPlaceType = placeType;
@@ -45,8 +46,10 @@ void GameRoomInfo::initWithGameRoomMsg(const GameRoomMsgInfo& roomInfo)
 	sServerPort = roomInfo.sServerPort;
 }
 
-void GameRoomInfo::setGameRoomMsg(GameRoomMsgInfo& roomInfo)
+void GameRoomInfo::setGameRoomMsg(GameRoomMsgInfo& roomInfo, EzInt32 nKindId, EzInt32 nPlaceId)
 {
+	roomInfo.nKindId = nKindId;
+	roomInfo.nPlaceId = nPlaceId;
 	roomInfo.nRoomId = nRoomId;
 	strcpy(roomInfo.szRoomName, szRoomName);
 	strcpy(roomInfo.szServerIp, szServerIp);

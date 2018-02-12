@@ -12,7 +12,8 @@
 NetMsgMapEntry MainServer::s_msgMapArray[] = {
 	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) },
 	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) },
-	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, static_cast<NetMsgHandler>(&MainServer::onRequestGameKinds) }
+	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, static_cast<NetMsgHandler>(&MainServer::onRequestGameKinds) },
+	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEPLACES, static_cast<NetMsgHandler>(&MainServer::onRequestGamePlaces) }
 };
 
 
@@ -551,6 +552,45 @@ void MainServer::onRequestGameKinds(ClientId id, void* pData, size_t nDataLen)
 
 	sendMsg(id, pKindListMsg, uMsgSize);
 	::free(pKindListMsg);
+}
+
+void MainServer::onRequestGamePlaces(ClientId id, void* pData, size_t nDataLen)
+{
+	EzAssert(sizeof(ReqGamePlacesMsg) == nDataLen);
+	ReqGamePlacesMsg* pReqPlaceMsg = (ReqGamePlacesMsg*)pData;
+	
+	GameKind* pKind = m_gameList.findGameKindById(pReqPlaceMsg->nKindId);
+	if (!EzVerify(pKind != NULL))
+	{
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_REQ_GAMEPLACES_FAIL);
+		return;
+	}
+
+	size_t uMsgSize = sizeof(GamePlaceListMsg) + sizeof(GamePlaceMsgInfo) * (pKind->getChildCount() - 1);
+	GamePlaceListMsg* pPlaceListMsg = (GamePlaceListMsg*)::malloc(uMsgSize);
+	if (NULL == pPlaceListMsg)
+	{
+		EzLogError(_T("Failed to allocate structure of GamePlaceListMsg.\n"));
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_REQ_GAMEPLACES_FAIL);
+		return;
+	}
+	::memset(pPlaceListMsg, 0, uMsgSize);
+
+	pPlaceListMsg->header.uMainId = MSG_MAINID_GAMELIST;
+	pPlaceListMsg->header.uSubId = MSG_SUBID_REQ_GAMEPLACES_SUCC;
+
+	for (int i = 0; i < pKind->getChildCount(); ++i)
+	{
+		GameNode* pNode = pKind->getAt(i);
+		if (!EzVerify(pNode != NULL && GameNode::kTypePlace == pNode->type()))
+			continue;
+
+		GamePlace* pPlace = (GamePlace*)pNode;
+		pPlace->m_placeInfo.setGamePlaceMsg(pPlaceListMsg->places[pPlaceListMsg->uCount++], pKind->m_kindInfo.nKindId);
+	}
+
+	sendMsg(id, pPlaceListMsg, uMsgSize);
+	::free(pPlaceListMsg);
 }
 
 bool MainServer::isClientLoginInProgress(ClientId id)

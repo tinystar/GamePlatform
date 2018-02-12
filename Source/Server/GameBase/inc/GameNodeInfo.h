@@ -61,7 +61,7 @@ struct GB_DLL_SPEC GamePlaceInfo
 	}
 
 	void initWithGamePlaceMsg(const GamePlaceMsgInfo& placeInfo);
-	void setGamePlaceMsg(GamePlaceMsgInfo& placeInfo);
+	void setGamePlaceMsg(GamePlaceMsgInfo& placeInfo, EzInt32 nKindId);
 };
 
 struct GB_DLL_SPEC GameRoomInfo
@@ -80,7 +80,7 @@ struct GB_DLL_SPEC GameRoomInfo
 	}
 
 	void initWithGameRoomMsg(const GameRoomMsgInfo& roomInfo);
-	void setGameRoomMsg(GameRoomMsgInfo& roomInfo);
+	void setGameRoomMsg(GameRoomMsgInfo& roomInfo, EzInt32 nKindId, EzInt32 nPlaceId);
 };
 
 #endif // __GAME_NODE_INFO_H__

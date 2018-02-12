@@ -35,6 +35,7 @@ __GData__ = {
     --       GameVer,
     --       PlaceList =        -- 场次列表，每个元素类型为：
     --                   {
+    --                      KindId,
     --                      PlaceId,
     --                      PlaceName,
     --                      PlaceType,

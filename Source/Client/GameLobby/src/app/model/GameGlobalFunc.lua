@@ -87,3 +87,13 @@ function cleanMainSocket()
     ClientSocketMgr.removeSocket("mainSocket")
     __GData__.MainSocket = nil
 end
+
+function findGameKindById(kindId)
+    for i = 1, #__GData__.GameList do
+        if __GData__.GameList[i].KindId == kindId then
+            return __GData__.GameList[i]
+        end
+    end
+
+    return nil
+end

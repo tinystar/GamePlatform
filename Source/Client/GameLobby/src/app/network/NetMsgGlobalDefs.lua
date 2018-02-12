@@ -172,5 +172,47 @@ function parseGameKindListMsg(data, len)
                       }
     end
 
-    return gameList;
+    return gameList
+end
+
+-- -----------------------------------------------------
+-- ReqGamePlacesMsg
+--     nKindId      -   INT32
+-- -----------------------------------------------------
+function packReqGamePlacesMsg(kindId)
+    local header, headerLen = packNetMsgHeader(MAINMSGID.MSG_MAINID_GAMELIST, SUBMSGID.MSG_SUBID_REQUEST_GAMEPLACES)
+
+    local msg = string.pack("Ai", header, kindId)
+    return msg, #msg
+end
+
+-- -----------------------------------------------------
+-- GamePlaceListMsg
+--     uCount       -   INT32
+--     places       -   GamePlaceMsgInfo
+--                          nKindId         -   INT32
+--                          nPlaceId        -   INT32
+--                          szPlaceName     -   char[24]
+--                          nPlaceType      -   INT32
+--                          uEnterLimit     -   UINT32
+--                          uBasePoint      -   UINT32
+-- -----------------------------------------------------
+function parseGamePlaceListMsg(data, len)
+    local nextPos, count = string.unpack(data, "i")
+
+    local placeList = {}
+    for i = 1, count do
+        local _next, kindId, placeId, placeName, placeType, enterLimit, basePoint = string.unpack(data, "iiA24iII", nextPos)
+        nextPos = _next
+
+        placeList[i] = {KindId = kindId,
+                        PlaceId = placeId,
+                        PlaceName = placeName,
+                        PlaceType = placeType,
+                        EnterLimit = enterLimit,
+                        BasePoint = basePoint
+                       }
+    end
+
+    return placeList
 end

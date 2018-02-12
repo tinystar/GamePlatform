@@ -84,7 +84,7 @@ struct GamePlaceMsgInfo
 	CSINT32			nKindId;
 	CSINT32			nPlaceId;
 	char			szPlaceName[24];
-	EzInt32			nPlaceType;
+	CSINT32			nPlaceType;
 	CSUINT32		uEnterLimit;	// 金钱用double表示，但是在网络传输时采用整形（浮点型不同语言、编译器编码方式可能不一样，网络传输最好是整形）
 	CSUINT32		uBasePoint;		// 金钱用double表示，但是在网络传输时采用整形（浮点型不同语言、编译器编码方式可能不一样，网络传输最好是整形）
 
