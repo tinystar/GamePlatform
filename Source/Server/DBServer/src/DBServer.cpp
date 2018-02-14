@@ -434,8 +434,8 @@ void DBServer::fillGamePlaceInfo(GamePlaceMsgInfo& placeInfo, const GamePlaceSet
 	placeInfo.nPlaceId = placeSet.m_nPlaceId;
 	strncpy(placeInfo.szPlaceName, sPlaceName.kcharPtr(kUtf8), EzCountOf(placeInfo.szPlaceName) - 1);
 	placeInfo.nPlaceType = placeSet.m_nPlaceType;
-	placeInfo.uEnterLimit = placeSet.m_dEnterLimit * 100;
-	placeInfo.uBasePoint = placeSet.m_dBasePoint * 100;
+	placeInfo.uEnterLimit = (CSUINT32)placeSet.m_dEnterLimit * 100;
+	placeInfo.uBasePoint = (CSUINT32)placeSet.m_dBasePoint * 100;
 }
 
 void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
@@ -534,6 +534,7 @@ void DBServer::fillGameRoomInfo(GameRoomMsgInfo& roomInfo, const GameRoomSet& ro
 	strncpy(roomInfo.szRoomName, sRoomName.kcharPtr(kUtf8), EzCountOf(roomInfo.szRoomName) - 1);
 	strncpy(roomInfo.szServerIp, sServerIp.kcharPtr(kUtf8), EzCountOf(roomInfo.szServerIp) - 1);
 	roomInfo.sServerPort = (CSUINT16)roomSet.m_nServerPort;
+	roomInfo.uMaxUser = roomSet.m_nMaxUserCnt;
 }
 
 void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)

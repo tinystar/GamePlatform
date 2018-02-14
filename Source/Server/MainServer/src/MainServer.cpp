@@ -13,7 +13,8 @@ NetMsgMapEntry MainServer::s_msgMapArray[] = {
 	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) },
 	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) },
 	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, static_cast<NetMsgHandler>(&MainServer::onRequestGameKinds) },
-	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEPLACES, static_cast<NetMsgHandler>(&MainServer::onRequestGamePlaces) }
+	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEPLACES, static_cast<NetMsgHandler>(&MainServer::onRequestGamePlaces) },
+	{ MSG_MAINID_GAMELIST, MSG_SUBID_ENTER_GAMEPLACE, static_cast<NetMsgHandler>(&MainServer::onEnterGamePlace) }
 };
 
 
@@ -593,6 +594,34 @@ void MainServer::onRequestGamePlaces(ClientId id, void* pData, size_t nDataLen)
 	::free(pPlaceListMsg);
 }
 
+void MainServer::onEnterGamePlace(ClientId id, void* pData, size_t nDataLen)
+{
+	EzAssert(sizeof(EnterGamePlaceMsg) == nDataLen);
+	EnterGamePlaceMsg* pEnterPlaceMsg = (EnterGamePlaceMsg*)pData;
+
+	GamePlace* pPlace = m_gameList.findGamePlaceById(pEnterPlaceMsg->nKindId, pEnterPlaceMsg->nPlaceId);
+	if (NULL == pPlace)
+	{
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_ENTER_PLACE_FAIL);
+		return;
+	}
+
+	GameRoom* pRoom = selectARoom(pPlace);
+	if (NULL == pRoom)
+	{
+		sendMsg(id, MSG_MAINID_GAMELIST, MSG_SUBID_ENTER_PLACE_FAIL);
+		return;
+	}
+
+	RoomAddressMsg msg;
+	msg.header.uMainId = MSG_MAINID_GAMELIST;
+	msg.header.uSubId = MSG_SUBID_ROOM_ADDRESS;
+	memcpy(msg.szIP, pRoom->m_roomInfo.szServerIp, sizeof(msg.szIP));
+	msg.sPort = pRoom->m_roomInfo.sServerPort;
+
+	sendMsg(id, &msg, sizeof(msg));
+}
+
 bool MainServer::isClientLoginInProgress(ClientId id)
 {
 	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
@@ -605,4 +634,22 @@ bool MainServer::isClientLoginInProgress(ClientId id)
 	}
 
 	return false;
+}
+
+GameRoom* MainServer::selectARoom(GamePlace* pPlace)
+{
+	if (NULL == pPlace)
+		return NULL;
+
+	for (int i = 0; i < pPlace->getChildCount(); ++i)
+	{
+		GameRoom* pRoom = (GameRoom*)pPlace->getAt(i);
+		if (NULL == pRoom)
+			continue;
+
+		if (pRoom->m_roomInfo.uOnlineCount < pRoom->m_roomInfo.uMaxUserCount)
+			return pRoom;
+	}
+
+	return NULL;
 }

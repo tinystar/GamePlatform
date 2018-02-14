@@ -74,6 +74,8 @@ protected:
 
 	bool isClientLoginInProgress(ClientId id);
 
+	GameRoom* selectARoom(GamePlace* pPlace);
+
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
@@ -86,6 +88,8 @@ protected:
 
 	void onRequestGameKinds(ClientId id, void* pData, size_t nDataLen);
 	void onRequestGamePlaces(ClientId id, void* pData, size_t nDataLen);
+
+	void onEnterGamePlace(ClientId id, void* pData, size_t nDataLen);
 
 	// DBServer messages
 protected:

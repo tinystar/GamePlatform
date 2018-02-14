@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS gameroom
     roomname      varchar(23)       NULL,
     serverip      char(19)          NOT NULL,
     serverport    smallint unsigned NOT NULL,
+    maxuser       int unsigned      NOT NULL DEFAULT 300,
     PRIMARY KEY(kindid, placeid, roomid)
 )ENGINE = InnoDB;
 

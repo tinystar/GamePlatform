@@ -75,7 +75,7 @@ const MainSvrNode* MainServerList::chooseServer() const
 		if (uOnlineCnt < uThreshold)
 			return &m_svrList[i];
 
-		if (uOnlineCnt < uMin)
+		if (uOnlineCnt < m_svrList[i].uMaxUser && uOnlineCnt < uMin)
 		{
 			uMin = uOnlineCnt;
 			idxMin = i;

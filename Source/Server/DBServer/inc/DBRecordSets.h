@@ -73,6 +73,7 @@ public:
 	CString	m_sRoomName;
 	CString m_sServerIp;
 	int		m_nServerPort;
+	int		m_nMaxUserCnt;
 
 	virtual void DoFieldExchange(CFieldExchange* pFX);
 };

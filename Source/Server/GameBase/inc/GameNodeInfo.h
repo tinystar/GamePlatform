@@ -70,10 +70,14 @@ struct GB_DLL_SPEC GameRoomInfo
 	char			szRoomName[24];
 	char			szServerIp[20];
 	unsigned short	sServerPort;
+	EzUInt32		uMaxUserCount;
+	EzUInt32		uOnlineCount;
 
 	GameRoomInfo()
 		: nRoomId(-1)
 		, sServerPort(0)
+		, uMaxUserCount(0)
+		, uOnlineCount(0)
 	{
 		::memset(szRoomName, 0, sizeof(szRoomName));
 		::memset(szServerIp, 0, sizeof(szServerIp));

@@ -21,6 +21,8 @@ PlaceScene.RESOURCE_BINDING = {
 -- MainMsgId            SubMsgId            MsgHandler
 -- -----------------------------------------------------
 PlaceScene.MainMsgMap = {
+    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_ROOM_ADDRESS, MsgHandler = "onRoomAddressMsg"},
+    {MainMsgId = MAINMSGID.MSG_MAINID_GAMELIST, SubMsgId = SUBMSGID.MSG_SUBID_ENTER_PLACE_FAIL, MsgHandler = "onEnterPlaceFailMsg"}
 }
 
 
@@ -71,6 +73,8 @@ end
 
 function PlaceScene:createPlaceItem(placeInfo)
     local item = self.GamePlaceItem:clone()
+    item.GamePlace_ = placeInfo
+    item:addClickEventListener(handler(self, self.onGamePlaceClicked))
 
     local limitText = item:getChildByName("Text_Limit")
     local basePointText = item:getChildByName("Text_BasePoint")
@@ -83,6 +87,29 @@ end
 function PlaceScene:onGoBackBtnClicked(sender)
     print("------onGoBackBtnClicked------")
     self:getApp():enterScene("LobbyScene")
+end
+
+function PlaceScene:onGamePlaceClicked(sender)
+    print("------onGamePlaceClicked------")
+    local placeInfo = sender.GamePlace_
+    if __GData__.GameUser.Money < placeInfo.EnterLimit then
+        -- Todo: jump to shop
+        return
+    end
+
+    __GData__.MainSocket:sendData(packEnterGamePlaceMsg(self.gameKind_.KindId, sender.GamePlace_.PlaceId))
+end
+
+function PlaceScene:onRoomAddressMsg(sockObj, msg, msgLen)
+    print("-------onRoomAddressMsg-------")
+    local RoomAddrMsg = parseRoomAddressMsg(msg, msgLen)
+
+    print(RoomAddrMsg.RoomAddr)
+    print(RoomAddrMsg.RoomPort)
+end
+
+function PlaceScene:onEnterPlaceFailMsg(sockObj, msg, msgLen)
+    print("-------onEnterPlaceFailMsg-------")
 end
 
 return PlaceScene

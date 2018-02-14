@@ -22,6 +22,7 @@
 
 #define MSG_SUBID_REQUEST_GAMEKINDS			1
 #define MSG_SUBID_REQUEST_GAMEPLACES		2
+#define MSG_SUBID_ENTER_GAMEPLACE			3
 
 // server -> client
 #define MSG_SUBID_LOGIN_SUCCESS				1
@@ -31,6 +32,8 @@
 #define MSG_SUBID_REQ_GAMEKINDS_FAIL		2
 #define MSG_SUBID_REQ_GAMEPLACES_SUCC		3
 #define MSG_SUBID_REQ_GAMEPLACES_FAIL		4
+#define MSG_SUBID_ROOM_ADDRESS				5
+#define MSG_SUBID_ENTER_PLACE_FAIL			6
 
 
 enum LoginFailReason
@@ -72,6 +75,35 @@ struct ReqGamePlacesMsg
 {
 	GameMsgHeader	header;
 	CSINT32			nKindId;
+
+	ReqGamePlacesMsg()
+		: nKindId(-1)
+	{}
+};
+
+struct EnterGamePlaceMsg
+{
+	GameMsgHeader	header;
+	CSINT32			nKindId;
+	CSINT32			nPlaceId;
+
+	EnterGamePlaceMsg()
+		: nKindId(-1)
+		, nPlaceId(-1)
+	{}
+};
+
+struct RoomAddressMsg
+{
+	GameMsgHeader	header;
+	char			szIP[20];
+	CSUINT16		sPort;
+
+	RoomAddressMsg()
+		: sPort(0)
+	{
+		::memset(szIP, 0, sizeof(szIP));
+	}
 };
 
 #pragma pack(pop)

@@ -34,8 +34,8 @@ void GamePlaceInfo::setGamePlaceMsg(GamePlaceMsgInfo& placeInfo, EzInt32 nKindId
 	placeInfo.nPlaceId = nPlaceId;
 	strcpy(placeInfo.szPlaceName, szPlaceName);
 	placeInfo.nPlaceType = placeType;
-	placeInfo.uEnterLimit = dEnterLimit * 100;
-	placeInfo.uBasePoint = dBasePoint * 100;
+	placeInfo.uEnterLimit = (CSUINT32)dEnterLimit * 100;
+	placeInfo.uBasePoint = (CSUINT32)dBasePoint * 100;
 }
 
 void GameRoomInfo::initWithGameRoomMsg(const GameRoomMsgInfo& roomInfo)
@@ -44,6 +44,7 @@ void GameRoomInfo::initWithGameRoomMsg(const GameRoomMsgInfo& roomInfo)
 	strcpy(szRoomName, roomInfo.szRoomName);
 	strcpy(szServerIp, roomInfo.szServerIp);
 	sServerPort = roomInfo.sServerPort;
+	uMaxUserCount = roomInfo.uMaxUser;
 }
 
 void GameRoomInfo::setGameRoomMsg(GameRoomMsgInfo& roomInfo, EzInt32 nKindId, EzInt32 nPlaceId)
@@ -54,4 +55,5 @@ void GameRoomInfo::setGameRoomMsg(GameRoomMsgInfo& roomInfo, EzInt32 nKindId, Ez
 	strcpy(roomInfo.szRoomName, szRoomName);
 	strcpy(roomInfo.szServerIp, szServerIp);
 	roomInfo.sServerPort = sServerPort;
+	roomInfo.uMaxUser = uMaxUserCount;
 }

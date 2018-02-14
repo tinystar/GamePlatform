@@ -91,8 +91,9 @@ GameRoomSet::GameRoomSet(CDatabase* pDatabase /*= NULL*/)
 	, m_nPlaceId(-1)
 	, m_nRoomId(-1)
 	, m_nServerPort(0)
+	, m_nMaxUserCnt(0)
 {
-	m_nFields = 6;
+	m_nFields = 7;
 }
 
 void GameRoomSet::DoFieldExchange(CFieldExchange* pFX)
@@ -104,4 +105,5 @@ void GameRoomSet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Text(pFX, _T("roomname"), m_sRoomName);
 	RFX_Text(pFX, _T("serverip"), m_sServerIp);
 	RFX_Int(pFX, _T("serverport"), m_nServerPort);
+	RFX_Int(pFX, _T("maxuser"), m_nMaxUserCnt);
 }

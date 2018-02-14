@@ -45,8 +45,8 @@ INSERT INTO gameplace(kindid, placeid, placename, placetype, enterlimit, basepoi
 VALUES(4, 1, "初级场", 1, 1000.00, 10.00);
 
 # 经典斗地主-初级场
-INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
-VALUES(1, 1, 1, "房间1", "127.0.0.1", 8001);
+INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport, maxuser)
+VALUES(1, 1, 1, "房间1", "127.0.0.1", 8001, 1200);
 # 经典斗地主-中级场
 INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
 VALUES(1, 2, 1, "房间2", "127.0.0.1", 8002);

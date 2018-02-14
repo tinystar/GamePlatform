@@ -107,12 +107,14 @@ struct GameRoomMsgInfo
 	char			szRoomName[24];
 	char			szServerIp[20];
 	CSUINT16		sServerPort;
+	CSUINT32		uMaxUser;
 
 	GameRoomMsgInfo()
 		: nKindId(-1)
 		, nPlaceId(-1)
 		, nRoomId(-1)
 		, sServerPort(0)
+		, uMaxUser(0)
 	{
 		::memset(szRoomName, 0, sizeof(szRoomName));
 		::memset(szServerIp, 0, sizeof(szServerIp));
