@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\UIComm\win\TrayIcon.h" />
     <ClInclude Include="ChildView.h" />
+    <ClInclude Include="GameListDialog.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -22,6 +23,7 @@
   <ItemGroup>
     <ClCompile Include="..\UIComm\win\TrayIcon.cpp" />
     <ClCompile Include="ChildView.cpp" />
+    <ClCompile Include="GameListDialog.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WorldServerApp.cpp" />
@@ -34,6 +36,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WorldServer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameSvrMgr\GameSvrMgr.vcxproj">
+      <Project>{96b677b9-f811-467c-be1e-e1c18e3504f0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1512E25C-125B-4009-804D-89BF19F752B5}</ProjectGuid>
@@ -83,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\GameBase\inc;..\UIComm\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\GameBase\inc;..\UIComm\win;$(ExternalPath)rapidjson-1.1.0\include;..\DBServer\inc;..\GameSvrMgr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,7 +116,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\GameBase\inc;..\UIComm\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\GameBase\inc;..\UIComm\win;$(ExternalPath)rapidjson-1.1.0\include;..\DBServer\inc;..\GameSvrMgr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

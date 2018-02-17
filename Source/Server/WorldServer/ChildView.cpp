@@ -24,6 +24,8 @@ CChildView::~CChildView()
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
+	ON_WM_CREATE()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -52,3 +54,20 @@ void CChildView::OnPaint()
 	// 不要为绘制消息而调用 CWnd::OnPaint()
 }
 
+int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	m_GameListDlg.Create(IDD_GAME_LIST, this);
+	m_GameListDlg.ShowWindow(SW_SHOW);
+
+	return 0;
+}
+
+void CChildView::OnSize(UINT nType, int cx, int cy)
+{
+	CWnd::OnSize(nType, cx, cy);
+
+	m_GameListDlg.MoveWindow(0, 0, cx, cy);
+}

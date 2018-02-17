@@ -68,7 +68,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON         "res\\WorldServer.ico"
+IDR_MAINFRAME           ICON                    "res\\WorldServer.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -87,7 +87,7 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "关于 WorldServer(&A)...",          ID_APP_ABOUT
+        MENUITEM "关于 WorldServer(&A)...",       ID_APP_ABOUT
     END
 END
 
@@ -137,6 +137,25 @@ BEGIN
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
 
+IDD_GAME_LIST DIALOGEX 0, 0, 595, 374
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD
+EXSTYLE WS_EX_STATICEDGE
+FONT 9, "宋体", 400, 0, 0x86
+BEGIN
+    GROUPBOX        "游戏列表：",IDC_STATIC,7,7,581,128
+    GROUPBOX        "游戏房间列表：",IDC_STATIC,7,143,581,224
+    CONTROL         "",IDC_GAME_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,18,508,112,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "加载组件",IDC_LOAD_MODULE,530,21,50,14
+    PUSHBUTTON      "卸载组件",IDC_UNLOAD_MODULE,530,42,50,14
+    PUSHBUTTON      "更新组件",IDC_UPDATE_MODULE,530,63,50,14
+    CONTROL         "",IDC_ROOM_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,153,508,207,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "启动房间",IDC_START_ROOM,530,157,50,14
+    PUSHBUTTON      "停止房间",IDC_STOP_ROOM,530,178,50,14
+    PUSHBUTTON      "全部启动",IDC_START_ALL,530,199,50,14
+    PUSHBUTTON      "全部停止",IDC_STOP_ALL,530,220,50,14
+    PUSHBUTTON      "刷新列表",IDC_UPDATE_LIST,530,241,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -162,12 +181,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "王海鑫"
             VALUE "FileDescription", "WorldServer"
-            VALUE "FileVersion",     "1.0.0.1"
-            VALUE "InternalName",    "WorldServer.exe"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "WorldServer.exe"
             VALUE "LegalCopyright", "Copyright (C) 2017 王海鑫"
-            VALUE "OriginalFilename","WorldServer.exe"
+            VALUE "OriginalFilename", "WorldServer.exe"
             VALUE "ProductName", "WorldServer"
-            VALUE "ProductVersion",  "1.0.0.1"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -192,6 +211,17 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
+
+    IDD_GAME_LIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 588
+        VERTGUIDE, 14
+        VERTGUIDE, 522
+        VERTGUIDE, 530
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 367
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -203,7 +233,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDP_OLE_INIT_FAILED       "OLE 初始化失败。  请确保 OLE 库是正确的版本。"
+    IDP_OLE_INIT_FAILED     "OLE 初始化失败。  请确保 OLE 库是正确的版本。"
 END
 
 STRINGTABLE
@@ -297,8 +327,8 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\\WorldServer.rc2"  // 非 Microsoft Visual C++ 编辑的资源
-#include "l.CHS\\afxres.rc"      // 标准组件
+#include "res\WorldServer.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

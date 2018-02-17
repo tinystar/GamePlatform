@@ -42,6 +42,9 @@
     <ClInclude Include="..\UIComm\win\TrayIcon.h">
       <Filter>mfc\inc</Filter>
     </ClInclude>
+    <ClInclude Include="GameListDialog.h">
+      <Filter>mfc\inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp">
@@ -57,6 +60,9 @@
       <Filter>mfc\src</Filter>
     </ClCompile>
     <ClCompile Include="..\UIComm\win\TrayIcon.cpp">
+      <Filter>mfc\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameListDialog.cpp">
       <Filter>mfc\src</Filter>
     </ClCompile>
   </ItemGroup>
