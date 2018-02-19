@@ -10,9 +10,27 @@
 #ifndef __GAME_SERVER_MANAGER_H__
 #define __GAME_SERVER_MANAGER_H__
 
+#include "GameSvrMgr.h"
 #include "GameNode.h"
+#include "TcpClientSocket.h"
 
-class GameServerManager
+struct GSM_DLL_SPEC MgrInitConfig
+{
+	bool			bDebugMode;
+	char			szDBAddress[20];
+	unsigned short	sDBPort;
+	size_t			nRoomPkgSize;
+
+	MgrInitConfig()
+		: bDebugMode(false)
+		, sDBPort(0)
+		, nRoomPkgSize(1024)
+	{
+		::memset(szDBAddress, 0, sizeof(szDBAddress));
+	}
+};
+
+class GSM_DLL_SPEC GameServerManager : public ITcpClientSocketEventHandler
 {
 public:
 	// singleton
@@ -20,11 +38,34 @@ public:
 	static void destroyInstance();
 
 public:
-	bool updateGameList();
+	bool initialize(const MgrInitConfig& config);
+	bool unInitialize();
+
+	void updateGameList();
 	bool loadGameModule(GameKind* pGameKind);
 	bool unloadGameModule(GameKind* pGameKind);
 	bool startGameRoom(GameRoom* pGameRoom);
 	bool stopGameRoom(GameRoom* pGameRoom);
+
+	const GameListTree& getGameList() const { return m_gameList; }
+
+	void doUpdate();
+
+protected:
+	virtual void onSocketConnected(TcpClientSocket* pClientSock);
+	virtual void onSocketRecved(TcpClientSocket* pClientSock, void* pPackage, size_t nSize);
+	virtual void onSocketClosed(TcpClientSocket* pClientSock, int nErrCode);
+
+protected:
+	bool connectToDB();
+
+	bool sendMsgToServer(TcpClientSocket* pClientSock, void* pData, size_t nDataLen);
+	bool sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved = 0);
+
+	void onDBQueryGameInfoFail(void* pData, size_t nSize);
+	void onDBQueryGameKinds(void* pData, size_t nSize);
+	void onDBQueryGamePlaces(void* pData, size_t nSize);
+	void onDBQueryGameRooms(void* pData, size_t nSize);
 
 private:
 	GameServerManager();
@@ -33,7 +74,11 @@ private:
 private:
 	static GameServerManager*	m_pSharedManager;
 
-	//GameRoot					m_rootNode;
+	MgrInitConfig				 m_config;
+	TcpClientSocket				 m_clientToDB;
+	GameListTree				 m_gameList;
 };
+
+#define GameServerMgr	GameServerManager::getInstance
 
 #endif // __GAME_SERVER_MANAGER_H__

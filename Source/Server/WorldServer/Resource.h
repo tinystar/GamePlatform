@@ -20,6 +20,9 @@
 #define IDC_STOP_ALL                    1009
 #define IDC_BUTTON8                     1010
 #define IDC_UPDATE_LIST                 1010
+#define IDC_LOAD_ALL                    1011
+#define IDC_UNLOAD_MODULE2              1012
+#define IDC_UNLOAD_ALL                  1012
 #define ID_TRAYMENU_OPEN                32775
 #define ID_TRAYMENU_EXIT                32776
 

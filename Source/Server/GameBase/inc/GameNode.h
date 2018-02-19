@@ -111,6 +111,7 @@ class GB_DLL_SPEC GameListTree
 public:
 	int getGameCount() const { return m_rootNode.getChildCount(); }
 	bool isEmpty() const { return 0 == getGameCount(); }
+	void setEmpty() { m_rootNode.deleteAllChildren(); }
 
 	GameKind* gameKindAt(int idx) const;
 

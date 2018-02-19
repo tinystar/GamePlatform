@@ -13,6 +13,7 @@
 #include <afxwin.h>
 #include <afxcmn.h>
 #include "Resource.h"
+#include "GameServerManager.h"
 
 class GameListDialog : public CDialog
 {
@@ -27,8 +28,20 @@ protected:
 	virtual BOOL OnInitDialog();
 
 protected:
+	bool loadConfig(MgrInitConfig& config);
+
+	void updateListCtrl();
+
+	bool isIPAddressEqual(const char* pszIP1, const char* pszIP2);
+
+protected:
+	afx_msg void OnDestroy();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
 	afx_msg void OnBtnLoadModuleClick();
 	afx_msg void OnBtnUnloadModuleClick();
+	afx_msg void OnBtnLoadAllClick();
+	afx_msg void OnBtnUnloadAllClick();
 	afx_msg void OnBtnUpdateModuleClick();
 
 	afx_msg void OnBtnStartRoomClick();
@@ -41,6 +54,8 @@ protected:
 protected:
 	CListCtrl		m_gameList;
 	CListCtrl		m_roomList;
+	bool			m_bInited;
+	char			m_szHostIP[20];
 };
 
 #endif // __GAMELIST_DIALOG_H__
