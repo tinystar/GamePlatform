@@ -382,7 +382,7 @@ int TcpClientSocketImp::doRecv()
 		}
 
 		m_nRecvBufUsed += nRet;
-		if (m_nRecvBufUsed >= sizeof(TcpPackageHeader))
+		while (m_nRecvBufUsed >= sizeof(TcpPackageHeader))
 		{
 			TcpPackageHeader* pHeader = (TcpPackageHeader*)m_pRecvBuffer;
 			size_t nTotalPkgSize = sizeof(TcpPackageHeader) + pHeader->uPackageSize;
@@ -398,6 +398,10 @@ int TcpClientSocketImp::doRecv()
 					::memmove(m_pRecvBuffer, m_pRecvBuffer + nTotalPkgSize, m_nRecvBufUsed - nTotalPkgSize);
 					m_nRecvBufUsed -= nTotalPkgSize;
 				}
+			}
+			else
+			{
+				break;
 			}
 		}
 	} while (!m_bBlocking);		// recv only once in blocking mode.
