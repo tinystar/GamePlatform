@@ -52,6 +52,9 @@ INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
 VALUES(1, 2, 1, "房间2", "127.0.0.1", 8002);
 INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
 VALUES(1, 2, 2, "房间3", "127.0.0.1", 8003);
+# 经典斗地主-中级场
+INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
+VALUES(1, 3, 1, "房间4", "127.0.0.1", 8004);
 
 # 诈金花-初级场
 INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
@@ -68,3 +71,7 @@ VALUES(3, 2, 1, "房间2", "127.0.0.1", 8052);
 # 武汉麻将-中级场
 INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
 VALUES(3, 3, 1, "房间3", "127.0.0.1", 8053);
+
+# 捕鱼-初级场
+INSERT INTO gameroom(kindid, placeid, roomid, roomname, serverip, serverport)
+VALUES(4, 1, 1, "房间1", "127.0.0.1", 8071);
