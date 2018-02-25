@@ -7,6 +7,7 @@
 GameNode::GameNode()
 	: m_type(kTypeUnknown)
 	, m_parent(NULL)
+	, m_pData(NULL)
 {
 
 }
@@ -14,6 +15,7 @@ GameNode::GameNode()
 GameNode::~GameNode()
 {
 	deleteAllChildren();
+	m_pData = NULL;
 }
 
 bool GameNode::addChild(GameNode* pNode)

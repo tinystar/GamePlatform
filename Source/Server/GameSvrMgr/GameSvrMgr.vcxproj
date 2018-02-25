@@ -93,8 +93,10 @@
     <ClInclude Include="inc\GameRoomServer.h" />
     <ClInclude Include="inc\GameServerManager.h" />
     <ClInclude Include="inc\GameSvrMgr.h" />
+    <ClInclude Include="inc\GameNodeData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\GameNodeData.cpp" />
     <ClCompile Include="src\GameRoomServer.cpp" />
     <ClCompile Include="src\GameServerManager.cpp" />
   </ItemGroup>

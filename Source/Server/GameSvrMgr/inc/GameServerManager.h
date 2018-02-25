@@ -42,10 +42,16 @@ public:
 	bool unInitialize();
 
 	void updateGameList();
+
 	bool loadGameModule(GameKind* pGameKind);
 	bool unloadGameModule(GameKind* pGameKind);
+	// Release the data that bound to GameKind node. The module will be unloaded before release the bounded data.
+	void cleanupGameModule(GameKind* pGameKind);
+
 	bool startGameRoom(GameRoom* pGameRoom);
 	bool stopGameRoom(GameRoom* pGameRoom);
+	// Release the data that bound to GameRoom node. The game room server will be stopped before release the bounded data.
+	void cleanupGameRoom(GameRoom* pGameRoom);
 
 	const GameListTree& getGameList() const { return m_gameList; }
 

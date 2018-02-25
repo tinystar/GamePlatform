@@ -37,6 +37,9 @@ public:
 
 	int getChildCount() const { return m_children.logicalLength(); }
 
+	void setUserData(void* pData) { m_pData = pData; }
+	void* getUserData() const { return m_pData; }
+
 public:
 	// pNode must be allocated on the heap
 	virtual bool addChild(GameNode* pNode);
@@ -54,6 +57,7 @@ protected:
 	NodeType			m_type;
 	GameNode*			m_parent;
 	EzArray<GameNode*>	m_children;
+	void*				m_pData;
 };
 
 // a placeholder as the root node for contain GameKind nodes

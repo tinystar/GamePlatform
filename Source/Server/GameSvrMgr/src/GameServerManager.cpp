@@ -1,5 +1,8 @@
 #include "GameServerManager.h"
 #include "DBMsgDefs.h"
+#include "GameNodeData.h"
+#include "GameRoomServer.h"
+#include "GameModuleDef.h"
 
 
 GameServerManager* GameServerManager::m_pSharedManager = NULL;
@@ -37,22 +40,167 @@ void GameServerManager::updateGameList()
 
 bool GameServerManager::loadGameModule(GameKind* pGameKind)
 {
-	return false;
+	if (NULL == pGameKind)
+		return false;
+
+	void* pData = pGameKind->getUserData();
+	if (NULL == pData)
+	{
+		GameModuleMgr* pMgr = new GameModuleMgr();
+		if (NULL == pMgr)
+			return false;
+
+		pGameKind->setUserData(pMgr);
+		pData = pMgr;
+	}
+
+	GameModuleMgr* pModuleMgr = (GameModuleMgr*)pData;
+	if (pModuleMgr->isLoaded())
+		return true;
+
+	bool bRet = pModuleMgr->loadGameModule(pGameKind->m_kindInfo.szServerModule);
+	if (!bRet)
+		return false;
+
+	GameAppEntryPointFuncPtr pAppEntryPoint = (GameAppEntryPointFuncPtr)pModuleMgr->getSymbAddress(GAMEAPPENTRYPOINT_PROC_NAME);
+	if (!pAppEntryPoint(kInitAppMsg))
+	{
+		pAppEntryPoint(kUnloadAppMsg);
+		pModuleMgr->unloadGameModule();
+		return false;
+	}
+
+	GetGameAppVersionFuncPtr pGetAppVersion = (GetGameAppVersionFuncPtr)pModuleMgr->getSymbAddress(GETGAMEAPPVERSION_PROC_NAME);
+	const char* pVersion = pGetAppVersion();
+	// Todo: compare version
+
+	return true;
 }
 
 bool GameServerManager::unloadGameModule(GameKind* pGameKind)
 {
-	return false;
+	if (NULL == pGameKind)
+		return false;
+
+	void* pData = pGameKind->getUserData();
+	if (NULL == pData)
+		return false;
+
+	GameModuleMgr* pModuleMgr = (GameModuleMgr*)pData;
+	if (!pModuleMgr->isLoaded())
+		return false;
+
+	// Todo: stop all room server depend on this module
+
+	GameAppEntryPointFuncPtr pAppEntryPoint = (GameAppEntryPointFuncPtr)pModuleMgr->getSymbAddress(GAMEAPPENTRYPOINT_PROC_NAME);
+	pAppEntryPoint(kUnloadAppMsg);
+
+	return pModuleMgr->unloadGameModule();
+}
+
+void GameServerManager::cleanupGameModule(GameKind* pGameKind)
+{
+	if (NULL == pGameKind)
+		return;
+
+	void* pData = pGameKind->getUserData();
+	if (NULL == pData)
+		return;
+
+	unloadGameModule(pGameKind);
+
+	GameModuleMgr* pModuleMgr = (GameModuleMgr*)pData;
+	pGameKind->setUserData(NULL);
+	delete pModuleMgr;
 }
 
 bool GameServerManager::startGameRoom(GameRoom* pGameRoom)
 {
+	if (pGameRoom != NULL)
+	{
+		ServerInitConfig svrConfig;
+		svrConfig.tcpConfig.sPort = pGameRoom->m_roomInfo.sServerPort;
+		svrConfig.tcpConfig.nMaxPackageSize = m_config.nRoomPkgSize;
+
+		void* pData = pGameRoom->getUserData();
+		if (pData != NULL)
+		{
+			GameRoomMgr* pRoomMgr = (GameRoomMgr*)pData;
+			if (pRoomMgr->isRunning())
+				return true;
+
+			return pRoomMgr->startRoomServer(svrConfig);
+		}
+
+		GameNode* pParent = pGameRoom->getParent();
+		if (pParent != NULL && GameNode::kTypePlace == pParent->type())
+		{
+			GamePlace* pPlace = (GamePlace*)pParent;
+			pParent = pPlace->getParent();
+			if (pParent != NULL && GameNode::kTypeKind == pParent->type())
+			{
+				GameKind* pKind = (GameKind*)pParent;
+				void* pKindData = pKind->getUserData();
+				if (NULL == pKindData)
+					return false;
+				GameModuleMgr* pModuleMgr = (GameModuleMgr*)pKindData;
+				if (!pModuleMgr->isLoaded())	// Game module has not loaded yet!
+					return false;
+
+				CreateDeskFactoryFuncPtr pCreateDeskFactory = (CreateDeskFactoryFuncPtr)pModuleMgr->getSymbAddress(CREATEDESKFACTORY_PROC_NAME);
+				GameDeskFactory* pDeskFactory = pCreateDeskFactory();
+				if (NULL == pDeskFactory)
+					return false;
+
+				RoomContext roomCtx;
+				roomCtx.placeType = pPlace->m_placeInfo.placeType;
+				roomCtx.dEnterLimit = pPlace->m_placeInfo.dEnterLimit;
+				roomCtx.dBasePoint = pPlace->m_placeInfo.dBasePoint;
+				roomCtx.pDeskFactory = pDeskFactory;
+
+				GameRoomMgr* pRoomMgr = new GameRoomMgr(roomCtx);
+				if (NULL == pRoomMgr)
+					return false;
+
+				pGameRoom->setUserData(pRoomMgr);
+				return pRoomMgr->startRoomServer(svrConfig);
+			}
+		}
+	}
+
 	return false;
 }
 
 bool GameServerManager::stopGameRoom(GameRoom* pGameRoom)
 {
-	return false;
+	if (NULL == pGameRoom)
+		return false;
+
+	void* pData = pGameRoom->getUserData();
+	if (NULL == pData)
+		return false;
+
+	GameRoomMgr* pRoomMgr = (GameRoomMgr*)pData;
+	if (!pRoomMgr->isRunning())
+		return false;
+
+	return pRoomMgr->stopRoomServer();
+}
+
+void GameServerManager::cleanupGameRoom(GameRoom* pGameRoom)
+{
+	if (NULL == pGameRoom)
+		return;
+
+	void* pData = pGameRoom->getUserData();
+	if (NULL == pData)
+		return;
+
+	stopGameRoom(pGameRoom);
+
+	GameRoomMgr* pRoomMgr = (GameRoomMgr*)pData;
+	pGameRoom->setUserData(NULL);
+	delete pRoomMgr;
 }
 
 void GameServerManager::onSocketConnected(TcpClientSocket* pClientSock)

@@ -144,11 +144,11 @@ FONT 9, "宋体", 400, 0, 0x86
 BEGIN
     GROUPBOX        "游戏列表：",IDC_STATIC,7,7,613,146
     GROUPBOX        "游戏房间列表：",IDC_STATIC,7,158,613,228
-    CONTROL         "",IDC_GAME_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,17,540,131,WS_EX_CLIENTEDGE
+    CONTROL         "",IDC_GAME_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,17,540,131,WS_EX_CLIENTEDGE
     PUSHBUTTON      "加载组件",IDC_LOAD_MODULE,562,21,50,14
     PUSHBUTTON      "卸载组件",IDC_UNLOAD_MODULE,562,41,50,14
     PUSHBUTTON      "更新组件",IDC_UPDATE_MODULE,562,101,50,14
-    CONTROL         "",IDC_ROOM_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,168,540,214,WS_EX_CLIENTEDGE
+    CONTROL         "",IDC_ROOM_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,168,540,214,WS_EX_CLIENTEDGE
     PUSHBUTTON      "启动房间",IDC_START_ROOM,562,174,50,14
     PUSHBUTTON      "停止房间",IDC_STOP_ROOM,562,195,50,14
     PUSHBUTTON      "全部启动",IDC_START_ALL,562,216,50,14
@@ -236,6 +236,17 @@ END
 STRINGTABLE
 BEGIN
     IDP_OLE_INIT_FAILED     "OLE 初始化失败。  请确保 OLE 库是正确的版本。"
+    IDS_GAME_ID             "游戏Id"
+    IDS_GAME_NAME           "游戏名称"
+    IDS_MODULE_NAME         "模块名称"
+    IDS_LOAD_STATUS         "加载状态"
+    IDS_GAME_VERSION        "游戏版本"
+    IDS_PLACE_ID            "场次Id"
+    IDS_PLACE_NAME          "场次名称"
+    IDS_ROOM_ID             "房间Id"
+    IDS_ROOM_NAME           "房间名称"
+    IDS_RUN_STATUS          "启动状态"
+    IDS_BASE_POINT          "底分"
 END
 
 STRINGTABLE
@@ -311,6 +322,23 @@ STRINGTABLE
 BEGIN
     AFX_IDS_SCRESTORE       "将窗口恢复到正常大小"
     AFX_IDS_SCTASKLIST      "激活任务列表"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ENTER_LIMIT         "进入限制"
+    IDS_ROOM_ADDRESS        "地址"
+    IDS_ROOM_PORT           "端口"
+    IDS_ONLINE_COUNT        "在线人数"
+    IDS_MAX_COUNT           "最大人数"
+    IDS_NOT_LOADED          "未加载"
+    IDS_HAS_LOADED          "已加载"
+    IDS_NOT_RUNNING         "未启动"
+    IDS_IS_RUNNING          "已启动"
+    IDS_SEL_LOADMODULE_TIP  "请先选择要加载的游戏模块！按住CTRL可以多选。"
+    IDS_SEL_UNLOADMODULE_TIP "请先选择要卸载的游戏模块！按住CTRL可以多选。"
+    IDS_SEL_STARTROOM_TIP   "请先选择要启动的游戏房间！按住CTRL可以多选。"
+    IDS_SEL_STOPROOM_TIP    "请先选择要停止的游戏房间！按住CTRL可以多选。"
 END
 
 #endif    // 中文(简体，中国) resources
