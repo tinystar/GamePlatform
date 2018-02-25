@@ -1,0 +1,6 @@
+
+EXPORTS
+
+GameAppEntryPoint
+GetGameAppVersion
+CreateGameDeskFactory

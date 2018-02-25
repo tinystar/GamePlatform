@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <GpOutDir>$(SolutionDir)..\Out\</GpOutDir>
+    <GpBinDir>$(GpOutDir)Bin\</GpBinDir>
+    <GpLibDir>$(GpOutDir)Lib\</GpLibDir>
+    <GpPdbDir>$(GpOutDir)Pdb\</GpPdbDir>
+    <GpTmpDir>$(GpOutDir)Tmp\</GpTmpDir>
+    <ExternalPath>$(SolutionDir)external\</ExternalPath>
+    <GamePrjPath>Games\$(PlatformName)\$(Configuration)\</GamePrjPath>
+    <ServerPrjPath>Server\$(PlatformName)\$(Configuration)\</ServerPrjPath>
+    <CmnLibPrjPath>CmnLib\$(PlatformName)\$(Configuration)\</CmnLibPrjPath>
+    <GameBinDir>$(GpBinDir)$(ServerPrjPath)Games\</GameBinDir>
+    <GameLibDir>$(GpLibDir)$(GamePrjPath)</GameLibDir>
+    <GamePdbDir>$(GpPdbDir)$(GamePrjPath)</GamePdbDir>
+    <GameTmpDir>$(GpTmpDir)$(GamePrjPath)$(ProjectName)\</GameTmpDir>
+    <CommonLibDir>$(GpLibDir)$(CmnLibPrjPath)</CommonLibDir>
+    <ServerLibDir>$(GpLibDir)$(ServerPrjPath)</ServerLibDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(GameBinDir)</OutDir>
+    <IntDir>$(GameTmpDir)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(CommonLibDir);$(ServerLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>xEzUtil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(GamePdbDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(GameLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;$(SolutionDir)Server\GameSvrMgr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GpOutDir">
+      <Value>$(GpOutDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GpBinDir">
+      <Value>$(GpBinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GpLibDir">
+      <Value>$(GpLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GpPdbDir">
+      <Value>$(GpPdbDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GpTmpDir">
+      <Value>$(GpTmpDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ExternalPath">
+      <Value>$(ExternalPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GamePrjPath">
+      <Value>$(GamePrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerPrjPath">
+      <Value>$(ServerPrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmnLibPrjPath">
+      <Value>$(CmnLibPrjPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameBinDir">
+      <Value>$(GameBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameLibDir">
+      <Value>$(GameLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GamePdbDir">
+      <Value>$(GamePdbDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameTmpDir">
+      <Value>$(GameTmpDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonLibDir">
+      <Value>$(CommonLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ServerLibDir">
+      <Value>$(ServerLibDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
