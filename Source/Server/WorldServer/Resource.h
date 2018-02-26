@@ -28,8 +28,8 @@
 #define IDS_SEL_LOADMODULE_TIP          121
 #define IDS_SEL_UNLOADMODULE_TIP        122
 #define IDS_SEL_STARTROOM_TIP           123
-#define IDS_STRING124                   124
 #define IDS_SEL_STOPROOM_TIP            124
+#define IDS_ONE_UPD_MODULE_TIP          125
 #define IDR_MAINFRAME                   128
 #define IDR_WorldServerTYPE             130
 #define IDD_GAME_LIST                   310
@@ -43,7 +43,6 @@
 #define IDC_STOP_ROOM                   1007
 #define IDC_START_ALL                   1008
 #define IDC_STOP_ALL                    1009
-#define IDC_BUTTON8                     1010
 #define IDC_UPDATE_LIST                 1010
 #define IDC_LOAD_ALL                    1011
 #define IDC_UNLOAD_ALL                  1012

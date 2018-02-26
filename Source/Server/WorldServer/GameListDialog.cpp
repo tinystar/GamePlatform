@@ -2,6 +2,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/document.h"
 #include <ws2tcpip.h>
+#include <afxdlgs.h>
 
 using namespace rapidjson;
 
@@ -72,6 +73,8 @@ BEGIN_MESSAGE_MAP(GameListDialog, CDialog)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_LOAD_MODULE, &GameListDialog::OnBtnLoadModuleClick)
 	ON_BN_CLICKED(IDC_UNLOAD_MODULE, &GameListDialog::OnBtnUnloadModuleClick)
+	ON_BN_CLICKED(IDC_LOAD_ALL, &GameListDialog::OnBtnLoadAllClick)
+	ON_BN_CLICKED(IDC_UNLOAD_ALL, &GameListDialog::OnBtnUnloadAllClick)
 	ON_BN_CLICKED(IDC_UPDATE_MODULE, &GameListDialog::OnBtnUpdateModuleClick)
 	ON_BN_CLICKED(IDC_START_ROOM, &GameListDialog::OnBtnStartRoomClick)
 	ON_BN_CLICKED(IDC_STOP_ROOM, &GameListDialog::OnBtnStopRoomClick)
@@ -178,18 +181,7 @@ void GameListDialog::OnBtnLoadModuleClick()
 	while (pos)
 	{
 		int nItem = m_gameList.GetNextSelectedItem(pos);
-		if (nItem >= 0)
-		{
-			GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
-			EzAssert(pGameKind != NULL);
-
-			if (GameServerMgr()->loadGameModule(pGameKind))
-			{
-				CString sStatus;
-				sStatus.LoadString(IDS_HAS_LOADED);
-				m_gameList.SetItemText(nItem, eGLColLoadStatus, sStatus);
-			}
-		}
+		loadModuleAtItem(nItem);
 	}
 }
 
@@ -207,34 +199,46 @@ void GameListDialog::OnBtnUnloadModuleClick()
 	while (pos)
 	{
 		int nItem = m_gameList.GetNextSelectedItem(pos);
-		if (nItem >= 0)
-		{
-			GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
-			EzAssert(pGameKind != NULL);
-
-			if (GameServerMgr()->unloadGameModule(pGameKind))
-			{
-				CString sStatus;
-				sStatus.LoadString(IDS_NOT_LOADED);
-				m_gameList.SetItemText(nItem, eGLColLoadStatus, sStatus);
-			}
-		}
+		unloadModuleAtItem(nItem);
 	}
 }
 
 void GameListDialog::OnBtnLoadAllClick()
 {
-
+	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
+		loadModuleAtItem(i);
 }
 
 void GameListDialog::OnBtnUnloadAllClick()
 {
-
+	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
+		unloadModuleAtItem(i);
 }
 
 void GameListDialog::OnBtnUpdateModuleClick()
 {
+	if (m_gameList.GetSelectedCount() != 1)
+	{
+		CString sTip;
+		sTip.LoadString(IDS_ONE_UPD_MODULE_TIP);
+		MessageBox(sTip);
+		return;
+	}
 
+	int nItem = m_gameList.GetSelectionMark();
+	GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
+	EzAssert(pGameKind != NULL);
+
+	CFileDialog dlgFile(TRUE, NULL, NULL, 0, _T("Game Module File(*.dll)|*.dll||"));
+	if (IDOK == dlgFile.DoModal())
+	{
+		CString sFullPath = dlgFile.GetPathName();
+		pGameKind->m_kindInfo.sSvrModFullPath = EzString(sFullPath.GetString()).kcharPtr(kAnsi);
+		m_gameList.SetItemText(nItem, eGLColModName, dlgFile.GetFileName());
+
+		unloadModuleAtItem(nItem);
+		loadModuleAtItem(nItem);
+	}
 }
 
 void GameListDialog::OnBtnStartRoomClick()
@@ -251,18 +255,7 @@ void GameListDialog::OnBtnStartRoomClick()
 	while (pos)
 	{
 		int nItem = m_roomList.GetNextSelectedItem(pos);
-		if (nItem >= 0)
-		{
-			GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
-			EzAssert(pGameRoom != NULL);
-
-			if (GameServerMgr()->startGameRoom(pGameRoom))
-			{
-				CString sStatus;
-				sStatus.LoadString(IDS_IS_RUNNING);
-				m_roomList.SetItemText(nItem, eRLColRunStatus, sStatus);
-			}
-		}
+		startRoomAtItem(nItem);
 	}
 }
 
@@ -280,29 +273,20 @@ void GameListDialog::OnBtnStopRoomClick()
 	while (pos)
 	{
 		int nItem = m_roomList.GetNextSelectedItem(pos);
-		if (nItem >= 0)
-		{
-			GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
-			EzAssert(pGameRoom != NULL);
-
-			if (GameServerMgr()->stopGameRoom(pGameRoom))
-			{
-				CString sStatus;
-				sStatus.LoadString(IDS_NOT_RUNNING);
-				m_roomList.SetItemText(nItem, eRLColRunStatus, sStatus);
-			}
-		}
+		stopRoomAtItem(nItem);
 	}
 }
 
 void GameListDialog::OnBtnStartAllClick()
 {
-
+	for (int i = 0; i < m_roomList.GetItemCount(); ++i)
+		startRoomAtItem(i);
 }
 
 void GameListDialog::OnBtnStopAllClick()
 {
-
+	for (int i = 0; i < m_roomList.GetItemCount(); ++i)
+		stopRoomAtItem(i);
 }
 
 void GameListDialog::OnBtnUpdateListClick()
@@ -433,4 +417,68 @@ bool GameListDialog::isIPAddressEqual(const char* pszIP1, const char* pszIP2)
 	inet_pton(AF_INET, pszIP2, (void*)&s2);
 
 	return s1.s_addr == s2.s_addr;
+}
+
+void GameListDialog::loadModuleAtItem(int nItem)
+{
+	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	{
+		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
+		EzAssert(pGameKind != NULL);
+
+		if (GameServerMgr()->loadGameModule(pGameKind))
+		{
+			CString sStatus;
+			sStatus.LoadString(IDS_HAS_LOADED);
+			m_gameList.SetItemText(nItem, eGLColLoadStatus, sStatus);
+		}
+	}
+}
+
+void GameListDialog::unloadModuleAtItem(int nItem)
+{
+	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	{
+		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
+		EzAssert(pGameKind != NULL);
+
+		if (GameServerMgr()->unloadGameModule(pGameKind))
+		{
+			CString sStatus;
+			sStatus.LoadString(IDS_NOT_LOADED);
+			m_gameList.SetItemText(nItem, eGLColLoadStatus, sStatus);
+		}
+	}
+}
+
+void GameListDialog::startRoomAtItem(int nItem)
+{
+	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	{
+		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
+		EzAssert(pGameRoom != NULL);
+
+		if (GameServerMgr()->startGameRoom(pGameRoom))
+		{
+			CString sStatus;
+			sStatus.LoadString(IDS_IS_RUNNING);
+			m_roomList.SetItemText(nItem, eRLColRunStatus, sStatus);
+		}
+	}
+}
+
+void GameListDialog::stopRoomAtItem(int nItem)
+{
+	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	{
+		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
+		EzAssert(pGameRoom != NULL);
+
+		if (GameServerMgr()->stopGameRoom(pGameRoom))
+		{
+			CString sStatus;
+			sStatus.LoadString(IDS_NOT_RUNNING);
+			m_roomList.SetItemText(nItem, eRLColRunStatus, sStatus);
+		}
+	}
 }

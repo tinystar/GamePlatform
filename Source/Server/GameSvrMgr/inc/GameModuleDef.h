@@ -20,7 +20,7 @@ enum AppMsgCode
 };
 
 
-typedef bool(*GameAppEntryPointFuncPtr)(AppMsgCode);
+typedef bool (*GameAppEntryPointFuncPtr)(AppMsgCode);
 typedef GameDeskFactory* (*CreateDeskFactoryFuncPtr)(void);
 typedef const char* (*GetGameAppVersionFuncPtr)(void);
 

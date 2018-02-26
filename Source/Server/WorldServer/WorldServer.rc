@@ -339,6 +339,7 @@ BEGIN
     IDS_SEL_UNLOADMODULE_TIP "请先选择要卸载的游戏模块！按住CTRL可以多选。"
     IDS_SEL_STARTROOM_TIP   "请先选择要启动的游戏房间！按住CTRL可以多选。"
     IDS_SEL_STOPROOM_TIP    "请先选择要停止的游戏房间！按住CTRL可以多选。"
+	IDS_ONE_UPD_MODULE_TIP	"每次只能更新一个模块！"
 END
 
 #endif    // 中文(简体，中国) resources

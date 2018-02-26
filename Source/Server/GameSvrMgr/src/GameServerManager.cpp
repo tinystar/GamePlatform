@@ -58,7 +58,13 @@ bool GameServerManager::loadGameModule(GameKind* pGameKind)
 	if (pModuleMgr->isLoaded())
 		return true;
 
-	bool bRet = pModuleMgr->loadGameModule(pGameKind->m_kindInfo.szServerModule);
+	if (pGameKind->m_kindInfo.sSvrModFullPath.empty())
+	{
+		pGameKind->m_kindInfo.sSvrModFullPath = "Games\\";
+		pGameKind->m_kindInfo.sSvrModFullPath += pGameKind->m_kindInfo.szServerModule;
+	}
+
+	bool bRet = pModuleMgr->loadGameModule(pGameKind->m_kindInfo.sSvrModFullPath.c_str());
 	if (!bRet)
 		return false;
 

@@ -14,6 +14,7 @@
 #include <memory.h>
 #include "BaseMsgDefs.h"
 #include "GameBase.h"
+#include <string>
 
 enum PlaceType
 {
@@ -22,6 +23,7 @@ enum PlaceType
 };
 
 
+template class GB_DLL_SPEC std::basic_string<char>;	// avoid warning C4251
 struct GB_DLL_SPEC GameKindInfo
 {
 	EzInt32			nKindId;
@@ -29,6 +31,7 @@ struct GB_DLL_SPEC GameKindInfo
 	char			szClientModule[24];
 	char			szServerModule[24];
 	char			szVersion[16];
+	std::string		sSvrModFullPath;
 
 	GameKindInfo()
 		: nKindId(-1)

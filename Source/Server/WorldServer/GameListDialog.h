@@ -34,6 +34,12 @@ protected:
 
 	bool isIPAddressEqual(const char* pszIP1, const char* pszIP2);
 
+	void loadModuleAtItem(int nItem);
+	void unloadModuleAtItem(int nItem);
+
+	void startRoomAtItem(int nItem);
+	void stopRoomAtItem(int nItem);
+
 protected:
 	afx_msg void OnDestroy();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
