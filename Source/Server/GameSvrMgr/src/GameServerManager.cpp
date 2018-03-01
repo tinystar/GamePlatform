@@ -154,8 +154,8 @@ bool GameServerManager::startGameRoom(GameRoom* pGameRoom)
 				if (!pModuleMgr->isLoaded())	// Game module has not loaded yet!
 					return false;
 
-				CreateDeskFactoryFuncPtr pCreateDeskFactory = (CreateDeskFactoryFuncPtr)pModuleMgr->getSymbAddress(CREATEDESKFACTORY_PROC_NAME);
-				GameDeskFactory* pDeskFactory = pCreateDeskFactory();
+				GetGameDeskFactoryFuncPtr pGetGameDeskFactory = (GetGameDeskFactoryFuncPtr)pModuleMgr->getSymbAddress(GETGAMEDESKFACTORY_PROC_NAME);
+				GameDeskFactory* pDeskFactory = pGetGameDeskFactory();
 				if (NULL == pDeskFactory)
 					return false;
 

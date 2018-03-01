@@ -26,7 +26,7 @@ bool GameModuleMgr::loadGameModule(const char* pszModName)
 	if (m_hGameModule != NULL)
 	{
 		if (NULL == EzSys::getSymbolAddress(m_hGameModule, GAMEAPPENTRYPOINT_PROC_NAME) ||
-			NULL == EzSys::getSymbolAddress(m_hGameModule, CREATEDESKFACTORY_PROC_NAME) ||
+			NULL == EzSys::getSymbolAddress(m_hGameModule, GETGAMEDESKFACTORY_PROC_NAME) ||
 			NULL == EzSys::getSymbolAddress(m_hGameModule, GETGAMEAPPVERSION_PROC_NAME))
 		{
 			unloadGameModule();

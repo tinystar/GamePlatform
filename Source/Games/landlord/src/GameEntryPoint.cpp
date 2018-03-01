@@ -22,7 +22,8 @@ extern "C" const char* GetGameAppVersion(void)
 	return "1.0.0";
 }
 
-extern "C" GameDeskFactory* CreateGameDeskFactory(void)
+extern "C" GameDeskFactory* GetGameDeskFactory(void)
 {
-	return new GameDeskFactoryTemplate<ServerGameDesk>();
+	static GameDeskFactoryTemplate<ServerGameDesk> _s_factory;
+	return &_s_factory;
 }

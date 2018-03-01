@@ -21,11 +21,11 @@ enum AppMsgCode
 
 
 typedef bool (*GameAppEntryPointFuncPtr)(AppMsgCode);
-typedef GameDeskFactory* (*CreateDeskFactoryFuncPtr)(void);
+typedef GameDeskFactory* (*GetGameDeskFactoryFuncPtr)(void);
 typedef const char* (*GetGameAppVersionFuncPtr)(void);
 
 #define GAMEAPPENTRYPOINT_PROC_NAME		"GameAppEntryPoint"
-#define CREATEDESKFACTORY_PROC_NAME		"CreateGameDeskFactory"
+#define GETGAMEDESKFACTORY_PROC_NAME	"GetGameDeskFactory"
 #define GETGAMEAPPVERSION_PROC_NAME		"GetGameAppVersion"
 
 #endif // __GAME_MODULE_DEF_H__
