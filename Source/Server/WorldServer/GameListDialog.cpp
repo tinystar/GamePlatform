@@ -8,7 +8,6 @@ using namespace rapidjson;
 
 #define WORLD_CONFIG_FILE			_T("WorldConfig.json")
 #define IDT_UPDATE_GAMEMGR			110
-#define IDT_UPDATE_LIST				111
 
 enum GameListColEnum
 {
@@ -59,7 +58,7 @@ const static ListColData _s_roomListCol[] = {
 	{ IDS_ROOM_ID,		LVCFMT_LEFT, 50 },
 	{ IDS_ROOM_NAME,	LVCFMT_LEFT, 60 },
 	{ IDS_RUN_STATUS,	LVCFMT_LEFT, 60 },
-	{ IDS_BASE_POINT,	LVCFMT_LEFT, 50 },
+	{ IDS_BASE_POINT,	LVCFMT_LEFT, 60 },
 	{ IDS_ENTER_LIMIT,	LVCFMT_LEFT, 60 },
 	{ IDS_ROOM_ADDRESS, LVCFMT_LEFT, 90 },
 	{ IDS_ROOM_PORT,	LVCFMT_LEFT, 50 },
@@ -124,9 +123,9 @@ BOOL GameListDialog::OnInitDialog()
 		if(GameServerMgr()->initialize(config))
 		{
 			m_bInited = true;
+			GameServerMgr()->registerEventListener(this);
 			GameServerMgr()->updateGameList();
 			SetTimer(IDT_UPDATE_GAMEMGR, 20, NULL);
-			SetTimer(IDT_UPDATE_LIST, 1000, NULL);
 		}
 		else
 		{
@@ -144,9 +143,13 @@ void GameListDialog::OnDestroy()
 	if (m_bInited)
 	{
 		KillTimer(IDT_UPDATE_GAMEMGR);
+		GameServerMgr()->registerEventListener(NULL);
 		GameServerMgr()->unInitialize();
 		m_bInited = false;
 	}
+
+	clearGameListCtrl();
+	clearRoomListCtrl();
 	GameServerManager::destroyInstance();
 }
 
@@ -155,12 +158,6 @@ void GameListDialog::OnTimer(UINT_PTR nIDEvent)
 	if (IDT_UPDATE_GAMEMGR == nIDEvent)
 	{
 		GameServerMgr()->doUpdate();
-		return;
-	}
-	else if (IDT_UPDATE_LIST == nIDEvent)
-	{
-		updateListCtrl();
-		KillTimer(IDT_UPDATE_LIST);
 		return;
 	}
 
@@ -291,7 +288,9 @@ void GameListDialog::OnBtnStopAllClick()
 
 void GameListDialog::OnBtnUpdateListClick()
 {
-
+	clearGameListCtrl();
+	clearRoomListCtrl();
+	GameServerMgr()->updateGameList();
 }
 
 bool GameListDialog::loadConfig(MgrInitConfig& config)
@@ -481,4 +480,37 @@ void GameListDialog::stopRoomAtItem(int nItem)
 			m_roomList.SetItemText(nItem, eRLColRunStatus, sStatus);
 		}
 	}
+}
+
+void GameListDialog::onUpdateGameListOver(void)
+{
+	updateListCtrl();
+}
+
+void GameListDialog::clearGameListCtrl()
+{
+	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
+	{
+		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(i);
+		EzAssert(pGameKind != NULL);
+
+		GameServerMgr()->cleanupGameModule(pGameKind);
+		m_gameList.SetItemData(i, NULL);
+	}
+
+	m_gameList.DeleteAllItems();
+}
+
+void GameListDialog::clearRoomListCtrl()
+{
+	for (int i = 0; i < m_roomList.GetItemCount(); ++i)
+	{
+		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(i);
+		EzAssert(pGameRoom != NULL);
+
+		GameServerMgr()->cleanupGameRoom(pGameRoom);
+		m_roomList.SetItemData(i, NULL);
+	}
+
+	m_roomList.DeleteAllItems();
 }

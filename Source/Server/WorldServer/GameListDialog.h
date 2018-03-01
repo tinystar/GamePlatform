@@ -15,7 +15,7 @@
 #include "Resource.h"
 #include "GameServerManager.h"
 
-class GameListDialog : public CDialog
+class GameListDialog : public CDialog, public IGameServerMgrEventListener
 {
 public:
 	GameListDialog();
@@ -26,6 +26,9 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 
 	virtual BOOL OnInitDialog();
+
+protected:
+	virtual void onUpdateGameListOver(void);
 
 protected:
 	bool loadConfig(MgrInitConfig& config);
@@ -39,6 +42,9 @@ protected:
 
 	void startRoomAtItem(int nItem);
 	void stopRoomAtItem(int nItem);
+
+	void clearGameListCtrl();
+	void clearRoomListCtrl();
 
 protected:
 	afx_msg void OnDestroy();

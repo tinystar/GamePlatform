@@ -30,6 +30,11 @@ struct GSM_DLL_SPEC MgrInitConfig
 	}
 };
 
+struct IGameServerMgrEventListener
+{
+	virtual void onUpdateGameListOver(void) = 0;
+};
+
 class GSM_DLL_SPEC GameServerManager : public ITcpClientSocketEventHandler
 {
 public:
@@ -40,6 +45,8 @@ public:
 public:
 	bool initialize(const MgrInitConfig& config);
 	bool unInitialize();
+
+	void registerEventListener(IGameServerMgrEventListener* pListener) { m_pEventListener = pListener; }
 
 	void updateGameList();
 
@@ -73,6 +80,9 @@ protected:
 	void onDBQueryGamePlaces(void* pData, size_t nSize);
 	void onDBQueryGameRooms(void* pData, size_t nSize);
 
+	void onDBQueryPlacesEnd(void* pData, size_t nSize);
+	void onDBQueryRoomsEnd(void* pData, size_t nSize);
+
 private:
 	GameServerManager();
 	~GameServerManager();
@@ -83,6 +93,8 @@ private:
 	MgrInitConfig				 m_config;
 	TcpClientSocket				 m_clientToDB;
 	GameListTree				 m_gameList;
+
+	IGameServerMgrEventListener* m_pEventListener;
 };
 
 #define GameServerMgr	GameServerManager::getInstance

@@ -47,6 +47,9 @@ protected:
 	void onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGameRooms(ClientId id, void* pData, size_t nDataLen);
 
+	void onQueryPlacesEnd(ClientId id, void* pData, size_t nDataLen);
+	void onQueryRoomsEnd(ClientId id, void* pData, size_t nDataLen);
+
 protected:
 	void sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStamp& cliStamp, const UserInfoSet& userSet);
 	void fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet);

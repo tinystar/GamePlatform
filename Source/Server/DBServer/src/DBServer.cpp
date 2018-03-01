@@ -17,7 +17,9 @@ NetMsgMapEntry DBServer::s_msgMapArray[] = {
 	{ MSG_MAINID_DB, MSG_SUBID_VALIDATE_USERID_LOGIN, static_cast<NetMsgHandler>(&DBServer::onValidateUserIdLogin) },
 	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS, static_cast<NetMsgHandler>(&DBServer::onQueryGameKinds) },
 	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEPLACES, static_cast<NetMsgHandler>(&DBServer::onQueryGamePlaces) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, static_cast<NetMsgHandler>(&DBServer::onQueryGameRooms) }
+	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, static_cast<NetMsgHandler>(&DBServer::onQueryGameRooms) },
+	{ MSG_MAINID_DB, MSG_SUBID_QUERY_PLACES_END, static_cast<NetMsgHandler>(&DBServer::onQueryPlacesEnd) },
+	{ MSG_MAINID_DB, MSG_SUBID_QUERY_ROOMS_END, static_cast<NetMsgHandler>(&DBServer::onQueryRoomsEnd) }
 };
 
 
@@ -620,4 +622,14 @@ void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
 		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game rooms.");
 		sendMsg(id, &failMsg, sizeof(failMsg));
 	}
+}
+
+void DBServer::onQueryPlacesEnd(ClientId id, void* pData, size_t nDataLen)
+{
+	sendMsg(id, pData, nDataLen);
+}
+
+void DBServer::onQueryRoomsEnd(ClientId id, void* pData, size_t nDataLen)
+{
+	sendMsg(id, pData, nDataLen);
 }

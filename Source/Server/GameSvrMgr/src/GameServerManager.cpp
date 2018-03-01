@@ -21,6 +21,7 @@ void GameServerManager::destroyInstance()
 }
 
 GameServerManager::GameServerManager()
+	: m_pEventListener(NULL)
 {
 	m_clientToDB.addEventHandler(this);
 }
@@ -236,6 +237,12 @@ void GameServerManager::onSocketRecved(TcpClientSocket* pClientSock, void* pPack
 		case MSG_SUBID_GET_GAMEINFO_FAIL:
 			onDBQueryGameInfoFail(pPackage, nSize);
 			break;
+		case MSG_SUBID_QUERY_PLACES_END:
+			onDBQueryPlacesEnd(pPackage, nSize);
+			break;
+		case MSG_SUBID_QUERY_ROOMS_END:
+			onDBQueryRoomsEnd(pPackage, nSize);
+			break;
 		default:
 			EzAssert(false);
 			break;
@@ -323,6 +330,12 @@ void GameServerManager::onDBQueryGameKinds(void* pData, size_t nSize)
 		queryPlaceMsg.nKindId = pKindListMsg->kinds[i].nKindId;
 		sendMsgToServer(&m_clientToDB, &queryPlaceMsg, sizeof(queryPlaceMsg));
 	}
+
+	// 获取游戏列表时采用的是依次请求游戏类型、游戏场次、游戏房间的方式，这带来一个问题就是无法直接知道
+	// 游戏列表获取完毕，在此采用一个简单的办法，利用Tcp协议有顺序的特点，在发送完请求游戏场次的消息后再
+	// 多发送一个消息，DB服务器回应相同的消息，等收到回复消息时场次已经完全收到并发送完所有请求房间的消
+	// 息，此时再发送一个消息，等收到消息时说明房间已经获取完毕。
+	sendMsgToServer(&m_clientToDB, MSG_MAINID_DB, MSG_SUBID_QUERY_PLACES_END);
 }
 
 void GameServerManager::onDBQueryGamePlaces(void* pData, size_t nSize)
@@ -354,4 +367,15 @@ void GameServerManager::onDBQueryGameRooms(void* pData, size_t nSize)
 		pRoom->m_roomInfo.initWithGameRoomMsg(pRoomListMsg->rooms[i]);
 		m_gameList.addGameRoom(pRoomListMsg->rooms[i].nKindId, pRoomListMsg->rooms[i].nPlaceId, pRoom);
 	}
+}
+
+void GameServerManager::onDBQueryPlacesEnd(void* pData, size_t nSize)
+{
+	sendMsgToServer(&m_clientToDB, MSG_MAINID_DB, MSG_SUBID_QUERY_ROOMS_END);
+}
+
+void GameServerManager::onDBQueryRoomsEnd(void* pData, size_t nSize)
+{
+	if (m_pEventListener != NULL)
+		m_pEventListener->onUpdateGameListOver();
 }
