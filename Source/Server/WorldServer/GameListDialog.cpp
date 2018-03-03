@@ -3,6 +3,7 @@
 #include "rapidjson/document.h"
 #include <ws2tcpip.h>
 #include <afxdlgs.h>
+#include "GameNodeData.h"
 
 using namespace rapidjson;
 
@@ -198,6 +199,10 @@ void GameListDialog::OnBtnUnloadModuleClick()
 		int nItem = m_gameList.GetNextSelectedItem(pos);
 		unloadModuleAtItem(nItem);
 	}
+
+	// Unload module will stop all room server that associated with this module.
+	// So, it need to update the room list control.
+	updateRoomListRunStatus();
 }
 
 void GameListDialog::OnBtnLoadAllClick()
@@ -210,6 +215,10 @@ void GameListDialog::OnBtnUnloadAllClick()
 {
 	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
 		unloadModuleAtItem(i);
+
+	// Unload module will stop all room server that associated with this module.
+	// So, it need to update the room list control.
+	updateRoomListRunStatus();
 }
 
 void GameListDialog::OnBtnUpdateModuleClick()
@@ -452,7 +461,7 @@ void GameListDialog::unloadModuleAtItem(int nItem)
 
 void GameListDialog::startRoomAtItem(int nItem)
 {
-	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	if (0 <= nItem && nItem < m_roomList.GetItemCount())
 	{
 		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
 		EzAssert(pGameRoom != NULL);
@@ -468,7 +477,7 @@ void GameListDialog::startRoomAtItem(int nItem)
 
 void GameListDialog::stopRoomAtItem(int nItem)
 {
-	if (0 <= nItem && nItem < m_gameList.GetItemCount())
+	if (0 <= nItem && nItem < m_roomList.GetItemCount())
 	{
 		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(nItem);
 		EzAssert(pGameRoom != NULL);
@@ -513,4 +522,21 @@ void GameListDialog::clearRoomListCtrl()
 	}
 
 	m_roomList.DeleteAllItems();
+}
+
+void GameListDialog::updateRoomListRunStatus()
+{
+	for (int i = 0; i < m_roomList.GetItemCount(); ++i)
+	{
+		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(i);
+
+		CString sStatus;
+		void* pData = pGameRoom->getUserData();
+		if (NULL == pData || !((GameRoomMgr*)pData)->isRunning())
+			sStatus.LoadString(IDS_NOT_RUNNING);
+		else
+			sStatus.LoadString(IDS_IS_RUNNING);
+
+		m_roomList.SetItemText(i, eRLColRunStatus, sStatus);
+	}
 }

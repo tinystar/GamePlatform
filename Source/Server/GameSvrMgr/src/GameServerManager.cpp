@@ -97,7 +97,12 @@ bool GameServerManager::unloadGameModule(GameKind* pGameKind)
 	if (!pModuleMgr->isLoaded())
 		return false;
 
-	// Todo: stop all room server depend on this module
+	// cleanup all room server depend on this module
+	GameRoomIterator iter(pGameKind);
+	for (iter.start(); !iter.done(); iter.next())
+	{
+		cleanupGameRoom(iter.curNode());
+	}
 
 	GameAppEntryPointFuncPtr pAppEntryPoint = (GameAppEntryPointFuncPtr)pModuleMgr->getSymbAddress(GAMEAPPENTRYPOINT_PROC_NAME);
 	pAppEntryPoint(kUnloadAppMsg);

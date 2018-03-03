@@ -267,3 +267,65 @@ GameRoom* GameListTree::findGameRoomById(EzInt32 nKindId, EzInt32 nPlaceId, EzIn
 
 	return NULL;
 }
+
+
+//-------------------------------------------------------------------------------
+// GameRoomIterator
+//-------------------------------------------------------------------------------
+GameRoomIterator::GameRoomIterator(GameNode* pRoot)
+	: m_pRootNode(pRoot)
+	, m_pCurRoom(NULL)
+{
+}
+
+void GameRoomIterator::start()
+{
+	if (NULL == m_pRootNode)
+		return;
+
+	// clear path stack
+	while (!m_iterPath.empty())
+		m_iterPath.pop();
+
+	m_pCurRoom = NULL;
+
+	m_iterPath.push(NodeIterState(m_pRootNode));
+	next();
+}
+
+void GameRoomIterator::next()
+{
+	while (!m_iterPath.empty())
+	{
+		NodeIterState& nod = m_iterPath.top();		// note!!! reference
+		EzAssert(nod.pNode != NULL);
+		if (GameNode::kTypeRoom == nod.pNode->type())
+		{
+			m_pCurRoom = (GameRoom*)nod.pNode;
+			m_iterPath.pop();
+			return;
+		}
+		else
+		{
+			if (nod.nIterIdx >= nod.pNode->getChildCount())
+			{
+				m_iterPath.pop();
+			}
+			else
+			{
+				GameNode* pChild = nod.pNode->getAt(nod.nIterIdx);
+				if (pChild != NULL)
+					m_iterPath.push(NodeIterState(pChild));
+
+				++nod.nIterIdx;
+			}
+		}
+	}
+
+	m_pCurRoom = NULL;
+}
+
+bool GameRoomIterator::done()
+{
+	return m_pCurRoom == NULL;
+}

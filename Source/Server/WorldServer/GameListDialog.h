@@ -46,6 +46,8 @@ protected:
 	void clearGameListCtrl();
 	void clearRoomListCtrl();
 
+	void updateRoomListRunStatus();
+
 protected:
 	afx_msg void OnDestroy();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

@@ -13,6 +13,7 @@
 #include "xEzUtil.h"
 #include "GameNodeInfo.h"
 #include "GameBase.h"
+#include <stack>
 
 class GameNode;
 
@@ -129,6 +130,34 @@ public:
 
 protected:
 	GameRoot	m_rootNode;
+};
+
+class GameRoomIterator
+{
+public:
+	explicit GB_DLL_SPEC GameRoomIterator(GameNode* pRoot);
+
+	GB_DLL_SPEC void start();
+	GB_DLL_SPEC void next();
+	GB_DLL_SPEC bool done();
+
+	GB_DLL_SPEC GameRoom* curNode() const { return m_pCurRoom; }
+
+private:
+	typedef struct NodeIterState
+	{
+		GameNode*	pNode;
+		int			nIterIdx;
+
+		NodeIterState(GameNode* pNd = NULL, int idx = 0)
+			: pNode(pNd)
+			, nIterIdx(idx)
+		{}
+	};
+
+	GameNode*					m_pRootNode;
+	GameRoom*					m_pCurRoom;
+	std::stack<NodeIterState>	m_iterPath;
 };
 
 #endif // __GAME_NODE_H__
