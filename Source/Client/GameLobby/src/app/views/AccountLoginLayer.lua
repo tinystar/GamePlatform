@@ -73,7 +73,7 @@ end
 function AccountLoginLayer:onLoginBtnClicked(sender)
     local account = self.accountEdit_:getString()
     local password = self.passwordEdit_:getString()
-    __GData__.MainSocket:sendData(packAccountLoginMsg(account, password))
+    __GData__.MainSocket:sendData(packAccountLoginMsg(account, password, device.platform, ""))
 end
 
 -- -----------------------------------------------------

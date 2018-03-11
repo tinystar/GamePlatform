@@ -99,14 +99,31 @@ function parseMainAddressMsg(data, len)
 end
 
 -- -----------------------------------------------------
+-- QuickLoginMsg
+--     deviceInfo   -   UserDeviceInfo
+--                          szOS         -   char[24]
+--                          szDevice   -     char[64]
+-- -----------------------------------------------------
+function packQuickLoginMsg(os, device)
+    local header, headerLen = packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_QUICK_LOGIN)
+
+    local msg = string.pack("AAA", header, paddingWith(os, 24), paddingWith(device, 64))
+    return msg, #msg
+end
+
+-- -----------------------------------------------------
 -- AccountLoginMsg
 --     szAccount    -   char[64]
 --     szPassword   -   char[16]
+--     deviceInfo   -   UserDeviceInfo
+--                          szOS         -   char[24]
+--                          szDevice   -     char[64]
 -- -----------------------------------------------------
-function packAccountLoginMsg(account, password)
+function packAccountLoginMsg(account, password, os, device)
     local header, headerLen = packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_ACCOUNT_LOGIN)
 
-    local msg = string.pack("AAA", header, paddingWith(account, 64), paddingWith(password, 16))
+    local msg = string.pack("AAAAA", header, paddingWith(account, 64), paddingWith(password, 16),
+                                             paddingWith(os, 24), paddingWith(device, 64))
     return msg, #msg
 end
 

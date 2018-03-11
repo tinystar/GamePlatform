@@ -15,10 +15,11 @@
 #define MSG_MAINID_DB						5
 
 #define MSG_SUBID_CREATE_GUEST_ACCT			1
-#define MSG_SUBID_VALIDATE_ACCOUNT_LOGIN	2
-#define MSG_SUBID_VALIDATE_USERID_LOGIN		3
+#define MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT		2
+#define MSG_SUBID_LOGIN_MAIN_BY_USERID		3
 #define MSG_SUBID_DB_LOGIN_SUCCESS			4
 #define MSG_SUBID_DB_LOGIN_FAILURE			5
+#define MSG_SUBID_LOGOUT_MAIN				6
 
 #define MSG_SUBID_QUERY_GAMEKINDS			11
 #define MSG_SUBID_QUERY_GAMEPLACES			12
@@ -42,17 +43,72 @@ enum GameInfoType
 
 #pragma pack(push, 1)
 
-struct ValidateAcctLoginMsg
+//-------------------------------------------------------------------------------
+// Common struct
+//-------------------------------------------------------------------------------
+struct MainValidateInfo
 {
-	GameMsgHeader	header;
-	ClientStamp		clientStamp;
-	char			szAccount[64];
 	char			szPassword[16];
+	char			szServerName[64];
+	char			szOS[24];
+	char			szDevice[64];
+	char			szLoginIp[20];
 
-	ValidateAcctLoginMsg()
+	MainValidateInfo()
+	{
+		::memset(szPassword, 0, sizeof(szPassword));
+		::memset(szServerName, 0, sizeof(szServerName));
+		::memset(szOS, 0, sizeof(szOS));
+		::memset(szDevice, 0, sizeof(szDevice));
+		::memset(szLoginIp, 0, sizeof(szLoginIp));
+	}
+};
+
+
+//-------------------------------------------------------------------------------
+// Net message definitions
+//-------------------------------------------------------------------------------
+struct CreateGuestAccountMsg
+{
+	GameMsgHeader		header;
+	ClientStamp			clientStamp;
+	MainValidateInfo	info;
+};
+
+struct ValidateLoginMainByAcctMsg
+{
+	GameMsgHeader		header;
+	ClientStamp			clientStamp;
+	char				szAccount[64];
+	MainValidateInfo	info;
+
+	ValidateLoginMainByAcctMsg()
 	{
 		::memset(szAccount, 0, sizeof(szAccount));
-		::memset(szPassword, 0, sizeof(szPassword));
+	}
+};
+
+struct ValidateLoginMainByIdMsg
+{
+	GameMsgHeader		header;
+	ClientStamp			clientStamp;
+	CSUINT32			userId;
+	MainValidateInfo	info;
+
+	ValidateLoginMainByIdMsg()
+		: userId(0)
+	{
+	}
+};
+
+struct UserLogoutMainMsg
+{
+	GameMsgHeader		header;
+	CSUINT32			userId;
+
+	UserLogoutMainMsg()
+		: userId(0)
+	{
 	}
 };
 

@@ -27,6 +27,7 @@ public:
 	void setGateSvrAddr(const char* pszAddr, unsigned short sPort);
 	void setDBSvrAddr(const char* pszAddr, unsigned short sPort);
 	void setMaxUser(unsigned int uMax) { m_uMaxUser = uMax; }
+	void setServerName(const char* pszName);
 
 	const char* getGateSvrIP() const { return m_szGateAddr; }
 	const char* getDBSvrIP() const { return m_szDBAddr; }
@@ -76,6 +77,10 @@ protected:
 
 	GameRoom* selectARoom(GamePlace* pPlace);
 
+	void notifyUserLogout(ClientId id);
+
+	void handleUserLogout(ClientId id);
+
 protected:
 	static unsigned __stdcall clientSelectThread(void* pParam);
 
@@ -90,6 +95,8 @@ protected:
 	void onRequestGamePlaces(ClientId id, void* pData, size_t nDataLen);
 
 	void onEnterGamePlace(ClientId id, void* pData, size_t nDataLen);
+
+	void onUserLogout(ClientId id, void* pData, size_t nDataLen);
 
 	// DBServer messages
 protected:
@@ -113,7 +120,7 @@ protected:
 	unsigned short			m_sDBPort;
 	unsigned short			m_sPort;
 	unsigned int			m_uMaxUser;
-	char					m_szSvrName[256];	// 保留，暂不使用
+	char					m_szSvrName[64];
 
 	TcpClientSocket			m_clientToGate;
 	TcpClientSocket			m_clientToDB;

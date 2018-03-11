@@ -142,9 +142,9 @@ function LoginScene:onQuickLoginBtnClicked(sender)
     local password = cc.UserDefault:getInstance():getStringForKey("PassWord", "")
 
     if account ~= "" and password ~= "" then
-        __GData__.MainSocket:sendData(packAccountLoginMsg(account, password))
+        __GData__.MainSocket:sendData(packAccountLoginMsg(account, password, device.platform, ""))
     else
-        __GData__.MainSocket:sendData(packNetMsgHeader(MAINMSGID.MSG_MAINID_USER, SUBMSGID.MSG_SUBID_QUICK_LOGIN))
+        __GData__.MainSocket:sendData(packQuickLoginMsg(device.platform, ""))
     end
 
     -- 禁用按钮，避免重复点击

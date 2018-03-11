@@ -9,13 +9,13 @@
 ##########################################################################
 
 # create card game database
-CREATE DATABASE IF NOT EXISTS xCardGame
+CREATE DATABASE IF NOT EXISTS xBoardGame
     CHARACTER SET = utf8;
 
-USE xCardGame;
+USE xBoardGame;
 
-# create userinfo table
-CREATE TABLE IF NOT EXISTS userinfo
+# create TUserInfo table
+CREATE TABLE IF NOT EXISTS TUserInfo
 (
     userid        int               NOT NULL AUTO_INCREMENT,
     account       char(16)          NOT NULL UNIQUE,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS userinfo
 )ENGINE = InnoDB, AUTO_INCREMENT = 100001;
 
 # create game kind table
-CREATE TABLE IF NOT EXISTS gamekind
+CREATE TABLE IF NOT EXISTS TGameKind
 (
     kindid        int               NOT NULL AUTO_INCREMENT,
     gamename      varchar(23)       NOT NULL UNIQUE,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS gamekind
 )ENGINE = InnoDB;
 
 # create game place table
-CREATE TABLE IF NOT EXISTS gameplace
+CREATE TABLE IF NOT EXISTS TGamePlace
 (
     kindid        int               NOT NULL,
     placeid       int               NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS gameplace
 )ENGINE = InnoDB;
 
 # create game room table
-CREATE TABLE IF NOT EXISTS gameroom
+CREATE TABLE IF NOT EXISTS TGameRoom
 (
     kindid        int               NOT NULL,
     placeid       int               NOT NULL,
@@ -68,19 +68,89 @@ CREATE TABLE IF NOT EXISTS gameroom
 )ENGINE = InnoDB;
 
 # add foreign keys
-ALTER TABLE gameplace
+ALTER TABLE TGamePlace
 ADD CONSTRAINT fk_gameplace_kind
-FOREIGN KEY(kindid) REFERENCES gamekind(kindid)
+FOREIGN KEY(kindid) REFERENCES TGameKind(kindid)
 ON UPDATE CASCADE
 ON DELETE CASCADE;
 
-ALTER TABLE gameroom
+ALTER TABLE TGameRoom
 ADD CONSTRAINT fk_gameroom_place
-FOREIGN KEY(kindid, placeid) REFERENCES gameplace(kindid, placeid)
+FOREIGN KEY(kindid, placeid) REFERENCES TGamePlace(kindid, placeid)
 ON UPDATE CASCADE
 ON DELETE CASCADE;
+
+
+# create main server login record table
+CREATE TABLE IF NOT EXISTS TMainLoginRecord
+(
+    userid        int               NOT NULL,
+    servername    varchar(64)       NULL,
+    loginip       char(19)          NOT NULL,
+    os            varchar(24)       NULL,
+    device        varchar(64)       NULL,
+    logintime     datetime          NOT NULL,
+    PRIMARY KEY(userid)
+)ENGINE = InnoDB;
+
+# add foreign keys
+ALTER TABLE TMainLoginRecord
+ADD CONSTRAINT fk_mainlogin_user
+FOREIGN KEY(userid) REFERENCES TUserInfo(userid);
+
+# create main server login history table
+CREATE TABLE IF NOT EXISTS TMainLoginHistory
+(
+    id            int               NOT NULL AUTO_INCREMENT,
+    userid        int               NOT NULL,
+    servername    varchar(64)       NULL,
+    loginip       char(19)          NOT NULL,
+    os            varchar(24)       NULL,
+    device        varchar(64)       NULL,
+    logintime     datetime          NOT NULL,
+    logouttime    datetime          NOT NULL,
+    PRIMARY KEY(id)
+)ENGINE = InnoDB;
+
+# create room server login record table
+CREATE TABLE IF NOT EXISTS TRoomLoginRecord
+(
+    userid        int               NOT NULL,
+    kindid        int               NOT NULL,
+    placeid       int               NOT NULL,
+    roomid        int               NOT NULL,
+    loginip       char(19)          NOT NULL,
+    logintime     datetime          NOT NULL,
+    PRIMARY KEY(userid)
+)ENGINE = InnoDB;
+
+# add foreign keys
+ALTER TABLE TRoomLoginRecord
+ADD CONSTRAINT fk_roomlogin_user
+FOREIGN KEY(userid) REFERENCES TUserInfo(userid);
+
+ALTER TABLE TRoomLoginRecord
+ADD CONSTRAINT fk_roomlogin_room
+FOREIGN KEY(kindid, placeid, roomid) REFERENCES TGameRoom(kindid, placeid, roomid)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+# create room server login history table
+CREATE TABLE IF NOT EXISTS TRoomLoginHistory
+(
+    id            int               NOT NULL AUTO_INCREMENT,
+    userid        int               NOT NULL,
+    kindid        int               NOT NULL,
+    placeid       int               NOT NULL,
+    roomid        int               NOT NULL,
+    loginip       char(19)          NOT NULL,
+    logintime     datetime          NOT NULL,
+    logouttime    datetime          NOT NULL,
+    PRIMARY KEY(id)
+)ENGINE = InnoDB;
 
 
 # create user
+DROP USER dbserver;
 CREATE USER dbserver IDENTIFIED BY 'xx.1314.z';
-GRANT ALL ON xCardGame.* TO dbserver;
+GRANT ALL ON xBoardGame.* TO dbserver;

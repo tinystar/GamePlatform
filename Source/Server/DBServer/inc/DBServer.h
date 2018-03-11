@@ -40,8 +40,10 @@ protected:
 
 protected:
 	void onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen);
-	void onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen);
-	void onValidateUserIdLogin(ClientId id, void* pData, size_t nDataLen);
+	void onLoginMainByAccount(ClientId id, void* pData, size_t nDataLen);
+	void onLoginMainByUserId(ClientId id, void* pData, size_t nDataLen);
+
+	void onUserLogoutMain(ClientId id, void* pData, size_t nDataLen);
 
 	void onQueryGameKinds(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen);
@@ -55,6 +57,8 @@ protected:
 	void fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet);
 	void fillGamePlaceInfo(GamePlaceMsgInfo& placeInfo, const GamePlaceSet& placeSet);
 	void fillGameRoomInfo(GameRoomMsgInfo& roomInfo, const GameRoomSet& roomSet);
+
+	CSINT32 ValidateResultToFailReason(int result) const;
 
 protected:
 	static NetMsgMapEntry s_msgMapArray[];

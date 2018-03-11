@@ -29,6 +29,7 @@ MainServer::MainServer()
 {
 	::memset(m_szGateAddr, 0, sizeof(m_szGateAddr));
 	::memset(m_szDBAddr, 0, sizeof(m_szDBAddr));
+	::memset(m_szSvrName, 0, sizeof(m_szSvrName));
 
 	m_clientToGate.addEventHandler(this);
 	m_clientToDB.addEventHandler(this);
@@ -102,6 +103,11 @@ void MainServer::setDBSvrAddr(const char* pszAddr, unsigned short sPort)
 	m_sDBPort = sPort;
 }
 
+void MainServer::setServerName(const char* pszName)
+{
+	strncpy(m_szSvrName, pszName, sizeof(m_szSvrName) - 1);
+}
+
 void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 {
 	if (pClientSock == &m_clientToGate)
@@ -161,7 +167,7 @@ void MainServer::onTcpClientCloseMsg(ClientId id)
 {
 	if (id.getUserData() != NULL)		// user already login
 	{
-		removeLoginUser(id);
+		handleUserLogout(id);
 	}
 	else
 	{
@@ -303,17 +309,21 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 	EzAssert(sizeof(AccountLoginMsg) == nDataLen);
 	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
 
-	ValidateAcctLoginMsg validateMsg;
+	ValidateLoginMainByAcctMsg validateMsg;
 
 	ClientStamp stampInfo;
 	stampInfo.clientId = id;
 	stampInfo.ulStamp = genDBRequestStamp();
 
 	validateMsg.header.uMainId = MSG_MAINID_DB;
-	validateMsg.header.uSubId = MSG_SUBID_VALIDATE_ACCOUNT_LOGIN;
+	validateMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT;
 	validateMsg.clientStamp = stampInfo;
 	memcpy(validateMsg.szAccount, pAccountLoginMsg->szAccount, sizeof(validateMsg.szAccount));
-	memcpy(validateMsg.szPassword, pAccountLoginMsg->szPassword, sizeof(validateMsg.szPassword));
+	memcpy(validateMsg.info.szPassword, pAccountLoginMsg->szPassword, sizeof(validateMsg.info.szPassword));
+	memcpy(validateMsg.info.szServerName, m_szSvrName, sizeof(validateMsg.info.szServerName));
+	memcpy(validateMsg.info.szOS, pAccountLoginMsg->deviceInfo.szOS, sizeof(validateMsg.info.szOS));
+	memcpy(validateMsg.info.szDevice, pAccountLoginMsg->deviceInfo.szDevice, sizeof(validateMsg.info.szDevice));
+	memcpy(validateMsg.info.szLoginIp, inet_ntoa(id.getAddress().sin_addr), sizeof(validateMsg.info.szLoginIp));
 
 	if (sendMsgToServer(&m_clientToDB, &validateMsg, sizeof(validateMsg)))
 		m_reqToDBClientQueue.push_back(stampInfo);
@@ -325,6 +335,9 @@ void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 	if (isClientLoginInProgress(id))
 		return;
 
+	EzAssert(sizeof(QuickLoginMsg) == nDataLen);
+	QuickLoginMsg* pQuickLoginMsg = (QuickLoginMsg*)pData;
+
 	// 消息发送到DB服务器，在DB服务器处理过程中，id对应的客户端可能断开连接，由于底层id结构会重用，
 	// 所以在DB服务器处理完返回时，id对于的客户端可能发生了变化，不是之前请求DB服务器时的客户端，
 	// 所以不能只用ClientId来唯一确定一个客户端连接，增加ulStamp字段来唯一的标志每次请求以解决这个问题。
@@ -333,12 +346,16 @@ void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 	stampInfo.clientId = id;
 	stampInfo.ulStamp = genDBRequestStamp();
 
-	ClientStampMsg stampMsg;
-	stampMsg.header.uMainId = MSG_MAINID_DB;
-	stampMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
-	stampMsg.clientStamp = stampInfo;
+	CreateGuestAccountMsg createGuestMsg;
+	createGuestMsg.header.uMainId = MSG_MAINID_DB;
+	createGuestMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
+	createGuestMsg.clientStamp = stampInfo;
+	memcpy(createGuestMsg.info.szServerName, m_szSvrName, sizeof(createGuestMsg.info.szServerName));
+	memcpy(createGuestMsg.info.szOS, pQuickLoginMsg->deviceInfo.szOS, sizeof(createGuestMsg.info.szOS));
+	memcpy(createGuestMsg.info.szDevice, pQuickLoginMsg->deviceInfo.szDevice, sizeof(createGuestMsg.info.szDevice));
+	memcpy(createGuestMsg.info.szLoginIp, inet_ntoa(id.getAddress().sin_addr), sizeof(createGuestMsg.info.szLoginIp));
 
-	if (sendMsgToServer(&m_clientToDB, &stampMsg, sizeof(stampMsg)))
+	if (sendMsgToServer(&m_clientToDB, &createGuestMsg, sizeof(createGuestMsg)))
 		m_reqToDBClientQueue.push_back(stampInfo);
 }
 
@@ -402,9 +419,6 @@ bool MainServer::addLoginUser(ClientId cId, const UserInfo& userInfo)
 
 bool MainServer::removeLoginUser(ClientId cId)
 {
-	if (cId.isNull())
-		return false;
-
 	void* pUserData = cId.getUserData();
 	if (NULL == pUserData)
 		return false;
@@ -622,6 +636,11 @@ void MainServer::onEnterGamePlace(ClientId id, void* pData, size_t nDataLen)
 	sendMsg(id, &msg, sizeof(msg));
 }
 
+void MainServer::onUserLogout(ClientId id, void* pData, size_t nDataLen)
+{
+	handleUserLogout(id);
+}
+
 bool MainServer::isClientLoginInProgress(ClientId id)
 {
 	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
@@ -652,4 +671,28 @@ GameRoom* MainServer::selectARoom(GamePlace* pPlace)
 	}
 
 	return NULL;
+}
+
+void MainServer::notifyUserLogout(ClientId id)
+{
+	void* pUserData = id.getUserData();
+	if (NULL == pUserData)
+		return;
+
+	GameUser* pGameUser = (GameUser*)pUserData;
+
+	UserLogoutMainMsg logoutMsg;
+	logoutMsg.header.uMainId = MSG_MAINID_DB;
+	logoutMsg.header.uSubId = MSG_SUBID_LOGOUT_MAIN;
+	logoutMsg.userId = pGameUser->getUserId();
+	sendMsgToServer(&m_clientToDB, &logoutMsg, sizeof(logoutMsg));
+}
+
+void MainServer::handleUserLogout(ClientId id)
+{
+	if (id.isNull())
+		return;
+
+	notifyUserLogout(id);
+	removeLoginUser(id);
 }

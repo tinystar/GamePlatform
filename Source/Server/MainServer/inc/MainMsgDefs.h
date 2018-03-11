@@ -48,11 +48,37 @@ enum LoginFailReason
 
 #pragma pack(push, 1)
 
+//-------------------------------------------------------------------------------
+// Common struct
+//-------------------------------------------------------------------------------
+struct UserDeviceInfo
+{
+	char			szOS[24];
+	char			szDevice[64];
+
+	UserDeviceInfo()
+	{
+		::memset(szOS, 0, sizeof(szOS));
+		::memset(szDevice, 0, sizeof(szDevice));
+	}
+};
+
+
+//-------------------------------------------------------------------------------
+// Net message definitions
+//-------------------------------------------------------------------------------
+struct QuickLoginMsg
+{
+	GameMsgHeader	header;
+	UserDeviceInfo	deviceInfo;
+};
+
 struct AccountLoginMsg
 {
 	GameMsgHeader	header;
 	char			szAccount[64];
 	char			szPassword[16];
+	UserDeviceInfo	deviceInfo;
 
 	AccountLoginMsg()
 	{

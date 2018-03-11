@@ -65,6 +65,7 @@ bool MainServerMgr::loadConfig()
 
 	m_bDebugMode = doc["debugMode"].GetBool();
 	LogLevel logLevel = (LogLevel)doc["logLevel"].GetInt();
+	const char* pszSvrName = doc["svrName"].GetString();
 	unsigned int uMaxUser = doc["maxUser"].GetUint();
 	const Value& tcpCfg = doc["tcpConfig"];
 	m_tcpConfig.sPort = (unsigned short)tcpCfg["port"].GetInt();
@@ -83,6 +84,7 @@ bool MainServerMgr::loadConfig()
 	m_server.setMaxUser(uMaxUser);
 	m_server.setGateSvrAddr(pszGateAddr, sGatePort);
 	m_server.setDBSvrAddr(pszDBAddr, sDBPort);
+	m_server.setServerName(pszSvrName);
 
 	return true;
 }

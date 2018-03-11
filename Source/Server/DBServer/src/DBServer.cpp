@@ -13,8 +13,9 @@
 
 NetMsgMapEntry DBServer::s_msgMapArray[] = {
 	{ MSG_MAINID_DB, MSG_SUBID_CREATE_GUEST_ACCT, static_cast<NetMsgHandler>(&DBServer::onCreateGuestAccount) },
-	{ MSG_MAINID_DB, MSG_SUBID_VALIDATE_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&DBServer::onValidateAcctLogin) },
-	{ MSG_MAINID_DB, MSG_SUBID_VALIDATE_USERID_LOGIN, static_cast<NetMsgHandler>(&DBServer::onValidateUserIdLogin) },
+	{ MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT, static_cast<NetMsgHandler>(&DBServer::onLoginMainByAccount) },
+	{ MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_USERID, static_cast<NetMsgHandler>(&DBServer::onLoginMainByUserId) },
+	{ MSG_MAINID_DB, MSG_SUBID_LOGOUT_MAIN, static_cast<NetMsgHandler>(&DBServer::onUserLogoutMain) },
 	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS, static_cast<NetMsgHandler>(&DBServer::onQueryGameKinds) },
 	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEPLACES, static_cast<NetMsgHandler>(&DBServer::onQueryGamePlaces) },
 	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, static_cast<NetMsgHandler>(&DBServer::onQueryGameRooms) },
@@ -194,8 +195,8 @@ void DBServer::sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStam
 // DB服务器应该在消息处理函数中所有分支返回处理结果，否则可能造成其它服务器数据的堆积或者造成客户端的等待
 void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 {
-	EzAssert(sizeof(ClientStampMsg) == nDataLen);
-	ClientStampMsg* pStampMsg = (ClientStampMsg*)pData;
+	EzAssert(sizeof(CreateGuestAccountMsg) == nDataLen);
+	CreateGuestAccountMsg* pCreateGuestMsg = (CreateGuestAccountMsg*)pData;
 
 	EzString sNameConvt(m_szGuestName, kUtf8);
 	EzString sPWConvt(m_szGuestPW, kUtf8);
@@ -208,7 +209,7 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
 	loginFailMsg.header.uSubId = MSG_SUBID_DB_LOGIN_FAILURE;
-	loginFailMsg.clientStamp = pStampMsg->clientStamp;
+	loginFailMsg.clientStamp = pCreateGuestMsg->clientStamp;
 
 	sSql.Format(_T("{CALL create_guest_account('%s', '%s', %d, %d, %.2f, %d, %d, ?)}"),
 				sGuestName.GetString(),
@@ -252,17 +253,17 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 			return;
 		}
 
-		sSql.Format(_T("SELECT * FROM userinfo WHERE account = '%s'"), sRetGuest);
-		UserInfoSet userSet(&m_database);
-		if (!userSet.Open(CRecordset::snapshot, sSql) || userSet.IsEOF())
-		{
-			EzLogError(_T("Failed to get user information of %s.\n"), sRetGuest.GetString());
-			loginFailMsg.nFailReason = eAccountNotExist;
-			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
-			return;
-		}
+		EzString sGuestUtf8(sRetGuest.GetString());
 
-		sendUserInfoMsg(id, MSG_SUBID_DB_LOGIN_SUCCESS, pStampMsg->clientStamp, userSet);
+		ValidateLoginMainByAcctMsg validateMsg;
+		validateMsg.header.uMainId = MSG_MAINID_DB;
+		validateMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT;
+		validateMsg.clientStamp = pCreateGuestMsg->clientStamp;
+		strncpy(validateMsg.szAccount, sGuestUtf8.kcharPtr(kUtf8), sizeof(validateMsg.szAccount) - 1);
+		validateMsg.info = pCreateGuestMsg->info;
+		memcpy(validateMsg.info.szPassword, m_szGuestPW, sizeof(validateMsg.info.szPassword));
+
+		onLoginMainByAccount(id, &validateMsg, sizeof(validateMsg));
 	}
 	catch (CDBException* pDBException)
 	{
@@ -278,17 +279,14 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 	}
 }
 
-void DBServer::onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen)
+void DBServer::onLoginMainByAccount(ClientId id, void* pData, size_t nDataLen)
 {
-	EzAssert(sizeof(ValidateAcctLoginMsg) == nDataLen);
-	ValidateAcctLoginMsg* pValidateMsg = (ValidateAcctLoginMsg*)pData;
-
-	EzString sAcctConvt(pValidateMsg->szAccount, kUtf8);
-	EzString sPwConvt(pValidateMsg->szPassword, kUtf8);
+	EzAssert(sizeof(ValidateLoginMainByAcctMsg) == nDataLen);
+	ValidateLoginMainByAcctMsg* pValidateMsg = (ValidateLoginMainByAcctMsg*)pData;
 
 	CString sSql;
+	EzString sAcctConvt(pValidateMsg->szAccount, kUtf8);
 	CString sAccount = sAcctConvt.kwcharPtr();
-	CString sPassword = sPwConvt.kwcharPtr();
 
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
@@ -297,8 +295,134 @@ void DBServer::onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen)
 
 	try
 	{
-		sSql.Format(_T("SELECT * FROM userinfo WHERE account = '%s'"), sAccount);
+		CRecordset rsUserId(&m_database);
+		sSql.Format(_T("SELECT userid FROM TUserInfo WHERE account = '%s'"), sAccount);
+		if (!rsUserId.Open(CRecordset::forwardOnly, sSql, CRecordset::executeDirect) || rsUserId.IsEOF())
+		{
+			loginFailMsg.nFailReason = eAccountNotExist;
+			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+			return;
+		}
+
+		CString strUserId = _T("0");
+		rsUserId.GetFieldValue((short)0, strUserId);
+		CSUINT32 uUserId = _ttoi(strUserId);
+
+		ValidateLoginMainByIdMsg validateByIdMsg;
+		validateByIdMsg.header.uMainId = MSG_MAINID_DB;
+		validateByIdMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_USERID;
+		validateByIdMsg.clientStamp = pValidateMsg->clientStamp;
+		validateByIdMsg.userId = uUserId;
+		validateByIdMsg.info = pValidateMsg->info;
+
+		onLoginMainByUserId(id, &validateByIdMsg, sizeof(validateByIdMsg));
+	}
+	catch (CDBException* pDBException)
+	{
+		EzLogError(_T("Error occur in onLoginMainByAccount, error message: %s.\n"), pDBException->m_strError);
+		loginFailMsg.nFailReason = eUnknownReason;
+		sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+	}
+	catch (...)
+	{
+		EzLogError(_T("Unknown error occur in onLoginMainByAccount.\n"));
+		loginFailMsg.nFailReason = eUnknownReason;
+		sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+	}
+}
+
+/**
+* 0	-	登录成功
+* 1	-	用户不存在
+* 2	-	已经登录
+* 3 -	密码不正确
+* 4 -	内部错误
+*/
+CSINT32 DBServer::ValidateResultToFailReason(int result) const
+{
+	switch (result)
+	{
+	case 1:
+		return eAccountNotExist;
+	case 2:
+		return eAlreadyLogin;
+	case 3:
+		return ePasswordWrong;
+	case 4:
+	default:
+		return eUnknownReason;
+	}
+
+	return eUnknownReason;
+}
+
+void DBServer::onLoginMainByUserId(ClientId id, void* pData, size_t nDataLen)
+{
+	EzAssert(sizeof(ValidateLoginMainByIdMsg) == nDataLen);
+	ValidateLoginMainByIdMsg* pValidateMsg = (ValidateLoginMainByIdMsg*)pData;
+
+	CString sSql;
+	EzString sPWConvt(pValidateMsg->info.szPassword, kUtf8);
+	EzString sSvrNameConvt(pValidateMsg->info.szServerName, kUtf8);
+	EzString sOSConvt(pValidateMsg->info.szOS, kUtf8);
+	EzString sDeviceConvt(pValidateMsg->info.szDevice, kUtf8);
+	EzString sLoginIpConvt(pValidateMsg->info.szLoginIp, kUtf8);
+	CString sPassword = sPWConvt.kwcharPtr();
+	CString sSvrName = sSvrNameConvt.kwcharPtr();
+	CString sOS = sOSConvt.kwcharPtr();
+	CString sDevice = sDeviceConvt.kwcharPtr();
+	CString sLoginIp = sLoginIpConvt.kwcharPtr();
+
+	DBAcctLoginFailMsg loginFailMsg;
+	loginFailMsg.header.uMainId = MSG_MAINID_DB;
+	loginFailMsg.header.uSubId = MSG_SUBID_DB_LOGIN_FAILURE;
+	loginFailMsg.clientStamp = pValidateMsg->clientStamp;
+
+	sSql.Format(_T("{CALL validate_main_login_by_userid(%d, '%s', '%s', '%s', '%s', '%s', ?)}"),
+				pValidateMsg->userId,
+				sPassword,
+				sSvrName,
+				sLoginIp,
+				sOS,
+				sDevice);
+
+	int nResult = -1;
+	SQLINTEGER nRetLen = 0;
+	CRecordset rs(&m_database);
+	SQLRETURN sSQLRet = ::SQLBindParameter(rs.m_hstmt, 1, SQL_PARAM_OUTPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, &nResult, 4, &nRetLen);
+	if (SQL_SUCCESS != sSQLRet && SQL_SUCCESS_WITH_INFO != sSQLRet)
+	{
+		EzLogError(_T("Bind parameter failed in onLoginMainByUserId.\n"));
+		loginFailMsg.nFailReason = eUnknownReason;
+		sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+		return;
+	}
+
+	try
+	{
+		BOOL bRet = rs.Open(CRecordset::snapshot, sSql, CRecordset::none);
+		if (!bRet)
+		{
+			EzLogError(_T("Call validate_main_login_by_userid failed.\n"));
+			loginFailMsg.nFailReason = eUnknownReason;
+			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+			return;
+		}
+
+		EzAssert(rs.GetODBCFieldCount() > 0);
+		CString sExecResult;
+		rs.GetFieldValue((short)0, sExecResult);
+		int nExecRet = _ttoi(sExecResult);
+
+		if (nExecRet != 0)		// error occurred
+		{
+			loginFailMsg.nFailReason = ValidateResultToFailReason(nExecRet);
+			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
+			return;
+		}
+
 		UserInfoSet userSet(&m_database);
+		sSql.Format(_T("SELECT * FROM TUserInfo WHERE userid = %d"), pValidateMsg->userId);
 		if (!userSet.Open(CRecordset::snapshot, sSql) || userSet.IsEOF())
 		{
 			loginFailMsg.nFailReason = eAccountNotExist;
@@ -306,33 +430,42 @@ void DBServer::onValidateAcctLogin(ClientId id, void* pData, size_t nDataLen)
 			return;
 		}
 
-		if (0 == userSet.m_sPassword.Compare(sPassword))
-		{
-			sendUserInfoMsg(id, MSG_SUBID_DB_LOGIN_SUCCESS, pValidateMsg->clientStamp, userSet);
-		}
-		else
-		{
-			loginFailMsg.nFailReason = ePasswordWrong;
-			sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
-		}
+		sendUserInfoMsg(id, MSG_SUBID_DB_LOGIN_SUCCESS, pValidateMsg->clientStamp, userSet);
 	}
 	catch (CDBException* pDBException)
 	{
-		EzLogError(_T("Error occur in onValidateAcctLogin, error message: %s.\n"), pDBException->m_strError);
+		EzLogError(_T("Error occur in onLoginMainByUserId, error message: %s.\n"), pDBException->m_strError);
 		loginFailMsg.nFailReason = eUnknownReason;
 		sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
 	}
 	catch (...)
 	{
-		EzLogError(_T("Unknown error occur in onValidateAcctLogin.\n"));
+		EzLogError(_T("Unknown error occur in onLoginMainByUserId.\n"));
 		loginFailMsg.nFailReason = eUnknownReason;
 		sendMsg(id, &loginFailMsg, sizeof(loginFailMsg));
 	}
 }
 
-void DBServer::onValidateUserIdLogin(ClientId id, void* pData, size_t nDataLen)
+void DBServer::onUserLogoutMain(ClientId id, void* pData, size_t nDataLen)
 {
+	EzAssert(sizeof(UserLogoutMainMsg) == nDataLen);
+	UserLogoutMainMsg* pLogoutMsg = (UserLogoutMainMsg*)pData;
 
+	CString sSql;
+	sSql.Format(_T("{CALL delete_main_login_record(%d)}"), pLogoutMsg->userId);
+
+	try
+	{
+		m_database.ExecuteSQL(sSql);
+	}
+	catch (CDBException* pDBException)
+	{
+		EzLogError(_T("Error occur in onUserLogoutMain, error message: %s.\n"), pDBException->m_strError);
+	}
+	catch (...)
+	{
+		EzLogError(_T("Unknown error occur in onUserLogoutMain.\n"));
+	}
 }
 
 void DBServer::fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet)
@@ -359,7 +492,7 @@ void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
 	{
 		long nKindCount = 0;
 		CRecordset rsCount(&m_database);
-		if (rsCount.Open(CRecordset::forwardOnly, _T("SELECT COUNT(*) FROM gamekind"), CRecordset::executeDirect))
+		if (rsCount.Open(CRecordset::forwardOnly, _T("SELECT COUNT(*) FROM TGameKind"), CRecordset::executeDirect))
 		{
 			CString sCount = _T("0");
 			if (!rsCount.IsEOF())
@@ -370,15 +503,15 @@ void DBServer::onQueryGameKinds(ClientId id, void* pData, size_t nDataLen)
 
 		if (0 == nKindCount)
 		{
-			EzLogInfo(_T("There is no game kind record in gamekind table.\n"));
+			EzLogInfo(_T("There is no game kind record in TGameKind table.\n"));
 			failMsg.nInfoType = kGameKind;
-			strcpy(failMsg.szDetail, "There is no game kind record in gamekind table.");
+			strcpy(failMsg.szDetail, "There is no game kind record in TGameKind table.");
 			sendMsg(id, &failMsg, sizeof(failMsg));
 			return;
 		}
 
 		GameKindSet kindSet(&m_database);
-		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM gamekind ORDER BY sortfield ASC")))
+		if (!kindSet.Open(CRecordset::snapshot, _T("SELECT * FROM TGameKind ORDER BY sortfield ASC")))
 		{
 			EzLogError(_T("Failed to get game kind list.\n"));
 			failMsg.nInfoType = kGameKind;
@@ -454,7 +587,7 @@ void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
 		long nPlaceCount = 0;
 		CRecordset rsCount(&m_database);
 		CString sSql;
-		sSql.Format(_T("SELECT COUNT(*) FROM gameplace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
+		sSql.Format(_T("SELECT COUNT(*) FROM TGamePlace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
 		if (rsCount.Open(CRecordset::forwardOnly, sSql, CRecordset::executeDirect))
 		{
 			CString sCount = _T("0");
@@ -474,7 +607,7 @@ void DBServer::onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen)
 		}
 
 		GamePlaceSet placeSet(&m_database);
-		sSql.Format(_T("SELECT * FROM gameplace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
+		sSql.Format(_T("SELECT * FROM TGamePlace WHERE kindid = %d"), pQueryPlaceMsg->nKindId);
 		if (!placeSet.Open(CRecordset::snapshot, sSql))
 		{
 			EzLogError(_T("Failed to get game place list.\n"));
@@ -553,7 +686,7 @@ void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
 		long nRoomCount = 0;
 		CRecordset rsCount(&m_database);
 		CString sSql;
-		sSql.Format(_T("SELECT COUNT(*) FROM gameroom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
+		sSql.Format(_T("SELECT COUNT(*) FROM TGameRoom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
 		if (rsCount.Open(CRecordset::forwardOnly, sSql, CRecordset::executeDirect))
 		{
 			CString sCount = _T("0");
@@ -573,7 +706,7 @@ void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
 		}
 
 		GameRoomSet roomSet(&m_database);
-		sSql.Format(_T("SELECT * FROM gameroom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
+		sSql.Format(_T("SELECT * FROM TGameRoom WHERE kindid = %d AND placeid = %d"), pQueryRoomMsg->nKindId, pQueryRoomMsg->nPlaceId);
 		if (!roomSet.Open(CRecordset::snapshot, sSql))
 		{
 			EzLogError(_T("Failed to get game room list.\n"));
@@ -612,14 +745,14 @@ void DBServer::onQueryGameRooms(ClientId id, void* pData, size_t nDataLen)
 	{
 		EzLogError(_T("Error occur in onQueryGameRooms, error message: %s.\n"), pDBException->m_strError);
 		failMsg.nInfoType = kGameRoom;
-		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game rooms.");
+		strcpy(failMsg.szDetail, "Unknown error has occurred during fetch game rooms.");
 		sendMsg(id, &failMsg, sizeof(failMsg));
 	}
 	catch (...)
 	{
 		EzLogError(_T("Unknown error occur in onQueryGameRooms.\n"));
 		failMsg.nInfoType = kGameRoom;
-		strcpy(failMsg.szDetail, "Unknown error has occured during fetch game rooms.");
+		strcpy(failMsg.szDetail, "Unknown error has occurred during fetch game rooms.");
 		sendMsg(id, &failMsg, sizeof(failMsg));
 	}
 }
