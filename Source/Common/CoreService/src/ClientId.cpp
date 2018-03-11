@@ -67,3 +67,8 @@ void ClientId::dump(EzDumpContext& dc) const
 
 	m_pClientCtx->dump(dc);
 }
+
+CSHANDLE ClientId::getUniqueHandle() const
+{
+	return (m_pClientCtx != NULL) ? m_pClientCtx->getUniqueHandle() : 0;
+}

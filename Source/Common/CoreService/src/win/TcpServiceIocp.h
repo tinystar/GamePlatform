@@ -71,6 +71,8 @@ protected:
 	void stopSendToAllThread();
 	void sendToAllProc();
 
+	CSHANDLE generateUniqueHandle();
+
 	static unsigned __stdcall iocpWorkerThread(void* pParam);
 	static unsigned __stdcall sendToAllThread(void* pParam);
 
@@ -101,6 +103,8 @@ private:
 	HANDLE								m_hSendQuitEvent;
 	SendCacheList						m_sendDataCache;
 	EzLock								m_cacheListLock;
+
+	CSHANDLE							m_handleSeed;
 };
 
 #endif // __TCP_SERVICE_IOCP_H__

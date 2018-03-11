@@ -26,4 +26,9 @@ typedef unsigned char	CSBYTE;
 typedef char			CSINT8;
 typedef unsigned char	CSUINT8;
 
+typedef __int64				CSINT64;
+typedef unsigned __int64	CSUINT64;
+
+typedef CSUINT64		CSHANDLE;
+
 #endif // __SERVICE_TYPES_H__

@@ -120,6 +120,7 @@ TcpServiceIocp::TcpServiceIocp()
 	, m_hSendToAllThread(NULL)
 	, m_hSendCacheSem(NULL)
 	, m_hSendQuitEvent(NULL)
+	, m_handleSeed(0)
 {
 }
 
@@ -518,7 +519,7 @@ bool TcpServiceIocp::doAccept(PER_ACCEPT_CONTEXT* pAcceptContext, DWORD dwBytes)
 		return false;
 	}
 
-	bRet = pClientCtx->attach(pAcceptContext->hAcceptSocket, *pClientAddr);
+	bRet = pClientCtx->attach(pAcceptContext->hAcceptSocket, *pClientAddr, generateUniqueHandle());
 	if (!EzVerify(bRet))
 	{
 		::closesocket(pAcceptContext->hAcceptSocket);		// must be closed.
@@ -862,4 +863,9 @@ void TcpServiceIocp::finalReleaseClient(ClientId id)
 	ClientContext* pClient = (ClientContext*)id;
 	pClient->reset();
 	m_ClientContextMgr.freeClientContext(pClient);
+}
+
+CSHANDLE TcpServiceIocp::generateUniqueHandle()
+{
+	return ++m_handleSeed;
 }

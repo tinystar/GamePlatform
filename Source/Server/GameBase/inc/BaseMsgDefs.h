@@ -45,22 +45,6 @@ struct UserInfo
 	}
 };
 
-// 唯一标志客户端连接，主要用于玩家登录期间DB服务器和其它服务器通信时唯一确定玩家客户端连接
-struct ClientStamp
-{
-	ClientId		clientId;
-	CSULONG			ulStamp;
-
-	ClientStamp()
-		: ulStamp(0)
-	{}
-
-	bool operator== (const ClientStamp& rhs) const
-	{
-		return clientId == rhs.clientId && ulStamp == rhs.ulStamp;
-	}
-};
-
 struct GameKindMsgInfo
 {
 	CSINT32			nKindId;
@@ -138,12 +122,6 @@ struct GameMsgHeader
 	{}
 };
 
-struct ClientStampMsg
-{
-	GameMsgHeader	header;
-	ClientStamp		clientStamp;
-};
-
 struct UserInfoMsg
 {
 	GameMsgHeader	header;
@@ -153,8 +131,13 @@ struct UserInfoMsg
 struct UserInfoWithClientMsg
 {
 	GameMsgHeader	header;
-	ClientStamp		clientStamp;
+	ClientId		clientId;
+	CSHANDLE		clientHandle;
 	UserInfo		userInfo;
+
+	UserInfoWithClientMsg()
+		: clientHandle(0)
+	{}
 };
 
 struct GameKindListMsg

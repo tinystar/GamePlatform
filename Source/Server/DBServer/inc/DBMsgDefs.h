@@ -71,18 +71,25 @@ struct MainValidateInfo
 struct CreateGuestAccountMsg
 {
 	GameMsgHeader		header;
-	ClientStamp			clientStamp;
+	ClientId			clientId;
+	CSHANDLE			clientHandle;
 	MainValidateInfo	info;
+
+	CreateGuestAccountMsg()
+		: clientHandle(0)
+	{}
 };
 
 struct ValidateLoginMainByAcctMsg
 {
 	GameMsgHeader		header;
-	ClientStamp			clientStamp;
+	ClientId			clientId;
+	CSHANDLE			clientHandle;
 	char				szAccount[64];
 	MainValidateInfo	info;
 
 	ValidateLoginMainByAcctMsg()
+		: clientHandle(0)
 	{
 		::memset(szAccount, 0, sizeof(szAccount));
 	}
@@ -91,12 +98,14 @@ struct ValidateLoginMainByAcctMsg
 struct ValidateLoginMainByIdMsg
 {
 	GameMsgHeader		header;
-	ClientStamp			clientStamp;
+	ClientId			clientId;
+	CSHANDLE			clientHandle;
 	CSUINT32			userId;
 	MainValidateInfo	info;
 
 	ValidateLoginMainByIdMsg()
-		: userId(0)
+		: clientHandle(0)
+		, userId(0)
 	{
 	}
 };
@@ -115,7 +124,8 @@ struct UserLogoutMainMsg
 struct DBAcctLoginFailMsg
 {
 	GameMsgHeader	header;
-	ClientStamp		clientStamp;
+	ClientId		clientId;
+	CSHANDLE		clientHandle;
 	CSINT32			nFailReason;
 
 	DBAcctLoginFailMsg()

@@ -169,7 +169,7 @@ bool DBServer::setInitRoomCard(unsigned int uRoomCard)
 	return true;
 }
 
-void DBServer::sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStamp& cliStamp, const UserInfoSet& userSet)
+void DBServer::sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, ClientId clientId, CSHANDLE clientHandle, const UserInfoSet& userSet)
 {
 	EzString sAccount(userSet.m_sAccount);
 	EzString sUserName(userSet.m_sUserName);
@@ -178,7 +178,8 @@ void DBServer::sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, const ClientStam
 	UserInfoWithClientMsg userMsg;
 	userMsg.header.uMainId = MSG_MAINID_DB;
 	userMsg.header.uSubId = uSubMsgId;
-	userMsg.clientStamp = cliStamp;
+	userMsg.clientId = clientId;
+	userMsg.clientHandle = clientHandle;
 	userMsg.userInfo.userId = (CSUINT32)userSet.m_nUserId;
 	strncpy(userMsg.userInfo.szAccount, sAccount.kcharPtr(kUtf8), sizeof(userMsg.userInfo.szAccount) - 1);
 	strncpy(userMsg.userInfo.szUserName, sUserName.kcharPtr(kUtf8), sizeof(userMsg.userInfo.szUserName) - 1);
@@ -209,7 +210,8 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
 	loginFailMsg.header.uSubId = MSG_SUBID_DB_LOGIN_FAILURE;
-	loginFailMsg.clientStamp = pCreateGuestMsg->clientStamp;
+	loginFailMsg.clientId = pCreateGuestMsg->clientId;
+	loginFailMsg.clientHandle = pCreateGuestMsg->clientHandle;
 
 	sSql.Format(_T("{CALL create_guest_account('%s', '%s', %d, %d, %.2f, %d, %d, ?)}"),
 				sGuestName.GetString(),
@@ -258,7 +260,8 @@ void DBServer::onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen)
 		ValidateLoginMainByAcctMsg validateMsg;
 		validateMsg.header.uMainId = MSG_MAINID_DB;
 		validateMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT;
-		validateMsg.clientStamp = pCreateGuestMsg->clientStamp;
+		validateMsg.clientId = pCreateGuestMsg->clientId;
+		validateMsg.clientHandle = pCreateGuestMsg->clientHandle;
 		strncpy(validateMsg.szAccount, sGuestUtf8.kcharPtr(kUtf8), sizeof(validateMsg.szAccount) - 1);
 		validateMsg.info = pCreateGuestMsg->info;
 		memcpy(validateMsg.info.szPassword, m_szGuestPW, sizeof(validateMsg.info.szPassword));
@@ -291,7 +294,8 @@ void DBServer::onLoginMainByAccount(ClientId id, void* pData, size_t nDataLen)
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
 	loginFailMsg.header.uSubId = MSG_SUBID_DB_LOGIN_FAILURE;
-	loginFailMsg.clientStamp = pValidateMsg->clientStamp;
+	loginFailMsg.clientId = pValidateMsg->clientId;
+	loginFailMsg.clientHandle = pValidateMsg->clientHandle;
 
 	try
 	{
@@ -311,7 +315,8 @@ void DBServer::onLoginMainByAccount(ClientId id, void* pData, size_t nDataLen)
 		ValidateLoginMainByIdMsg validateByIdMsg;
 		validateByIdMsg.header.uMainId = MSG_MAINID_DB;
 		validateByIdMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_USERID;
-		validateByIdMsg.clientStamp = pValidateMsg->clientStamp;
+		validateByIdMsg.clientId = pValidateMsg->clientId;
+		validateByIdMsg.clientHandle = pValidateMsg->clientHandle;
 		validateByIdMsg.userId = uUserId;
 		validateByIdMsg.info = pValidateMsg->info;
 
@@ -376,7 +381,8 @@ void DBServer::onLoginMainByUserId(ClientId id, void* pData, size_t nDataLen)
 	DBAcctLoginFailMsg loginFailMsg;
 	loginFailMsg.header.uMainId = MSG_MAINID_DB;
 	loginFailMsg.header.uSubId = MSG_SUBID_DB_LOGIN_FAILURE;
-	loginFailMsg.clientStamp = pValidateMsg->clientStamp;
+	loginFailMsg.clientId = pValidateMsg->clientId;
+	loginFailMsg.clientHandle = pValidateMsg->clientHandle;
 
 	sSql.Format(_T("{CALL validate_main_login_by_userid(%d, '%s', '%s', '%s', '%s', '%s', ?)}"),
 				pValidateMsg->userId,
@@ -430,7 +436,7 @@ void DBServer::onLoginMainByUserId(ClientId id, void* pData, size_t nDataLen)
 			return;
 		}
 
-		sendUserInfoMsg(id, MSG_SUBID_DB_LOGIN_SUCCESS, pValidateMsg->clientStamp, userSet);
+		sendUserInfoMsg(id, MSG_SUBID_DB_LOGIN_SUCCESS, pValidateMsg->clientId, pValidateMsg->clientHandle, userSet);
 	}
 	catch (CDBException* pDBException)
 	{

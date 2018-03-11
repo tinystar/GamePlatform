@@ -43,6 +43,5 @@ LoginFailReason = {
     AccountNotExist = 1,
     PasswordWrong   = 2,
     GuestCreateFail = 3,
-    DBServerClosed  = 4,
-    AlreadyLogin    = 5
+    AlreadyLogin    = 4
 }

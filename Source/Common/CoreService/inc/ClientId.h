@@ -11,6 +11,7 @@
 #define __CLIENT_ID_H__
 
 #include "CoreService.h"
+#include "ServiceTypes.h"
 
 
 class ClientContext;
@@ -37,6 +38,14 @@ public:
 
 	void setUserData(void* pData);
 	void* getUserData() const;
+
+	/**
+	* The ClientContext structure is cached by a pool, that is it will be reused instead of be released
+	* after the client is closed.So we need a mechanism to uniquely identify a client connection.I solve
+	* this by generating an unique number and attach it to the ClientContext.You can use this number to
+	* identify the client in a server.When the client is closed the unique number is reset to zero.
+	*/
+	CSHANDLE getUniqueHandle() const;
 
 	// for debug
 	void dump(EzDumpContext& dc) const;

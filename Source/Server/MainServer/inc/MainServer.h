@@ -69,12 +69,6 @@ protected:
 
 	ClientId findClientByUserId(EzUInt32 userId) const;
 
-	bool removeClientFromDBReqQueue(ClientId id);
-
-	void notifyClientWhenDBClosed();
-
-	bool isClientLoginInProgress(ClientId id);
-
 	GameRoom* selectARoom(GamePlace* pPlace);
 
 	void notifyUserLogout(ClientId id);
@@ -109,7 +103,6 @@ protected:
 	void onDBQueryGameRooms(void* pData, size_t nSize);
 
 protected:
-	typedef std::list<ClientStamp>			ClientStampQueue;
 	typedef std::map<EzUInt32, ClientId>	UserId2ClientIdMap;
 
 	static NetMsgMapEntry s_msgMapArray[];
@@ -126,8 +119,6 @@ protected:
 	TcpClientSocket			m_clientToDB;
 	HANDLE					m_hSelectThread;
 	bool					m_bStopServer;
-
-	ClientStampQueue		m_reqToDBClientQueue;
 
 	UserId2ClientIdMap		m_userIdToClientMap;
 

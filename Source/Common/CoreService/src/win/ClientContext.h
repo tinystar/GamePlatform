@@ -16,6 +16,7 @@
 #include "IClientSessionMgr.h"
 #include "IocpSendBuffer.h"
 #include "IocpRecvBuffer.h"
+#include "ServiceTypes.h"
 
 
 class ClientContext
@@ -41,6 +42,7 @@ public:
 		, m_pUserData(NULL)
 		, m_bWaitSend(false)
 		, m_nWaitSendSize(0)
+		, m_hUnique(0)
 	{
 		::memset(&m_address, 0, sizeof(m_address));
 		m_hWaitSendEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -60,7 +62,7 @@ public:
 
 	bool init(IClientSessionMgr* pManager, size_t nMaxPkgSize);
 
-	bool attach(SOCKET hSocket, const SOCKADDR_IN& addr);
+	bool attach(SOCKET hSocket, const SOCKADDR_IN& addr, CSHANDLE handle);
 
 	SOCKET getSocket() const { return m_hSocket; }
 	const SOCKADDR_IN& getAddress() const { return m_address; }
@@ -84,6 +86,8 @@ public:
 
 	void reset();
 
+	CSHANDLE getUniqueHandle() const { return m_hUnique; }
+
 private:
 	IClientSessionMgr*	m_pClientMgr;
 	Status				m_status;
@@ -101,26 +105,7 @@ private:
 	bool				m_bWaitSend;
 	size_t				m_nWaitSendSize;
 	void*				m_pUserData;
+	CSHANDLE			m_hUnique;			// unique value to identify the client connection
 };
-
-inline bool ClientContext::attach(SOCKET hSocket, const SOCKADDR_IN& addr)
-{
-	if (!EzVerify(kInitialized == m_status || kClosed == m_status))
-		return false;
-
-	if (!EzVerify(hSocket != INVALID_SOCKET))
-		return false;
-
-	EzAssert(m_hSocket == INVALID_SOCKET);
-	m_hSocket = hSocket;
-	m_address = addr;
-
-	m_sendIoContext.type = eOpSend;
-	m_recvIoContext.type = eOpRecv;
-
-	m_status = kConnected;
-
-	return true;
-}
 
 #endif // __CLIENT_CONTEXT_H__

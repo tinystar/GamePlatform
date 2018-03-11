@@ -153,8 +153,6 @@ void MainServer::onSocketClosed(TcpClientSocket* pClientSock, int nErrCode)
 	}
 	else if (pClientSock == &m_clientToDB)
 	{
-		notifyClientWhenDBClosed();
-
 		if (m_pUIObserver != NULL)
 			m_pUIObserver->onUIConnToDBClosed();
 
@@ -168,10 +166,6 @@ void MainServer::onTcpClientCloseMsg(ClientId id)
 	if (id.getUserData() != NULL)		// user already login
 	{
 		handleUserLogout(id);
-	}
-	else
-	{
-		removeClientFromDBReqQueue(id);
 	}
 }
 
@@ -303,21 +297,15 @@ bool MainServer::sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId,
 
 void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 {
-	if (isClientLoginInProgress(id))
-		return;
-
 	EzAssert(sizeof(AccountLoginMsg) == nDataLen);
 	AccountLoginMsg* pAccountLoginMsg = (AccountLoginMsg*)pData;
 
 	ValidateLoginMainByAcctMsg validateMsg;
 
-	ClientStamp stampInfo;
-	stampInfo.clientId = id;
-	stampInfo.ulStamp = genDBRequestStamp();
-
 	validateMsg.header.uMainId = MSG_MAINID_DB;
 	validateMsg.header.uSubId = MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT;
-	validateMsg.clientStamp = stampInfo;
+	validateMsg.clientId = id;
+	validateMsg.clientHandle = id.getUniqueHandle();
 	memcpy(validateMsg.szAccount, pAccountLoginMsg->szAccount, sizeof(validateMsg.szAccount));
 	memcpy(validateMsg.info.szPassword, pAccountLoginMsg->szPassword, sizeof(validateMsg.info.szPassword));
 	memcpy(validateMsg.info.szServerName, m_szSvrName, sizeof(validateMsg.info.szServerName));
@@ -325,38 +313,25 @@ void MainServer::onAccountLogin(ClientId id, void* pData, size_t nDataLen)
 	memcpy(validateMsg.info.szDevice, pAccountLoginMsg->deviceInfo.szDevice, sizeof(validateMsg.info.szDevice));
 	memcpy(validateMsg.info.szLoginIp, inet_ntoa(id.getAddress().sin_addr), sizeof(validateMsg.info.szLoginIp));
 
-	if (sendMsgToServer(&m_clientToDB, &validateMsg, sizeof(validateMsg)))
-		m_reqToDBClientQueue.push_back(stampInfo);
+	sendMsgToServer(&m_clientToDB, &validateMsg, sizeof(validateMsg));
 }
 
 void MainServer::onQuickLogin(ClientId id, void* pData, size_t nDataLen)
 {
-	// 避免重复请求登录
-	if (isClientLoginInProgress(id))
-		return;
-
 	EzAssert(sizeof(QuickLoginMsg) == nDataLen);
 	QuickLoginMsg* pQuickLoginMsg = (QuickLoginMsg*)pData;
-
-	// 消息发送到DB服务器，在DB服务器处理过程中，id对应的客户端可能断开连接，由于底层id结构会重用，
-	// 所以在DB服务器处理完返回时，id对于的客户端可能发生了变化，不是之前请求DB服务器时的客户端，
-	// 所以不能只用ClientId来唯一确定一个客户端连接，增加ulStamp字段来唯一的标志每次请求以解决这个问题。
-	// 此问题只有在登录时会出现，登录成功以后id对应的客户端会被分配一个唯一的玩家Id，不会出现这种情况
-	ClientStamp stampInfo;
-	stampInfo.clientId = id;
-	stampInfo.ulStamp = genDBRequestStamp();
 
 	CreateGuestAccountMsg createGuestMsg;
 	createGuestMsg.header.uMainId = MSG_MAINID_DB;
 	createGuestMsg.header.uSubId = MSG_SUBID_CREATE_GUEST_ACCT;
-	createGuestMsg.clientStamp = stampInfo;
+	createGuestMsg.clientId = id;
+	createGuestMsg.clientHandle = id.getUniqueHandle();
 	memcpy(createGuestMsg.info.szServerName, m_szSvrName, sizeof(createGuestMsg.info.szServerName));
 	memcpy(createGuestMsg.info.szOS, pQuickLoginMsg->deviceInfo.szOS, sizeof(createGuestMsg.info.szOS));
 	memcpy(createGuestMsg.info.szDevice, pQuickLoginMsg->deviceInfo.szDevice, sizeof(createGuestMsg.info.szDevice));
 	memcpy(createGuestMsg.info.szLoginIp, inet_ntoa(id.getAddress().sin_addr), sizeof(createGuestMsg.info.szLoginIp));
 
-	if (sendMsgToServer(&m_clientToDB, &createGuestMsg, sizeof(createGuestMsg)))
-		m_reqToDBClientQueue.push_back(stampInfo);
+	sendMsgToServer(&m_clientToDB, &createGuestMsg, sizeof(createGuestMsg));
 }
 
 void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
@@ -364,19 +339,25 @@ void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
 	EzAssert(sizeof(UserInfoWithClientMsg) == nSize);
 	UserInfoWithClientMsg* pUserMsg = (UserInfoWithClientMsg*)pData;
 
-	ClientStamp headStamp = m_reqToDBClientQueue.front();
-	if (headStamp == pUserMsg->clientStamp)
+	// 登录请求从DB服务器返回时如果ClientId的UniqueHandle和请求时的UniqueHandle不想等，
+	// 说明ClientId已经关闭（如果UniqueHandle不为0，说明都已经被重用），如果此时继续向
+	// ClientId发送，则可能发送给重用后的客户端而产生逻辑错误。
+	if (pUserMsg->clientId.getUniqueHandle() != pUserMsg->clientHandle)
 	{
-		m_reqToDBClientQueue.pop_front();
+		if (pUserMsg->clientId.getUniqueHandle() != 0)
+			EzLogInfo(_T("The ClientId has been reused before the login request return from DBServer!\n"));
+		return;
+	}
 
+	if (pUserMsg->clientId.isValid())
+	{
 		UserInfoMsg userMsg;
 		userMsg.header.uMainId = MSG_MAINID_USER;
 		userMsg.header.uSubId = MSG_SUBID_LOGIN_SUCCESS;
 		userMsg.userInfo = pUserMsg->userInfo;
+		sendMsg(pUserMsg->clientId, &userMsg, sizeof(userMsg));
 
-		sendMsg(headStamp.clientId, &userMsg, sizeof(userMsg));
-
-		bool bAdded = addLoginUser(headStamp.clientId, pUserMsg->userInfo);
+		bool bAdded = addLoginUser(pUserMsg->clientId, pUserMsg->userInfo);
 		if (!EzVerify(bAdded))
 			EzLogInfo(_T("Add Login User Failed!\n"));
 	}
@@ -387,16 +368,20 @@ void MainServer::onDBLoginFailure(void* pData, size_t nSize)
 	EzAssert(sizeof(DBAcctLoginFailMsg) == nSize);
 	DBAcctLoginFailMsg* pLoginFailMsg = (DBAcctLoginFailMsg*)pData;
 
-	ClientStamp headStamp = m_reqToDBClientQueue.front();
-	if (headStamp == pLoginFailMsg->clientStamp)
+	if (pLoginFailMsg->clientId.getUniqueHandle() != pLoginFailMsg->clientHandle)
 	{
-		m_reqToDBClientQueue.pop_front();
+		if (pLoginFailMsg->clientId.getUniqueHandle() != 0)
+			EzLogInfo(_T("The ClientId has been reused before the login request return from DBServer!\n"));
+		return;
+	}
 
+	if (pLoginFailMsg->clientId.isValid())
+	{
 		LoginFailMsg failMsg;
 		failMsg.header.uMainId = MSG_MAINID_USER;
 		failMsg.header.uSubId = MSG_SUBID_LOGIN_FAILURE;
 		failMsg.nFailReason = pLoginFailMsg->nFailReason;
-		sendMsg(headStamp.clientId, &failMsg, sizeof(failMsg));
+		sendMsg(pLoginFailMsg->clientId, &failMsg, sizeof(failMsg));
 	}
 }
 
@@ -442,39 +427,6 @@ ClientId MainServer::findClientByUserId(EzUInt32 userId) const
 		return ClientId::kNull;
 
 	return iter->second;
-}
-
-bool MainServer::removeClientFromDBReqQueue(ClientId id)
-{
-	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
-	while (iter != m_reqToDBClientQueue.end())
-	{
-		if (id == iter->clientId)
-		{
-			m_reqToDBClientQueue.erase(iter);
-			return true;
-		}
-
-		++iter;
-	}
-
-	return false;
-}
-
-void MainServer::notifyClientWhenDBClosed()
-{
-	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
-	while (iter != m_reqToDBClientQueue.end())
-	{
-		LoginFailMsg failMsg;
-		failMsg.header.uMainId = MSG_MAINID_USER;
-		failMsg.header.uSubId = MSG_SUBID_LOGIN_FAILURE;
-		failMsg.nFailReason = eDBServerClosed;
-		sendMsg(iter->clientId, &failMsg, sizeof(failMsg));
-
-		++iter;
-	}
-	m_reqToDBClientQueue.clear();
 }
 
 void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
@@ -639,20 +591,6 @@ void MainServer::onEnterGamePlace(ClientId id, void* pData, size_t nDataLen)
 void MainServer::onUserLogout(ClientId id, void* pData, size_t nDataLen)
 {
 	handleUserLogout(id);
-}
-
-bool MainServer::isClientLoginInProgress(ClientId id)
-{
-	ClientStampQueue::iterator iter = m_reqToDBClientQueue.begin();
-	while (iter != m_reqToDBClientQueue.end())
-	{
-		if (id == iter->clientId)
-			return true;
-
-		++iter;
-	}
-
-	return false;
 }
 
 GameRoom* MainServer::selectARoom(GamePlace* pPlace)

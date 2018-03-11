@@ -27,6 +27,27 @@ bool ClientContext::init(IClientSessionMgr* pManager, size_t nMaxPkgSize)
 	return true;
 }
 
+bool ClientContext::attach(SOCKET hSocket, const SOCKADDR_IN& addr, CSHANDLE handle)
+{
+	if (!EzVerify(kInitialized == m_status || kClosed == m_status))
+		return false;
+
+	if (!EzVerify(hSocket != INVALID_SOCKET))
+		return false;
+
+	EzAssert(m_hSocket == INVALID_SOCKET);
+	m_hSocket = hSocket;
+	m_address = addr;
+	m_hUnique = handle;
+
+	m_sendIoContext.type = eOpSend;
+	m_recvIoContext.type = eOpRecv;
+
+	m_status = kConnected;
+
+	return true;
+}
+
 bool ClientContext::asyncRecv()
 {
 	EzAutoLocker autoLocker(&m_recvLock);
@@ -210,4 +231,5 @@ void ClientContext::reset()
 	m_recvBuffer.reset();
 
 	m_pUserData = NULL;
+	m_hUnique = 0;
 }
