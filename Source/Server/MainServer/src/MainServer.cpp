@@ -357,7 +357,7 @@ void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
 		userMsg.userInfo = pUserMsg->userInfo;
 		sendMsg(pUserMsg->clientId, &userMsg, sizeof(userMsg));
 
-		bool bAdded = addLoginUser(pUserMsg->clientId, pUserMsg->userInfo);
+		bool bAdded = m_userManager.addLoginUser(pUserMsg->clientId, pUserMsg->userInfo);
 		if (!EzVerify(bAdded))
 			EzLogInfo(_T("Add Login User Failed!\n"));
 	}
@@ -383,50 +383,6 @@ void MainServer::onDBLoginFailure(void* pData, size_t nSize)
 		failMsg.nFailReason = pLoginFailMsg->nFailReason;
 		sendMsg(pLoginFailMsg->clientId, &failMsg, sizeof(failMsg));
 	}
-}
-
-bool MainServer::addLoginUser(ClientId cId, const UserInfo& userInfo)
-{
-	if (!EzVerify(cId.isValid() && userInfo.userId > 0))
-		return false;
-
-	GameUser* pGameUser = new GameUser(userInfo);
-	if (NULL == pGameUser)
-		return false;
-
-	EzAssert(NULL == cId.getUserData());
-	cId.setUserData(pGameUser);
-
-	EzAssert(m_userIdToClientMap.find(pGameUser->getUserId()) == m_userIdToClientMap.end());
-	m_userIdToClientMap.insert(UserId2ClientIdMap::value_type(pGameUser->getUserId(), cId));
-	return true;
-}
-
-bool MainServer::removeLoginUser(ClientId cId)
-{
-	void* pUserData = cId.getUserData();
-	if (NULL == pUserData)
-		return false;
-
-	GameUser* pGameUser = (GameUser*)pUserData;
-	
-	cId.setUserData(NULL);
-	UserId2ClientIdMap::iterator iter = m_userIdToClientMap.find(pGameUser->getUserId());
-	EzAssert(iter != m_userIdToClientMap.end());
-	if (iter != m_userIdToClientMap.end())
-		m_userIdToClientMap.erase(iter);
-
-	delete pGameUser;
-	return true;
-}
-
-ClientId MainServer::findClientByUserId(EzUInt32 userId) const
-{
-	UserId2ClientIdMap::const_iterator iter = m_userIdToClientMap.find(userId);
-	if (iter == m_userIdToClientMap.end())
-		return ClientId::kNull;
-
-	return iter->second;
 }
 
 void MainServer::onDBQueryGameKinds(void* pData, size_t nSize)
@@ -632,5 +588,6 @@ void MainServer::handleUserLogout(ClientId id)
 		return;
 
 	notifyUserLogout(id);
-	removeLoginUser(id);
+
+	m_userManager.removeLoginUser(id);
 }

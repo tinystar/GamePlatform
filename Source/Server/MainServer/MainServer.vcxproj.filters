@@ -54,6 +54,9 @@
     <ClInclude Include="inc\IMainServerUIObserver.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\MainUserManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp">
@@ -75,6 +78,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\MainServerMgr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainUserManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,6 +17,7 @@
     <ClInclude Include="inc\MainMsgDefs.h" />
     <ClInclude Include="inc\MainServer.h" />
     <ClInclude Include="inc\MainServerMgr.h" />
+    <ClInclude Include="inc\MainUserManager.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MainServerApp.h" />
     <ClInclude Include="Resource.h" />
@@ -30,6 +31,7 @@
     <ClCompile Include="MainServerApp.cpp" />
     <ClCompile Include="src\MainServer.cpp" />
     <ClCompile Include="src\MainServerMgr.cpp" />
+    <ClCompile Include="src\MainUserManager.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>

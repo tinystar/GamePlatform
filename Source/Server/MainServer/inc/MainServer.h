@@ -13,9 +13,8 @@
 #include "BaseGameServer.h"
 #include "TcpClientSocket.h"
 #include "IMainServerUIObserver.h"
-#include <list>
-#include <map>
 #include "GameNode.h"
+#include "MainUserManager.h"
 
 class MainServer : public BaseGameServer, public ITcpClientSocketEventHandler
 {
@@ -64,11 +63,6 @@ protected:
 	bool sendMsgToServer(TcpClientSocket* pClientSock, void* pData, size_t nDataLen);
 	bool sendMsgToServer(TcpClientSocket* pClientSock, CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved = 0);
 
-	bool addLoginUser(ClientId cId, const UserInfo& userInfo);
-	bool removeLoginUser(ClientId cId);
-
-	ClientId findClientByUserId(EzUInt32 userId) const;
-
 	GameRoom* selectARoom(GamePlace* pPlace);
 
 	void notifyUserLogout(ClientId id);
@@ -103,8 +97,6 @@ protected:
 	void onDBQueryGameRooms(void* pData, size_t nSize);
 
 protected:
-	typedef std::map<EzUInt32, ClientId>	UserId2ClientIdMap;
-
 	static NetMsgMapEntry s_msgMapArray[];
 
 	char					m_szGateAddr[20];
@@ -120,8 +112,7 @@ protected:
 	HANDLE					m_hSelectThread;
 	bool					m_bStopServer;
 
-	UserId2ClientIdMap		m_userIdToClientMap;
-
+	MainUserManager			m_userManager;
 	GameListTree			m_gameList;
 
 	IMainServerUIObserver*	m_pUIObserver;
