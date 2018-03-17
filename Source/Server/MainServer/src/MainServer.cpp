@@ -55,6 +55,7 @@ bool MainServer::onInit(const ServerInitConfig& serverConfig)
 bool MainServer::onUninit()
 {
 	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
+	m_userManager.cleanupAllUser();
 	return BaseGameServer::onUninit();
 }
 
@@ -81,13 +82,14 @@ bool MainServer::onStop()
 	if (!BaseGameServer::onStop())
 		return false;
 
+	m_clientToGate.close();
+	m_clientToDB.close();
+
 	m_bStopServer = true;
 	::WaitForSingleObject(m_hSelectThread, INFINITE);
 	::CloseHandle(m_hSelectThread);
 	m_hSelectThread = NULL;
 
-	m_clientToGate.close();
-	m_clientToDB.close();
 	return true;
 }
 

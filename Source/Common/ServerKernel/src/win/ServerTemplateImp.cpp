@@ -50,7 +50,6 @@ bool ServerTemplateImp::start()
 
 bool ServerTemplateImp::stop()
 {
-	m_bRunning = false;
 	if (m_hMsgThread != NULL)
 	{
 		EzAssert(m_hQuitEvent != NULL);
@@ -75,6 +74,7 @@ bool ServerTemplateImp::stop()
 	}
 	m_msgQueue.clear();
 
+	m_bRunning = false;
 	return true;
 }
 
@@ -176,15 +176,22 @@ unsigned __stdcall ServerTemplateImp::msgQueueHandleThread(void* pParam)
 	ServerTemplateImp* pServerImp = (ServerTemplateImp*)pParam;
 	HANDLE hEvents[2] = { pServerImp->m_hSemaphore, pServerImp->m_hQuitEvent };
 
+	bool bExitSignaled = false;
 	while (true)
 	{
 		DWORD dwRet = ::WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
 		if (WAIT_OBJECT_0 == dwRet)
 			pServerImp->handleQueueMsg();
 		else if ((WAIT_OBJECT_0 + 1) == dwRet)
-			break;		// quit
+			bExitSignaled = true;
 		else
 			continue;
+
+		if (bExitSignaled)
+		{
+			if (pServerImp->isQueueEmpty())		// Exit until all msg has been processed.
+				break;		// quit
+		}
 	}
 
 	return 0;
@@ -267,4 +274,14 @@ bool ServerTemplateImp::queueUserItem(int itemId, void* pData, size_t nSize)
 	::memcpy(pUserItem->pItemData, pData, nSize);
 
 	return addQueueItem(pUserItem);
+}
+
+bool ServerTemplateImp::isQueueEmpty() const
+{
+	EzAutoLocker _auto(&m_queueLock);
+
+	if (m_msgQueue.empty())
+		return true;
+
+	return false;
 }

@@ -42,6 +42,8 @@ protected:
 
 	bool queueUserItem(int itemId, void* pData, size_t nSize);
 
+	bool isQueueEmpty() const;
+
 protected:
 	ServerTemplate*				m_pApiObj;
 

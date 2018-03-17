@@ -22,8 +22,8 @@ public:
 	EzLock();
 	~EzLock();
 
-	void lock();
-	void unlock();
+	void lock() const;
+	void unlock() const;
 
 private:
 	EzLockImp*	m_pImpLock;
@@ -32,7 +32,7 @@ private:
 class EZ_DLL_SPEC EzAutoLocker
 {
 public:
-	explicit EzAutoLocker(EzLock* pLock)
+	explicit EzAutoLocker(const EzLock* pLock)
 		: m_pLock(pLock)
 	{
 		if (m_pLock)
@@ -46,7 +46,7 @@ public:
 	}
 
 private:
-	EzLock* m_pLock;
+	const EzLock* m_pLock;
 };
 
 class EZ_DLL_SPEC EzRWLock
@@ -55,11 +55,11 @@ public:
 	EzRWLock();
 	~EzRWLock();
 
-	void lockRead();
-	void lockWrite();
+	void lockRead() const;
+	void lockWrite() const;
 
-	void unlockRead();
-	void unlockWrite();
+	void unlockRead() const;
+	void unlockWrite() const;
 
 private:
 	EzRWLockImp* m_pImpLock;

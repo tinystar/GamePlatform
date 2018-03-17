@@ -32,13 +32,13 @@ EzLock::~EzLock()
 	EZ_SAFE_DELETE(m_pImpLock);
 }
 
-void EzLock::lock()
+void EzLock::lock() const
 {
 	if (m_pImpLock)
 		m_pImpLock->lock();
 }
 
-void EzLock::unlock()
+void EzLock::unlock() const
 {
 	if (m_pImpLock)
 		m_pImpLock->unlock();
@@ -163,25 +163,25 @@ EzRWLock::~EzRWLock()
 	EZ_SAFE_DELETE(m_pImpLock);
 }
 
-void EzRWLock::lockRead()
+void EzRWLock::lockRead() const
 {
 	if (m_pImpLock)
 		m_pImpLock->lockRead();
 }
 
-void EzRWLock::lockWrite()
+void EzRWLock::lockWrite() const
 {
 	if (m_pImpLock)
 		m_pImpLock->lockWrite();
 }
 
-void EzRWLock::unlockRead()
+void EzRWLock::unlockRead() const
 {
 	if (m_pImpLock)
 		m_pImpLock->unlockRead();
 }
 
-void EzRWLock::unlockWrite()
+void EzRWLock::unlockWrite() const
 {
 	if (m_pImpLock)
 		m_pImpLock->unlockWrite();

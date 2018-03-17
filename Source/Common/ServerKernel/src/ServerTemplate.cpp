@@ -136,6 +136,9 @@ SVCErrorCode ServerTemplate::start()
 	if (m_state & kRunning)
 		return eOk;
 
+	if (!onStart())
+		return eNotApplicable;
+
 	if (!m_pServerImp->start())
 		return eSystemError;
 
@@ -150,14 +153,7 @@ SVCErrorCode ServerTemplate::start()
 		ec = m_pTimerService->start();
 
 	if (eOk == ec)
-	{
 		m_state |= kRunning;
-		if (!onStart())
-		{
-			stop();
-			return eNotApplicable;
-		}
-	}
 
 	return ec;
 }
@@ -167,15 +163,15 @@ SVCErrorCode ServerTemplate::stop()
 	if (!(m_state & kRunning))
 		return eOk;
 
-	onStop();
-
-	m_pServerImp->stop();
-
 	if (m_pTcpService != NULL)
 		m_pTcpService->stop();
 
 	if (m_pTimerService != NULL)
 		m_pTimerService->stop();
+
+	m_pServerImp->stop();
+
+	onStop();
 
 	m_state &= ~kRunning;
 	return eOk;
