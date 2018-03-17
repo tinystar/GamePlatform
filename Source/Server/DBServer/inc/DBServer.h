@@ -14,6 +14,7 @@
 #include "BaseGameServer.h"
 #include "IDBServerUIObserver.h"
 #include "DBRecordSets.h"
+#include "BaseMsgDefs.h"
 
 class DBServer : public BaseGameServer
 {
@@ -35,8 +36,6 @@ public:
 protected:
 	virtual bool onInit(const ServerInitConfig& serverConfig);
 	virtual bool onUninit();
-	virtual bool onStart();
-	virtual bool onStop();
 
 protected:
 	void onCreateGuestAccount(ClientId id, void* pData, size_t nDataLen);
@@ -52,6 +51,8 @@ protected:
 	void onQueryPlacesEnd(ClientId id, void* pData, size_t nDataLen);
 	void onQueryRoomsEnd(ClientId id, void* pData, size_t nDataLen);
 
+	DECLARE_NETMSG_TABLE()
+
 protected:
 	void sendUserInfoMsg(ClientId id, CSUINT16 uSubMsgId, ClientId clientId, CSHANDLE clientHandle, const UserInfoSet& userSet);
 	void fillGameKindInfo(GameKindMsgInfo& kindInfo, const GameKindSet& kindSet);
@@ -61,8 +62,6 @@ protected:
 	CSINT32 ValidateResultToFailReason(int result) const;
 
 protected:
-	static NetMsgMapEntry s_msgMapArray[];
-
 	CDatabase				m_database;
 	char					m_szDSN[256];
 	char					m_szGuestName[256];

@@ -9,13 +9,13 @@
 #define ITEM_ID_DB			2
 
 
-NetMsgMapEntry MainServer::s_msgMapArray[] = {
-	{ MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, static_cast<NetMsgHandler>(&MainServer::onAccountLogin) },
-	{ MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, static_cast<NetMsgHandler>(&MainServer::onQuickLogin) },
-	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, static_cast<NetMsgHandler>(&MainServer::onRequestGameKinds) },
-	{ MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEPLACES, static_cast<NetMsgHandler>(&MainServer::onRequestGamePlaces) },
-	{ MSG_MAINID_GAMELIST, MSG_SUBID_ENTER_GAMEPLACE, static_cast<NetMsgHandler>(&MainServer::onEnterGamePlace) }
-};
+BEGIN_NETMSG_TABLE(MainServer, BaseGameServer)
+	ON_NET_MESSAGE(MSG_MAINID_USER, MSG_SUBID_ACCOUNT_LOGIN, &MainServer::onAccountLogin)
+	ON_NET_MESSAGE(MSG_MAINID_USER, MSG_SUBID_QUICK_LOGIN, &MainServer::onQuickLogin)
+	ON_NET_MESSAGE(MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEKINDS, &MainServer::onRequestGameKinds)
+	ON_NET_MESSAGE(MSG_MAINID_GAMELIST, MSG_SUBID_REQUEST_GAMEPLACES, &MainServer::onRequestGamePlaces)
+	ON_NET_MESSAGE(MSG_MAINID_GAMELIST, MSG_SUBID_ENTER_GAMEPLACE, &MainServer::onEnterGamePlace)
+END_NETMSG_TABLE()
 
 
 MainServer::MainServer()
@@ -47,14 +47,11 @@ bool MainServer::onInit(const ServerInitConfig& serverConfig)
 		return false;
 
 	m_sPort = serverConfig.tcpConfig.sPort;
-
-	registerMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	return true;
 }
 
 bool MainServer::onUninit()
 {
-	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	m_userManager.cleanupAllUser();
 	return BaseGameServer::onUninit();
 }

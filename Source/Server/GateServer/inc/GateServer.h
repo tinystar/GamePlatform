@@ -30,12 +30,6 @@ public:
 	void registerUIObserver(IGateServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
 
 protected:
-	virtual bool onInit(const ServerInitConfig& serverConfig);
-	virtual bool onUninit();
-	virtual bool onStart();
-	virtual bool onStop();
-
-protected:
 	virtual void onTcpClientCloseMsg(ClientId id);
 
 protected:
@@ -44,9 +38,9 @@ protected:
 
 	void onMainConnect(ClientId id, void* pData, size_t nDataLen);
 
-protected:
-	static NetMsgMapEntry s_msgMapArray[];
+	DECLARE_NETMSG_TABLE()
 
+protected:
 	MainServerList			m_mainSvrList;
 	char					m_szVersion[16];
 	char					m_szUpdUrl[128];

@@ -11,17 +11,17 @@
 #define DEFAULT_GENDER_TYPE		eFemale
 
 
-NetMsgMapEntry DBServer::s_msgMapArray[] = {
-	{ MSG_MAINID_DB, MSG_SUBID_CREATE_GUEST_ACCT, static_cast<NetMsgHandler>(&DBServer::onCreateGuestAccount) },
-	{ MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT, static_cast<NetMsgHandler>(&DBServer::onLoginMainByAccount) },
-	{ MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_USERID, static_cast<NetMsgHandler>(&DBServer::onLoginMainByUserId) },
-	{ MSG_MAINID_DB, MSG_SUBID_LOGOUT_MAIN, static_cast<NetMsgHandler>(&DBServer::onUserLogoutMain) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS, static_cast<NetMsgHandler>(&DBServer::onQueryGameKinds) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEPLACES, static_cast<NetMsgHandler>(&DBServer::onQueryGamePlaces) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, static_cast<NetMsgHandler>(&DBServer::onQueryGameRooms) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_PLACES_END, static_cast<NetMsgHandler>(&DBServer::onQueryPlacesEnd) },
-	{ MSG_MAINID_DB, MSG_SUBID_QUERY_ROOMS_END, static_cast<NetMsgHandler>(&DBServer::onQueryRoomsEnd) }
-};
+BEGIN_NETMSG_TABLE(DBServer, BaseGameServer)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_CREATE_GUEST_ACCT, &DBServer::onCreateGuestAccount)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT, &DBServer::onLoginMainByAccount)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_USERID, &DBServer::onLoginMainByUserId)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGOUT_MAIN, &DBServer::onUserLogoutMain)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS, &DBServer::onQueryGameKinds)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEPLACES, &DBServer::onQueryGamePlaces)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, &DBServer::onQueryGameRooms)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_PLACES_END, &DBServer::onQueryPlacesEnd)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_ROOMS_END, &DBServer::onQueryRoomsEnd)
+END_NETMSG_TABLE()
 
 
 DBServer::DBServer()
@@ -76,7 +76,6 @@ bool DBServer::onInit(const ServerInitConfig& serverConfig)
 			m_pUIObserver->onUIDatabaseOpen(false, NULL);
 	}
 
-	registerMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	return !!bRet;
 }
 
@@ -95,18 +94,7 @@ bool DBServer::onUninit()
 	{
 	}
 
-	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
 	return BaseGameServer::onUninit();
-}
-
-bool DBServer::onStart()
-{
-	return BaseGameServer::onStart();
-}
-
-bool DBServer::onStop()
-{
-	return BaseGameServer::onStop();
 }
 
 bool DBServer::setDSN(const char* pszDSN)

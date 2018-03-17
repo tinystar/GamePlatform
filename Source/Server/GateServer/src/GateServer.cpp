@@ -4,11 +4,11 @@
 #define CLIENT_TYPE_MAIN		1
 
 
-NetMsgMapEntry GateServer::s_msgMapArray[] = {
-	{ MSG_MAINID_GATE, MSG_SUBID_REQUEST_CONFIG, static_cast<NetMsgHandler>(&GateServer::onRequestConfig) },
-	{ MSG_MAINID_GATE, MSG_SUBID_REQUEST_MAINSVR_ADDR, static_cast<NetMsgHandler>(&GateServer::onRequestMainAddr) },
-	{ MSG_MAINID_MAIN_TO_GATE, MSG_SUBID_MAIN_CONNECT, static_cast<NetMsgHandler>(&GateServer::onMainConnect) }
-};
+BEGIN_NETMSG_TABLE(GateServer, BaseGameServer)
+	ON_NET_MESSAGE(MSG_MAINID_GATE, MSG_SUBID_REQUEST_CONFIG, &GateServer::onRequestConfig)
+	ON_NET_MESSAGE(MSG_MAINID_GATE, MSG_SUBID_REQUEST_MAINSVR_ADDR, &GateServer::onRequestMainAddr)
+	ON_NET_MESSAGE(MSG_MAINID_MAIN_TO_GATE, MSG_SUBID_MAIN_CONNECT, &GateServer::onMainConnect)
+END_NETMSG_TABLE()
 
 
 GateServer::GateServer()
@@ -21,31 +21,6 @@ GateServer::GateServer()
 GateServer::~GateServer()
 {
 
-}
-
-bool GateServer::onInit(const ServerInitConfig& serverConfig)
-{
-	if (!BaseGameServer::onInit(serverConfig))
-		return false;
-
-	registerMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
-	return true;
-}
-
-bool GateServer::onUninit()
-{
-	removeMsgHandler(s_msgMapArray, EzCountOf(s_msgMapArray));
-	return BaseGameServer::onUninit();
-}
-
-bool GateServer::onStart()
-{
-	return BaseGameServer::onStart();
-}
-
-bool GateServer::onStop()
-{
-	return BaseGameServer::onStop();
 }
 
 void GateServer::onRequestConfig(ClientId id, void* pData, size_t nDataLen)

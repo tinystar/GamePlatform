@@ -12,19 +12,8 @@
 
 #include "GameBase.h"
 #include "ServerTemplate.h"
-#include "BaseMsgDefs.h"
+#include "NetMsgMapDefs.h"
 #include <map>
-
-class BaseGameServer;
-
-typedef void (BaseGameServer::*NetMsgHandler)(ClientId, void*, size_t);
-
-struct NetMsgMapEntry
-{
-	CSUINT16		uMainId;
-	CSUINT16		uSubId;
-	NetMsgHandler	pHandler;
-};
 
 
 class BaseGameServer : public ServerTemplate
@@ -56,10 +45,7 @@ protected:
 	bool sendMsgToAll(CSUINT16 uMainId, CSUINT16 uSubId, CSUINT32 uReserved = 0);
 
 	bool registerMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId, NetMsgHandler pHandler);
-	bool registerMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
-
 	bool removeMsgHandler(CSUINT16 uMainId, CSUINT16 uSubId);
-	bool removeMsgHandler(const NetMsgMapEntry* const pEntries, size_t nEntryCount);
 
 	// input parameter must be dynamically allocated and needn't be deleted,
 	// it will be automatically deleted in the destructor of this class.
@@ -68,6 +54,13 @@ protected:
 protected:
 	// Msg that are not mapped by the msg map mechanism will be handled by this function.
 	virtual void onDefaultMsgHandler(ClientId id, void* pData, size_t nDataLen);
+
+	DECLARE_NETMSG_TABLE()
+
+private:
+	void buildNetMsgMap();
+	void clearNetMsgMap();
+	void registerMsgHandler(const NetMsgTable* pMsgTable);
 
 protected:
 	typedef std::map<CSUINT32, NetMsgHandler> NetMsgMap;

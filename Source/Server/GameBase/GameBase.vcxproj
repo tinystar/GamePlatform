@@ -90,6 +90,7 @@
     <ClInclude Include="inc\GameNode.h" />
     <ClInclude Include="inc\GameNodeInfo.h" />
     <ClInclude Include="inc\GameUserDefs.h" />
+    <ClInclude Include="inc\NetMsgMapDefs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp" />

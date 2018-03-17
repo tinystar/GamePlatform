@@ -30,6 +30,9 @@
     <ClInclude Include="inc\GameNodeInfo.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\NetMsgMapDefs.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp">

@@ -86,6 +86,8 @@ protected:
 
 	void onUserLogout(ClientId id, void* pData, size_t nDataLen);
 
+	DECLARE_NETMSG_TABLE()
+
 	// DBServer messages
 protected:
 	void onDBLoginSuccess(void* pData, size_t nSize);
@@ -97,8 +99,6 @@ protected:
 	void onDBQueryGameRooms(void* pData, size_t nSize);
 
 protected:
-	static NetMsgMapEntry s_msgMapArray[];
-
 	char					m_szGateAddr[20];
 	char					m_szDBAddr[20];
 	unsigned short			m_sGatePort;

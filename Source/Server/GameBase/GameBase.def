@@ -12,11 +12,11 @@ EXPORTS
 ?onTimerMsg@BaseGameServer@@MAEXI@Z
 ?onDefaultMsgHandler@BaseGameServer@@MAEXVClientId@@PAXI@Z
 ?onUserItemMsg@BaseGameServer@@MAEXHPAXI@Z
-?registerMsgHandler@BaseGameServer@@IAE_NQBUNetMsgMapEntry@@I@Z
-?removeMsgHandler@BaseGameServer@@IAE_NQBUNetMsgMapEntry@@I@Z
 ?sendMsg@BaseGameServer@@IAE_NVClientId@@PAXI@Z
 ?sendMsg@BaseGameServer@@IAE_NVClientId@@GGI@Z
 ?onInit@BaseGameServer@@MAE_NABUServerInitConfig@@@Z
 ?onUninit@BaseGameServer@@MAE_NXZ
 ?onStart@BaseGameServer@@MAE_NXZ
 ?onStop@BaseGameServer@@MAE_NXZ
+?GetThisNetMsgTable@BaseGameServer@@KAPBUNetMsgTable@@XZ
+?GetNetMsgTable@BaseGameServer@@MBEPBUNetMsgTable@@XZ
