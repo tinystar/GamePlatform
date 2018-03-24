@@ -116,6 +116,8 @@ void MainServer::onSocketConnected(TcpClientSocket* pClientSock)
 		connMsg.header.uSubId = MSG_SUBID_MAIN_CONNECT;
 		connMsg.sPort = m_sPort;
 		connMsg.uMaxUser = m_uMaxUser;
+		connMsg.uCurUser = m_userManager.getLoginCount();
+		strcpy(connMsg.szSvrName, m_szSvrName);
 
 		sendMsgToServer(pClientSock, &connMsg, sizeof(connMsg));
 
@@ -350,15 +352,28 @@ void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
 
 	if (pUserMsg->clientId.isValid())
 	{
-		UserInfoMsg userMsg;
-		userMsg.header.uMainId = MSG_MAINID_USER;
-		userMsg.header.uSubId = MSG_SUBID_LOGIN_SUCCESS;
-		userMsg.userInfo = pUserMsg->userInfo;
-		sendMsg(pUserMsg->clientId, &userMsg, sizeof(userMsg));
-
 		bool bAdded = m_userManager.addLoginUser(pUserMsg->clientId, pUserMsg->userInfo);
-		if (!EzVerify(bAdded))
+		if (EzVerify(bAdded))
+		{
+			// send to client
+			UserInfoMsg userMsg;
+			userMsg.header.uMainId = MSG_MAINID_USER;
+			userMsg.header.uSubId = MSG_SUBID_LOGIN_SUCCESS;
+			userMsg.userInfo = pUserMsg->userInfo;
+			sendMsg(pUserMsg->clientId, &userMsg, sizeof(userMsg));
+
+			// notify gate user login main
+			MainUserNotifyMsg mainUserMsg;
+			mainUserMsg.header.uMainId = MSG_MAINID_MAIN_TO_GATE;
+			mainUserMsg.header.uSubId = MSG_SUBID_USER_LOGIN_MAIN;
+			mainUserMsg.userId = pUserMsg->userInfo.userId;
+			sendMsgToServer(&m_clientToGate, &mainUserMsg, sizeof(mainUserMsg));
+		}
+		else
+		{
 			EzLogInfo(_T("Add Login User Failed!\n"));
+			m_pTcpService->closeClient(pUserMsg->clientId);
+		}
 	}
 }
 
@@ -579,6 +594,12 @@ void MainServer::notifyUserLogout(ClientId id)
 	logoutMsg.header.uSubId = MSG_SUBID_LOGOUT_MAIN;
 	logoutMsg.userId = pGameUser->getUserId();
 	sendMsgToServer(&m_clientToDB, &logoutMsg, sizeof(logoutMsg));
+
+	MainUserNotifyMsg mainUserMsg;
+	mainUserMsg.header.uMainId = MSG_MAINID_MAIN_TO_GATE;
+	mainUserMsg.header.uSubId = MSG_SUBID_USER_LOGOUT_MAIN;
+	mainUserMsg.userId = pGameUser->getUserId();
+	sendMsgToServer(&m_clientToGate, &mainUserMsg, sizeof(mainUserMsg));
 }
 
 void MainServer::handleUserLogout(ClientId id)

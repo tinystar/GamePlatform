@@ -37,6 +37,9 @@ public:
 	void setMaxUser(unsigned int uMax) { return m_server.setMaxUser(uMax); }
 	unsigned int getMaxUser() const { return m_server.getMaxUser(); }
 
+	void setServerName(const char* pszSvrName) { return m_server.setServerName(pszSvrName); }
+	const char* getServerName() const { return m_server.getServerName(); }
+
 	MainServer& getServer() { return m_server; }
 
 protected:

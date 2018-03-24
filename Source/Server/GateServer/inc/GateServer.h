@@ -37,6 +37,8 @@ protected:
 	void onRequestMainAddr(ClientId id, void* pData, size_t nDataLen);
 
 	void onMainConnect(ClientId id, void* pData, size_t nDataLen);
+	void onMainUserLogin(ClientId id, void* pData, size_t nDataLen);
+	void onMainUserLogout(ClientId id, void* pData, size_t nDataLen);
 
 	DECLARE_NETMSG_TABLE()
 

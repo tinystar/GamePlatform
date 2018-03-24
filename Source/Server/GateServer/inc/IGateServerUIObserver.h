@@ -18,6 +18,8 @@ class IGateServerUIObserver
 public:
 	virtual void onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode) = 0;
 	virtual void onUIMainServerRemoved(ClientId id) = 0;
+	virtual void onUIMainUserLogin(ClientId id) = 0;
+	virtual void onUIMainUserLogout(ClientId id) = 0;
 };
 
 #endif // __IGATESERVER_UI_OBSERVER_H__

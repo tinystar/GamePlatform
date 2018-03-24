@@ -143,6 +143,14 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rcControl.SetRect(194, 298, 254, 318);
 	m_maxUserEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
 
+	rcControl.SetRect(274, 300, 338, 320);
+	strRes.LoadString(IDS_SVR_NAME);
+	m_svrNameLabel.Create(strRes, WS_CHILD | WS_VISIBLE, rcControl, this);
+	m_svrNameLabel.SetFont(&m_font);
+
+	rcControl.SetRect(340, 298, 440, 318);
+	m_svrNameEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER, rcControl, this, -1);
+
 	rcControl.SetRect(25, 330, 110, 350);
 	strRes.LoadString(IDS_GATE_ADDR);
 	m_gateAddrLabel.Create(strRes, WS_CHILD | WS_VISIBLE, rcControl, this);
@@ -192,6 +200,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		strPort.Format(_T("%d"), m_mainSvrMgr.getMaxUser());
 		m_maxUserEdit.SetWindowText(strPort);
 
+		EzString sSvrName(m_mainSvrMgr.getServerName(), kUtf8);
+		m_svrNameEdit.SetWindowText(sSvrName.kwcharPtr());
+
 		char szAddr[50] = { 0 };
 		unsigned short sPort = 0;
 
@@ -231,6 +242,16 @@ void CChildView::OnBtnStartClick()
 		unsigned int uMaxUser = (unsigned int)_ttoi(sPort.GetString());
 		m_mainSvrMgr.setMaxUser(uMaxUser);
 
+		m_svrNameEdit.GetWindowText(sPort);
+		EzString sSvrName(sPort.GetString());
+		m_mainSvrMgr.setServerName(sSvrName.kcharPtr(kUtf8));
+
+		CString sTitle;
+		sTitle.LoadString(AFX_IDS_APP_TITLE);
+		sTitle += _T("-");
+		sTitle += sPort;
+		((CFrameWnd*)GetParent())->SetWindowText(sTitle);
+
 		if ((ec = m_mainSvrMgr.initServer()) != eOk)
 		{
 			TCHAR szLog[512] = { 0 };
@@ -244,6 +265,7 @@ void CChildView::OnBtnStartClick()
 			m_svrStatus |= kInited;
 			m_portEdit.EnableWindow(FALSE);
 			m_maxUserEdit.EnableWindow(FALSE);
+			m_svrNameEdit.EnableWindow(FALSE);
 		}
 	}
 

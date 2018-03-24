@@ -295,6 +295,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAX_USER            "最大人数限制"
+	IDS_SVR_NAME            "服务器名称"
 END
 
 #endif    // 中文(简体，中国) resources

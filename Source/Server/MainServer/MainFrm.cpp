@@ -169,7 +169,13 @@ LRESULT CMainFrame::OnTrayNotify(WPARAM wParam, LPARAM lParam)
 LRESULT CMainFrame::OnFirstStartServer(WPARAM wParam, LPARAM lParam)
 {
 	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_trayIcon.ShowIcon(hIcon, _T("MainServer"));
+	CString sTitle;
+	sTitle.LoadString(AFX_IDS_APP_TITLE);
+	sTitle += _T("-");
+	EzString sSvrName(m_wndView.getServerMgr().getServerName(), kUtf8);
+	sTitle += sSvrName.kwcharPtr();
+
+	m_trayIcon.ShowIcon(hIcon, sTitle);
 	m_bIconAdded = true;
 	CString strTip, strTipMsg;
 	strTip.LoadString(IDS_TRAY_TIP);

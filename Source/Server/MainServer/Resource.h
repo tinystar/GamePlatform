@@ -16,6 +16,7 @@
 #define IDS_DB_ADDR                     110
 #define IDS_DB_PORT                     111
 #define IDS_MAX_USER                    112
+#define IDS_SVR_NAME                    113
 #define IDR_MAINFRAME                   128
 #define IDR_MainServerTYPE              130
 #define IDR_MENUTRAY                    311

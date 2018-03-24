@@ -42,6 +42,11 @@ public:
 protected:
 	virtual void onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode);
 	virtual void onUIMainServerRemoved(ClientId id);
+	virtual void onUIMainUserLogin(ClientId id);
+	virtual void onUIMainUserLogout(ClientId id);
+
+protected:
+	void updateOnlineUserDisplay(ClientId svrId, bool bLogin);
 
 	// 生成的消息映射函数
 protected:
@@ -55,6 +60,8 @@ protected:
 	afx_msg void OnDestroy();
 	afx_msg LRESULT OnAddServerUIMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnRemoveServerUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnMainUserLoginUIMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnMainUserLogoutUIMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 protected:

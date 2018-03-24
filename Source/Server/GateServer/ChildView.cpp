@@ -22,13 +22,17 @@
 // UI notify msg
 #define WM_MAINSVR_ADD			(WM_USER + 1)
 #define WM_MAINSVR_REMOVE		(WM_USER + 2)
+#define WM_MAIN_USER_ADD		(WM_USER + 3)
+#define WM_MAIN_USER_REMOVE		(WM_USER + 4)
 
 struct AddServerParam
 {
 	ClientId			id;
 	TCHAR				szMainIP[20];
+	TCHAR				szMainName[64];
 	unsigned short		sMainPort;
 	unsigned int		uMaxUser;
+	unsigned int		uOnlineUser;
 };
 
 struct RemoveServerParam
@@ -36,6 +40,10 @@ struct RemoveServerParam
 	ClientId			id;
 };
 
+struct MainUserParam
+{
+	ClientId			id;
+};
 
 // CChildView
 
@@ -62,6 +70,8 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_BN_CLICKED(ID_BTN_OPENDIR, &CChildView::OnBtnOpenDirClick)
 	ON_MESSAGE(WM_MAINSVR_ADD, &CChildView::OnAddServerUIMsg)
 	ON_MESSAGE(WM_MAINSVR_REMOVE, &CChildView::OnRemoveServerUIMsg)
+	ON_MESSAGE(WM_MAIN_USER_ADD, &CChildView::OnMainUserLoginUIMsg)
+	ON_MESSAGE(WM_MAIN_USER_REMOVE, &CChildView::OnMainUserLogoutUIMsg)
 END_MESSAGE_MAP()
 
 
@@ -128,11 +138,15 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rcControl.SetRect(5, 30, 505, 418);
 	m_msvrList.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT, rcControl, this, ID_LCTL_MSVR);
 	strRes.LoadString(IDS_SERVER_ADDR);
-	m_msvrList.InsertColumn(0, strRes, LVCFMT_LEFT, 150);
+	m_msvrList.InsertColumn(0, strRes, LVCFMT_LEFT, 120);
 	strRes.LoadString(IDS_SERVER_PORT);
 	m_msvrList.InsertColumn(1, strRes, LVCFMT_LEFT, 80);
+	strRes.LoadString(IDS_SERVER_NAME);
+	m_msvrList.InsertColumn(2, strRes, LVCFMT_LEFT, 120);
+	strRes.LoadString(IDS_ONLINE_COUNT);
+	m_msvrList.InsertColumn(3, strRes, LVCFMT_LEFT, 80);
 	strRes.LoadString(IDS_SERVER_USERCNT);
-	m_msvrList.InsertColumn(2, strRes, LVCFMT_LEFT, 80);
+	m_msvrList.InsertColumn(4, strRes, LVCFMT_LEFT, 80);
 
 	SVCErrorCode ec = eOk;
 	if ((ec = m_gateSvrMgr.initServer()) != eOk)
@@ -246,11 +260,14 @@ void CChildView::onUIMainServerAdded(ClientId id, const MainSvrNode& svrNode)
 {
 	AddServerParam* pAddParam = new AddServerParam();
 	EzString sMainIP(svrNode.szMainAddr, kAnsi);
+	EzString sMainName(svrNode.szMainName, kUtf8);
 	memcpy(pAddParam->szMainIP, sMainIP.kwcharPtr(), sizeof(pAddParam->szMainIP));
+	memcpy(pAddParam->szMainName, sMainName.kwcharPtr(), sizeof(pAddParam->szMainName));
 
 	pAddParam->id = id;
 	pAddParam->sMainPort = svrNode.sMainPort;
 	pAddParam->uMaxUser = svrNode.uMaxUser;
+	pAddParam->uOnlineUser = svrNode.uOnlineUser;
 
 	this->PostMessage(WM_MAINSVR_ADD, 0, (LPARAM)pAddParam);
 }
@@ -261,6 +278,22 @@ void CChildView::onUIMainServerRemoved(ClientId id)
 	pRemoveParam->id = id;
 
 	this->PostMessage(WM_MAINSVR_REMOVE, 0, (LPARAM)pRemoveParam);
+}
+
+void CChildView::onUIMainUserLogin(ClientId id)
+{
+	MainUserParam* pParam = new MainUserParam();
+	pParam->id = id;
+
+	this->PostMessage(WM_MAIN_USER_ADD, 0, (LPARAM)pParam);
+}
+
+void CChildView::onUIMainUserLogout(ClientId id)
+{
+	MainUserParam* pParam = new MainUserParam();
+	pParam->id = id;
+
+	this->PostMessage(WM_MAIN_USER_REMOVE, 0, (LPARAM)pParam);
 }
 
 LRESULT CChildView::OnAddServerUIMsg(WPARAM wParam, LPARAM lParam)
@@ -275,8 +308,11 @@ LRESULT CChildView::OnAddServerUIMsg(WPARAM wParam, LPARAM lParam)
 	TCHAR szBuf[256] = { 0 };
 	_stprintf_s(szBuf, 256, _T("%d"), pAddParam->sMainPort);
 	m_msvrList.SetItemText(idx, 1, szBuf);
+	m_msvrList.SetItemText(idx, 2, pAddParam->szMainName);
+	_stprintf_s(szBuf, 256, _T("%d"), pAddParam->uOnlineUser);
+	m_msvrList.SetItemText(idx, 3, szBuf);
 	_stprintf_s(szBuf, 256, _T("%d"), pAddParam->uMaxUser);
-	m_msvrList.SetItemText(idx, 2, szBuf);
+	m_msvrList.SetItemText(idx, 4, szBuf);
 
 	return 0;
 }
@@ -298,4 +334,38 @@ LRESULT CChildView::OnRemoveServerUIMsg(WPARAM wParam, LPARAM lParam)
 
 	delete pRemoveParam;
 	return 0;
+}
+
+LRESULT CChildView::OnMainUserLoginUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	MainUserParam* pParam = (MainUserParam*)lParam;
+
+	updateOnlineUserDisplay(pParam->id, true);
+	delete pParam;
+	return 0;
+}
+
+LRESULT CChildView::OnMainUserLogoutUIMsg(WPARAM wParam, LPARAM lParam)
+{
+	MainUserParam* pParam = (MainUserParam*)lParam;
+
+	updateOnlineUserDisplay(pParam->id, false);
+	delete pParam;
+	return 0;
+}
+
+void CChildView::updateOnlineUserDisplay(ClientId svrId, bool bLogin)
+{
+	for (int i = 0; i < m_msvrList.GetItemCount(); ++i)
+	{
+		AddServerParam* pAddParam = (AddServerParam*)m_msvrList.GetItemData(i);
+		if (pAddParam->id == svrId)
+		{
+			bLogin ? pAddParam->uOnlineUser++ : pAddParam->uOnlineUser--;
+			TCHAR szBuf[256] = { 0 };
+			_stprintf_s(szBuf, 256, _T("%d"), pAddParam->uOnlineUser);
+			m_msvrList.SetItemText(i, 3, szBuf);
+			break;
+		}
+	}
 }

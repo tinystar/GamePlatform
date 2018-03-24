@@ -21,6 +21,8 @@
 
 // main -> gate
 #define MSG_SUBID_MAIN_CONNECT				20
+#define MSG_SUBID_USER_LOGIN_MAIN			21
+#define MSG_SUBID_USER_LOGOUT_MAIN			22
 
 // server -> client
 #define MSG_SUBID_CONFIG					1
@@ -60,11 +62,27 @@ struct MainConnectMsg
 	GameMsgHeader	header;
 	CSUINT16		sPort;
 	CSUINT32		uMaxUser;
+	CSUINT32		uCurUser;
+	char			szSvrName[64];
 
 	MainConnectMsg()
 		: sPort(0)
 		, uMaxUser(0)
-	{}
+		, uCurUser(0)
+	{
+		::memset(szSvrName, 0, sizeof(szSvrName));
+	}
+};
+
+struct MainUserNotifyMsg
+{
+	GameMsgHeader	header;
+	CSUINT32		userId;
+
+	MainUserNotifyMsg()
+		: userId(0)
+	{
+	}
 };
 
 #pragma pack(pop)

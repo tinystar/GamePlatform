@@ -26,6 +26,8 @@ public:
 	bool addLoginUser(ClientId cId, const UserInfo& userInfo);
 	bool removeLoginUser(ClientId cId);
 
+	size_t getLoginCount() const { return m_userIdToClientMap.size(); }
+
 	ClientId findClientIdByUserId(EzUInt32 userId) const;
 
 	GameUser* getGameUserByClientId(ClientId cId) const;

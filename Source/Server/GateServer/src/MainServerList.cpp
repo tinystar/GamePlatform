@@ -29,39 +29,28 @@ void MainServerList::removeServer(const ClientId& id)
 	}
 }
 
-void MainServerList::addServerUser(const ClientId& id, EzUInt32 userId)
+void MainServerList::addServerUser(const ClientId& id)
 {
 	for (int i = 0; i < m_svrList.logicalLength(); ++i)
 	{
 		if (m_svrList[i].svrId == id)
 		{
-			m_svrList[i].onlineUserIds.insert(userId);
+			m_svrList[i].uOnlineUser++;
 			break;
 		}
 	}
 }
 
-void MainServerList::removeServerUser(const ClientId& id, EzUInt32 userId)
+void MainServerList::removeServerUser(const ClientId& id)
 {
 	for (int i = 0; i < m_svrList.logicalLength(); ++i)
 	{
 		if (m_svrList[i].svrId == id)
 		{
-			m_svrList[i].onlineUserIds.erase(userId);
+			m_svrList[i].uOnlineUser--;
 			break;
 		}
 	}
-}
-
-const MainSvrNode* MainServerList::getServerByUserId(EzUInt32 userId)
-{
-	for (int i = 0; i < m_svrList.logicalLength(); ++i)
-	{
-		if (m_svrList[i].onlineUserIds.find(userId) != m_svrList[i].onlineUserIds.end())
-			return &m_svrList[i];
-	}
-
-	return NULL;
 }
 
 const MainSvrNode* MainServerList::chooseServer() const
@@ -70,7 +59,7 @@ const MainSvrNode* MainServerList::chooseServer() const
 	int idxMin = -1;
 	for (int i = 0; i < m_svrList.logicalLength(); ++i)
 	{
-		unsigned int uOnlineCnt = m_svrList[i].onlineUserIds.size();
+		unsigned int uOnlineCnt = m_svrList[i].uOnlineUser;
 		unsigned int uThreshold = (unsigned int)(0.8 * m_svrList[i].uMaxUser);		// 80%
 		if (uOnlineCnt < uThreshold)
 			return &m_svrList[i];

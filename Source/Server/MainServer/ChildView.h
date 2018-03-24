@@ -28,6 +28,7 @@ public:
 
 // ²Ù×÷
 public:
+	MainServerMgr& getServerMgr() { return m_mainSvrMgr; }
 
 // ÖØÐ´
 	protected:
@@ -89,6 +90,8 @@ protected:
 	CEdit					m_DBPortEdit;
 	CStatic					m_maxUserLabel;
 	CEdit					m_maxUserEdit;
+	CStatic					m_svrNameLabel;
+	CEdit					m_svrNameEdit;
 	CEdit					m_svrMsgEdit;
 	CFont					m_font;
 	BOOL					m_bFirstStart;

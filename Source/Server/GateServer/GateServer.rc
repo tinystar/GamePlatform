@@ -209,12 +209,14 @@ BEGIN
     IDS_MAINSVR_LIST        "主服务器列表"
     IDS_SERVER_ADDR         "地址"
     IDS_SERVER_PORT         "端口"
-    IDS_SERVER_USERCNT      "玩家数"
+    IDS_SERVER_USERCNT      "最大人数"
     IDS_UPDATECONFIG        "更新配置"
     IDS_OPENDIR             "打开目录"
     IDS_TRAY_TIP            "提示"
     IDS_TRAY_TIP_MSG        "GateServer启动成功！"
     ID_INDICATOR_SVRINFO    "Port: 00000 Version: 1.0.0"
+	IDS_SERVER_NAME			"服务器名称"
+	IDS_ONLINE_COUNT		"在线人数"
 END
 
 STRINGTABLE

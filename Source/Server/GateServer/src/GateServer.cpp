@@ -8,6 +8,8 @@ BEGIN_NETMSG_TABLE(GateServer, BaseGameServer)
 	ON_NET_MESSAGE(MSG_MAINID_GATE, MSG_SUBID_REQUEST_CONFIG, &GateServer::onRequestConfig)
 	ON_NET_MESSAGE(MSG_MAINID_GATE, MSG_SUBID_REQUEST_MAINSVR_ADDR, &GateServer::onRequestMainAddr)
 	ON_NET_MESSAGE(MSG_MAINID_MAIN_TO_GATE, MSG_SUBID_MAIN_CONNECT, &GateServer::onMainConnect)
+	ON_NET_MESSAGE(MSG_MAINID_MAIN_TO_GATE, MSG_SUBID_USER_LOGIN_MAIN, &GateServer::onMainUserLogin)
+	ON_NET_MESSAGE(MSG_MAINID_MAIN_TO_GATE, MSG_SUBID_USER_LOGOUT_MAIN, &GateServer::onMainUserLogout)
 END_NETMSG_TABLE()
 
 
@@ -61,8 +63,10 @@ void GateServer::onMainConnect(ClientId id, void* pData, size_t nDataLen)
 	MainSvrNode svrNode;
 	svrNode.svrId = id;
 	::strcpy(svrNode.szMainAddr, inet_ntoa(id.getAddress().sin_addr));
+	::strcpy(svrNode.szMainName, pConnMsg->szSvrName);
 	svrNode.sMainPort = pConnMsg->sPort;
 	svrNode.uMaxUser = pConnMsg->uMaxUser;
+	svrNode.uOnlineUser = pConnMsg->uCurUser;
 	m_mainSvrList.addServer(svrNode);
 
 	id.setUserData((void*)CLIENT_TYPE_MAIN);
@@ -99,4 +103,18 @@ bool GateServer::setUpdUrl(const char* pszUrl)
 
 	strcpy(m_szUpdUrl, pszUrl);
 	return true;
+}
+
+void GateServer::onMainUserLogin(ClientId id, void* pData, size_t nDataLen)
+{
+	m_mainSvrList.addServerUser(id);
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onUIMainUserLogin(id);
+}
+
+void GateServer::onMainUserLogout(ClientId id, void* pData, size_t nDataLen)
+{
+	m_mainSvrList.removeServerUser(id);
+	if (m_pUIObserver != NULL)
+		m_pUIObserver->onUIMainUserLogout(id);
 }

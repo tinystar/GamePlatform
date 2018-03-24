@@ -15,6 +15,8 @@
 #define IDS_TRAY_TIP                    109
 #define IDS_TRAY_TIP_MSG                110
 #define ID_INDICATOR_SVRINFO            111
+#define IDS_SERVER_NAME					112
+#define IDS_ONLINE_COUNT				113
 #define IDR_MAINFRAME                   128
 #define IDR_GateServerTYPE              130
 #define IDR_MENUTRAY                    311

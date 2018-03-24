@@ -18,16 +18,18 @@ struct MainSvrNode
 {
 	ClientId			svrId;
 	char				szMainAddr[20];
+	char				szMainName[64];
 	unsigned short		sMainPort;
 	unsigned int		uMaxUser;
-
-	std::set<EzUInt32>	onlineUserIds;
+	unsigned int		uOnlineUser;
 
 	MainSvrNode()
 		: sMainPort(0)
 		, uMaxUser(0)
+		, uOnlineUser(0)
 	{
 		::memset(szMainAddr, 0, sizeof(szMainAddr));
+		::memset(szMainName, 0, sizeof(szMainName));
 	}
 };
 
@@ -40,9 +42,8 @@ public:
 public:
 	void addServer(const MainSvrNode& svr);
 	void removeServer(const ClientId& id);
-	void addServerUser(const ClientId& id, EzUInt32 userId);
-	void removeServerUser(const ClientId& id, EzUInt32 userId);
-	const MainSvrNode* getServerByUserId(EzUInt32 userId);
+	void addServerUser(const ClientId& id);
+	void removeServerUser(const ClientId& id);
 
 	const MainSvrNode* chooseServer() const;
 

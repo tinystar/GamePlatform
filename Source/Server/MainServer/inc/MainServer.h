@@ -33,6 +33,7 @@ public:
 	unsigned short getGateSvrPort() const { return m_sGatePort; }
 	unsigned short getDBSvrPort() const { return m_sDBPort; }
 	unsigned int getMaxUser() const { return m_uMaxUser; }
+	const char* getServerName() const { return m_szSvrName; }
 
 	void registerUIObserver(IMainServerUIObserver* pObserver) { m_pUIObserver = pObserver; }
 
