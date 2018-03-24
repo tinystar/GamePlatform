@@ -3,7 +3,6 @@
 #include "rapidjson/document.h"
 #include <ws2tcpip.h>
 #include <afxdlgs.h>
-#include "GameNodeData.h"
 
 using namespace rapidjson;
 
@@ -65,6 +64,16 @@ const static ListColData _s_roomListCol[] = {
 	{ IDS_ROOM_PORT,	LVCFMT_LEFT, 50 },
 	{ IDS_ONLINE_COUNT, LVCFMT_LEFT, 60 },
 	{ IDS_MAX_COUNT,	LVCFMT_LEFT, 60 }
+};
+
+struct GameListItemData
+{
+	GameKind*		pGameKind;
+	EzArray<int>	roomItems;		// save room list item index
+
+	GameListItemData()
+		: pGameKind(NULL)
+	{}
 };
 
 
@@ -199,10 +208,6 @@ void GameListDialog::OnBtnUnloadModuleClick()
 		int nItem = m_gameList.GetNextSelectedItem(pos);
 		unloadModuleAtItem(nItem);
 	}
-
-	// Unload module will stop all room server that associated with this module.
-	// So, it need to update the room list control.
-	updateRoomListRunStatus();
 }
 
 void GameListDialog::OnBtnLoadAllClick()
@@ -215,10 +220,6 @@ void GameListDialog::OnBtnUnloadAllClick()
 {
 	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
 		unloadModuleAtItem(i);
-
-	// Unload module will stop all room server that associated with this module.
-	// So, it need to update the room list control.
-	updateRoomListRunStatus();
 }
 
 void GameListDialog::OnBtnUpdateModuleClick()
@@ -232,14 +233,14 @@ void GameListDialog::OnBtnUpdateModuleClick()
 	}
 
 	int nItem = m_gameList.GetSelectionMark();
-	GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
-	EzAssert(pGameKind != NULL);
+	GameListItemData* pItemData = (GameListItemData*)m_gameList.GetItemData(nItem);
+	EzAssert(pItemData->pGameKind != NULL);
 
 	CFileDialog dlgFile(TRUE, NULL, NULL, 0, _T("Game Module File(*.dll)|*.dll||"));
 	if (IDOK == dlgFile.DoModal())
 	{
 		CString sFullPath = dlgFile.GetPathName();
-		pGameKind->m_kindInfo.sSvrModFullPath = EzString(sFullPath.GetString()).kcharPtr(kAnsi);
+		pItemData->pGameKind->m_kindInfo.sSvrModFullPath = EzString(sFullPath.GetString()).kcharPtr(kAnsi);
 		m_gameList.SetItemText(nItem, eGLColModName, dlgFile.GetFileName());
 
 		unloadModuleAtItem(nItem);
@@ -352,8 +353,13 @@ void GameListDialog::updateListCtrl()
 		if (NULL == pKind)
 			continue;
 
+		GameListItemData* pItemData = new GameListItemData();
+		if (!EzVerify(pItemData != NULL))
+			continue;
+
+		pItemData->pGameKind = pKind;
 		m_gameList.InsertItem(i, NULL);
-		m_gameList.SetItemData(i, (DWORD_PTR)pKind);
+		m_gameList.SetItemData(i, (DWORD_PTR)pItemData);
 
 		TCHAR szBuf[256] = { 0 };
 		_stprintf_s(szBuf, 256, _T("%d"), pKind->m_kindInfo.nKindId);
@@ -385,6 +391,8 @@ void GameListDialog::updateListCtrl()
 				int idx = m_roomList.GetItemCount();
 				idx = m_roomList.InsertItem(idx, NULL);
 				m_roomList.SetItemData(idx, (DWORD_PTR)pRoom);
+
+				pItemData->roomItems.append(idx);
 
 				_stprintf_s(szBuf, 256, _T("%d"), pKind->m_kindInfo.nKindId);
 				m_roomList.SetItemText(idx, 0, szBuf);
@@ -431,10 +439,10 @@ void GameListDialog::loadModuleAtItem(int nItem)
 {
 	if (0 <= nItem && nItem < m_gameList.GetItemCount())
 	{
-		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
-		EzAssert(pGameKind != NULL);
+		GameListItemData* pItemData = (GameListItemData*)m_gameList.GetItemData(nItem);
+		EzAssert(pItemData->pGameKind != NULL);
 
-		if (GameServerMgr()->loadGameModule(pGameKind))
+		if (GameServerMgr()->loadGameModule(pItemData->pGameKind))
 		{
 			CString sStatus;
 			sStatus.LoadString(IDS_HAS_LOADED);
@@ -447,14 +455,19 @@ void GameListDialog::unloadModuleAtItem(int nItem)
 {
 	if (0 <= nItem && nItem < m_gameList.GetItemCount())
 	{
-		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(nItem);
-		EzAssert(pGameKind != NULL);
+		GameListItemData* pItemData = (GameListItemData*)m_gameList.GetItemData(nItem);
+		EzAssert(pItemData->pGameKind != NULL);
 
-		if (GameServerMgr()->unloadGameModule(pGameKind))
+		if (GameServerMgr()->unloadGameModule(pItemData->pGameKind))
 		{
 			CString sStatus;
 			sStatus.LoadString(IDS_NOT_LOADED);
 			m_gameList.SetItemText(nItem, eGLColLoadStatus, sStatus);
+
+			// Unload module will stop all room server that associated with this module.
+			// So, it need to update the room list item display.
+			for (int i = 0; i < pItemData->roomItems.logicalLength(); ++i)
+				updateRoomItemRunStatus(pItemData->roomItems[i], true);
 		}
 	}
 }
@@ -500,11 +513,12 @@ void GameListDialog::clearGameListCtrl()
 {
 	for (int i = 0; i < m_gameList.GetItemCount(); ++i)
 	{
-		GameKind* pGameKind = (GameKind*)m_gameList.GetItemData(i);
-		EzAssert(pGameKind != NULL);
+		GameListItemData* pItemData = (GameListItemData*)m_gameList.GetItemData(i);
+		EzAssert(pItemData->pGameKind != NULL);
 
-		GameServerMgr()->cleanupGameModule(pGameKind);
+		GameServerMgr()->cleanupGameModule(pItemData->pGameKind);	
 		m_gameList.SetItemData(i, NULL);
+		delete pItemData;
 	}
 
 	m_gameList.DeleteAllItems();
@@ -524,19 +538,16 @@ void GameListDialog::clearRoomListCtrl()
 	m_roomList.DeleteAllItems();
 }
 
-void GameListDialog::updateRoomListRunStatus()
+void GameListDialog::updateRoomItemRunStatus(int item, bool bStopped)
 {
-	for (int i = 0; i < m_roomList.GetItemCount(); ++i)
-	{
-		GameRoom* pGameRoom = (GameRoom*)m_roomList.GetItemData(i);
+	if (item < 0 || item >= m_roomList.GetItemCount())
+		return;
 
-		CString sStatus;
-		void* pData = pGameRoom->getUserData();
-		if (NULL == pData || !((GameRoomMgr*)pData)->isRunning())
-			sStatus.LoadString(IDS_NOT_RUNNING);
-		else
-			sStatus.LoadString(IDS_IS_RUNNING);
+	CString sStatus;
+	if (bStopped)
+		sStatus.LoadString(IDS_NOT_RUNNING);
+	else
+		sStatus.LoadString(IDS_IS_RUNNING);
 
-		m_roomList.SetItemText(i, eRLColRunStatus, sStatus);
-	}
+	m_roomList.SetItemText(item, eRLColRunStatus, sStatus);
 }

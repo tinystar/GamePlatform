@@ -46,7 +46,7 @@ protected:
 	void clearGameListCtrl();
 	void clearRoomListCtrl();
 
-	void updateRoomListRunStatus();
+	void updateRoomItemRunStatus(int item, bool bStopped);
 
 protected:
 	afx_msg void OnDestroy();
