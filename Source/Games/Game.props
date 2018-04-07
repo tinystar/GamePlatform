@@ -25,7 +25,7 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalLibraryDirectories>$(CommonLibDir);$(ServerLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>xEzUtil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xEzUtil.lib;GameSvrMgr.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(GamePdbDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(GameLibDir)$(TargetName).lib</ImportLibrary>
     </Link>

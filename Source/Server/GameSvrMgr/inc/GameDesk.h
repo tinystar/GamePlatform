@@ -10,16 +10,29 @@
 #ifndef __GAME_DESK_H__
 #define __GAME_DESK_H__
 
+#include "GameSvrMgr.h"
+#include "xEzUtil.h"
 
-class GameDesk
+class GSM_DLL_SPEC GameDesk
 {
+protected:
+	GameDesk(int nChairs);
 
+public:
+	virtual ~GameDesk();
+
+public:
+	int getChairCount() const { return m_nChairCount; }
+
+protected:
+	int				m_nChairCount;
 };
 
 class GameDeskFactory
 {
+public:
 	virtual GameDesk* createGameDesk() = 0;
-	virtual GameDesk* createGameDesk(int nDeskCount) = 0;
+	virtual void destroyGameDesk(GameDesk*& pDesk) = 0;
 };
 
 template<class GameDeskClass>
@@ -30,9 +43,10 @@ class GameDeskFactoryTemplate : public GameDeskFactory
 		return new GameDeskClass();
 	}
 
-	virtual GameDesk* createGameDesk(int nDeskCount)
+	virtual void destroyGameDesk(GameDesk*& pDesk)
 	{
-		return new GameDeskClass[nDeskCount];
+		delete pDesk;
+		pDesk = NULL;
 	}
 };
 

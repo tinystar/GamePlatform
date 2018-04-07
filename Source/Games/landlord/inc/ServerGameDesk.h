@@ -12,10 +12,13 @@
 
 #include "GameDesk.h"
 
+const int DESK_CHAIR_COUNT = 3;
 
 class ServerGameDesk : public GameDesk
 {
-
+public:
+	ServerGameDesk();
+	virtual ~ServerGameDesk();
 };
 
 #endif // __SERVER_GAME_DESK_H__

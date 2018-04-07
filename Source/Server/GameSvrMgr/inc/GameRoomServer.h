@@ -12,6 +12,7 @@
 
 #include "BaseGameServer.h"
 #include "GameNodeInfo.h"
+#include "RoomPlayerManager.h"
 
 class GameDesk;
 class GameDeskFactory;
@@ -21,12 +22,14 @@ struct RoomContext
 	PlaceType		 placeType;
 	double			 dEnterLimit;
 	double			 dBasePoint;
+	EzUInt32		 uMaxUserCount;
 	GameDeskFactory* pDeskFactory;
 
 	RoomContext()
 		: placeType(kPlaceNormal)
 		, dEnterLimit(0.0)
 		, dBasePoint(0.0)
+		, uMaxUserCount(0)
 		, pDeskFactory(NULL)
 	{}
 };
@@ -44,8 +47,14 @@ protected:
 	virtual bool onStop();
 
 protected:
-	GameDesk*			m_pGameDesks;
+	bool initGameDesks();
+	void cleanGameDesks();
+
+protected:
 	const RoomContext	m_RoomCtx;
+	GameDesk**			m_pGameDesks;
+	int					m_nDeskCount;
+	RoomPlayerManager	m_playerManager;
 };
 
 #endif // __GAME_ROOM_SERVER_H__

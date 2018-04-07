@@ -30,6 +30,12 @@
     <ClInclude Include="inc\GameNodeData.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\RoomPlayer.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\RoomPlayerManager.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GameServerManager.cpp">
@@ -39,6 +45,15 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\GameNodeData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoomPlayer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoomPlayerManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameDesk.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
