@@ -74,10 +74,10 @@ protected:
 
 	// template methods
 protected:
-	virtual bool onInit(const ServerInitConfig&) { return true; }		// invoked after init
-	virtual bool onUninit() { return true; }							// invoked before uninit
-	virtual bool onStart() { return true; }								// invoked before start
-	virtual bool onStop() { return true; }								// invoked after stop
+	virtual bool onInit(const ServerInitConfig&) { return true; }		// invoked by init after initialized
+	virtual bool onUninit() { return true; }							// invoked by unInit after uninitialized
+	virtual bool onStart() { return true; }								// invoked by start after started
+	virtual bool onStop() { return true; }								// invoked by stop after stopped
 
 	// event handler methods, must be override
 protected:

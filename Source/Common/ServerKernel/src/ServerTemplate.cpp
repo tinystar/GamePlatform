@@ -107,8 +107,6 @@ SVCErrorCode ServerTemplate::unInit()
 	if (!(m_state & kInited))
 		return eOk;
 
-	onUninit();
-
 	if (m_pTcpService != NULL)
 	{
 		m_pTcpService->removeEventHandler(m_pServerImp);
@@ -125,6 +123,8 @@ SVCErrorCode ServerTemplate::unInit()
 		m_pTimerService = NULL;
 	}
 
+	onUninit();
+
 	m_state &= ~kInited;
 	return eOk;
 }
@@ -135,9 +135,6 @@ SVCErrorCode ServerTemplate::start()
 		return eNotInitialized;
 	if (m_state & kRunning)
 		return eOk;
-
-	if (!onStart())
-		return eNotApplicable;
 
 	if (!m_pServerImp->start())
 		return eSystemError;
@@ -153,7 +150,14 @@ SVCErrorCode ServerTemplate::start()
 		ec = m_pTimerService->start();
 
 	if (eOk == ec)
+	{
 		m_state |= kRunning;
+		if (!onStart())
+		{
+			stop();
+			return eNotApplicable;
+		}
+	}
 
 	return ec;
 }
