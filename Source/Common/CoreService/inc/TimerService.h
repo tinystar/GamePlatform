@@ -12,6 +12,13 @@
 
 #include "CoreService.h"
 
+
+enum TimerType
+{
+	kSysTimer = 0,							// use system timer
+	kMiniHeap								// high-resolution timer using mini-heap
+};
+
 // Timer event notify interface
 struct ITimerServiceEventHandler
 {
@@ -32,6 +39,7 @@ public:
 	virtual SVCErrorCode start() = 0;
 	virtual SVCErrorCode stop() = 0;
 
+	// setup a timer to schedule per `uElapse` milliseconds
 	virtual bool setTimer(EzUInt uTimerId, EzUInt uElapse) = 0;
 
 	virtual bool killTimer(EzUInt uTimerId) = 0;
@@ -49,7 +57,7 @@ protected:
 	EventHandlerArray			m_EventHandlers;
 };
 
-SVC_DLL_SPEC TimerService* createTimerService();
+SVC_DLL_SPEC TimerService* createTimerService(TimerType type = kMiniHeap);
 SVC_DLL_SPEC void releaseTimerService(TimerService* pService);
 
 #endif // __TIMER_SERVICE_H__

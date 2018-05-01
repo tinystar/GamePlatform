@@ -32,5 +32,6 @@
 #include "xEzMisc.h"
 #include "xEzSmartPtr.h"
 #include "xEzString.h"
+#include "xEzHeapAlg.h"
 
 #endif // __XEZ_UTIL_H__

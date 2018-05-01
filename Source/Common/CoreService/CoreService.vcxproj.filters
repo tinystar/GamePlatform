@@ -66,6 +66,12 @@
     <ClInclude Include="src\TcpClientSocketImp.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="src\MiniHeapTimer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimerHeap.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="CoreService.def" />
@@ -102,6 +108,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TcpClientSocketImp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MiniHeapTimer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerHeap.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

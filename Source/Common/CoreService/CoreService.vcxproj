@@ -97,7 +97,9 @@
     <ClInclude Include="inc\TcpPackage.h" />
     <ClInclude Include="inc\TcpService.h" />
     <ClInclude Include="inc\TimerService.h" />
+    <ClInclude Include="src\MiniHeapTimer.h" />
     <ClInclude Include="src\TcpClientSocketImp.h" />
+    <ClInclude Include="src\TimerHeap.h" />
     <ClInclude Include="src\win\ClientContext.h" />
     <ClInclude Include="src\win\ClientContextMgr.h" />
     <ClInclude Include="src\win\IClientSessionMgr.h" />
@@ -112,9 +114,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClientId.cpp" />
+    <ClCompile Include="src\MiniHeapTimer.cpp" />
     <ClCompile Include="src\TcpClientSocket.cpp" />
     <ClCompile Include="src\TcpClientSocketImp.cpp" />
     <ClCompile Include="src\TcpService.cpp" />
+    <ClCompile Include="src\TimerHeap.cpp" />
     <ClCompile Include="src\TimerService.cpp" />
     <ClCompile Include="src\win\ClientContext.cpp" />
     <ClCompile Include="src\win\ClientContextMgr.cpp" />

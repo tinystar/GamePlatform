@@ -22,6 +22,7 @@ public:
 
 	void start() const;
 
+	// Returns the time in seconds passed from the start() function been called.
 	double stop() const;
 
 private:

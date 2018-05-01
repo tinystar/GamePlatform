@@ -4,6 +4,7 @@
 #elif defined(EZ_LINUX)
 // todo
 #endif
+#include "MiniHeapTimer.h"
 
 
 //-------------------------------------------------------------------------------
@@ -42,9 +43,22 @@ bool TimerService::removeEventHandler(ITimerServiceEventHandler* pEventHandler)
 //-------------------------------------------------------------------------------
 // create/release timer service
 //-------------------------------------------------------------------------------
-TimerService* createTimerService()
+TimerService* createTimerService(TimerType type /*= kMiniHeap*/)
 {
-	return new TimerServiceImp();
+	TimerService* pService = NULL;
+	switch (type)
+	{
+	case kSysTimer:
+		pService = new TimerServiceImp();
+		break;
+	case kMiniHeap:
+		pService = new MiniHeapTimer();
+		break;
+	default:
+		EzAssert(false);
+	}
+
+	return pService;
 }
 
 void releaseTimerService(TimerService* pService)

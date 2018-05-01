@@ -98,6 +98,7 @@
     <ClInclude Include="inc\xEzDump.h" />
     <ClInclude Include="inc\xEzEncryptor.h" />
     <ClInclude Include="inc\xEzException.h" />
+    <ClInclude Include="inc\xEzHeapAlg.h" />
     <ClInclude Include="inc\xEzLinkedList.h" />
     <ClInclude Include="inc\xEzLock.h" />
     <ClInclude Include="inc\xEzLog.h" />
