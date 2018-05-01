@@ -690,6 +690,49 @@ void testSmartPtr()
 	ptrTest1.refCount();
 }
 
+void testMiniHeap()
+{
+	EzMiniHeap<int> testheap(5);
+	bool bIsEmpty = testheap.isEmpty();
+	testheap.insert(53);
+	testheap.insert(17);
+	testheap.insert(78);
+	testheap.insert(9);
+	testheap.insert(45);
+	testheap.insert(65);
+	testheap.insert(87);
+	testheap.insert(23);
+
+	bIsEmpty = testheap.isEmpty();
+
+	int arr[] = { 53, 17, 78, 9, 45, 65, 87, 23 };
+	EzMiniHeap<int> testheap1(arr, EzCountOf(arr));
+
+	const EzArray<int>& heapArr = testheap1.toArray();
+	for (int i = 0; i < heapArr.logicalLength(); ++i)
+	{
+		int item = heapArr[i];
+	}
+
+	int value;
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	testheap.removeMin(value);
+	//testheap.removeMin(value);
+	testheap.insert(17);
+	testheap.insert(8);
+	testheap.insert(45);
+
+	int nSize = testheap.size();
+
+	testheap.clear();
+}
+
 void testEntry()
 {
 	// debug
@@ -721,4 +764,6 @@ void testEntry()
 
 	testEzString();
 	testSmartPtr();
+
+	testMiniHeap();
 }

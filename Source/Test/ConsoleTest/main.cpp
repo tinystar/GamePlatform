@@ -2,6 +2,9 @@
 #include "xEzUtil.h"
 #include <conio.h>
 #include <windows.h>
+#include "MinHeap.h"
+
+#pragma comment(lib, "winmm.lib")
 
 using namespace std;
 
@@ -66,23 +69,90 @@ void testNewPerf()
 	cout << "------system new time: " << watch2.stop() << "--------" << endl;
 }
 
+void TimerServiceTestEntry();
+
 int main()
 {
-	srand(::GetTickCount());
+// 	srand(::GetTickCount());
+// 
+// 	cout << "press any key~~" << endl;
+// 	_getch();
+// 
+// 	testNewPerf();
+// 
+// 	for (int i = 0; i < 10; ++i)
+// 		testMemPerf();
+// 
+// 	time_t tArr[1000];
+// 	for (int i = 0; i < 1000; ++i)
+// 	{
+// 		tArr[i] = time(NULL);
+// 	}
 
-	cout << "press any key~~" << endl;
-	_getch();
+// 	MinHeap<int> * heap = new MinHeap<int >(8);
+// 	heap->Insert(53);
+// 	heap->Insert(17);
+// 	heap->Insert(78);
+// 	int value;
+// 	heap->RemoveMin(value);
+// 	cout << value << " \n";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " \n";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " \n";
+// 	heap->Insert(53);
+// 	heap->Insert(17);
+// 	heap->Insert(78);
+// 	heap->Insert(9);
+// 	heap->Insert(45);
+// 	heap->Insert(65);
+// 	heap->Insert(87);
+// 	heap->Insert(23);
+// 	cout << "依次删除最小堆中的元素<从小到大>：\n" << endl;
+// 	int value;
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " ";
+// 
+// 	heap->RemoveMin(value);
+// 	cout << value << " \n\n";
+// 	delete heap;
+	
+// 	TIMECAPS	timeCaps;
+// 	timeGetDevCaps(&timeCaps, sizeof(timeCaps));
+// 	UINT iPeriodMin = timeCaps.wPeriodMin;
+// 
+// 	//MMRESULT ret = timeBeginPeriod(1);
+// 	EzStopwatch watch1;
+// 	for (int i = 0; i < 10; ++i)
+// 	{
+// 		watch1.start();
+// 		::Sleep(5);
+// 		cout << "period: " << watch1.stop() << endl;
+// 	}
+// 	//timeEndPeriod(1);
 
-	testNewPerf();
-
-	for (int i = 0; i < 10; ++i)
-		testMemPerf();
-
-	time_t tArr[1000];
-	for (int i = 0; i < 1000; ++i)
-	{
-		tArr[i] = time(NULL);
-	}
+	TimerServiceTestEntry();
 
 	_getch();
 	return 0;
