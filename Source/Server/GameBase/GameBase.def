@@ -20,3 +20,10 @@ EXPORTS
 ?onStop@BaseGameServer@@MAE_NXZ
 ?GetThisNetMsgTable@BaseGameServer@@KAPBUNetMsgTable@@XZ
 ?GetNetMsgTable@BaseGameServer@@MBEPBUNetMsgTable@@XZ
+
+;---------------------------------------------------------------------
+;TimerTask
+;---------------------------------------------------------------------
+??0TaskNode@@IAE@XZ
+??1TaskNode@@IAE@XZ
+??1TimerTask@@MAE@XZ

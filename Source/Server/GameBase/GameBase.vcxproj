@@ -91,12 +91,16 @@
     <ClInclude Include="inc\GameNodeInfo.h" />
     <ClInclude Include="inc\GameUserDefs.h" />
     <ClInclude Include="inc\NetMsgMapDefs.h" />
+    <ClInclude Include="inc\TimerTask.h" />
+    <ClInclude Include="inc\TimerTaskManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp" />
     <ClCompile Include="src\GameNode.cpp" />
     <ClCompile Include="src\GameNodeInfo.cpp" />
     <ClCompile Include="src\GameUserDefs.cpp" />
+    <ClCompile Include="src\TimerTask.cpp" />
+    <ClCompile Include="src\TimerTaskManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GameBase.def" />

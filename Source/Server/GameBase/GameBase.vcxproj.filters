@@ -33,6 +33,12 @@
     <ClInclude Include="inc\NetMsgMapDefs.h">
       <Filter>sdk_inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\TimerTask.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TimerTaskManager.h">
+      <Filter>sdk_inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseGameServer.cpp">
@@ -45,6 +51,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\GameNodeInfo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerTask.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimerTaskManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
