@@ -168,6 +168,7 @@ bool GameServerManager::startGameRoom(GameRoom* pGameRoom)
 				roomCtx.placeType = pPlace->m_placeInfo.placeType;
 				roomCtx.dEnterLimit = pPlace->m_placeInfo.dEnterLimit;
 				roomCtx.dBasePoint = pPlace->m_placeInfo.dBasePoint;
+				roomCtx.uMaxUserCount = pGameRoom->m_roomInfo.uMaxUserCount;
 				roomCtx.pDeskFactory = pDeskFactory;
 
 				GameRoomMgr* pRoomMgr = new GameRoomMgr(roomCtx);
