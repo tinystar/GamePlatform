@@ -20,7 +20,7 @@ TimerTaskManager::~TimerTaskManager()
 	destroyWheel();
 }
 
-bool TimerTaskManager::addNewTask(TimerTask*& pTask, unsigned int uDelay)
+bool TimerTaskManager::addNewTask(TimerTask* pTask, unsigned int uDelay)
 {
 	if (NULL == pTask)
 		return false;
@@ -62,7 +62,7 @@ bool TimerTaskManager::addNewTask(TimerTask*& pTask, unsigned int uDelay)
 	return true;
 }
 
-bool TimerTaskManager::killTask(TimerTask*& pTask)
+bool TimerTaskManager::killTask(TimerTask* pTask)
 {
 	if (removeTask(pTask))
 	{
@@ -74,7 +74,7 @@ bool TimerTaskManager::killTask(TimerTask*& pTask)
 	return false;
 }
 
-bool TimerTaskManager::resetTask(TimerTask*& pTask, unsigned int uNewDelay)
+bool TimerTaskManager::resetTask(TimerTask* pTask, unsigned int uNewDelay)
 {
 	if (!removeTask(pTask))
 		return false;

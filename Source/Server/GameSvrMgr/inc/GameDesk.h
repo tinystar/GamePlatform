@@ -12,20 +12,42 @@
 
 #include "GameSvrMgr.h"
 #include "xEzUtil.h"
+#include "RoomPlayer.h"
 
 class GSM_DLL_SPEC GameDesk
 {
+	friend class GameRoomServer;
+	friend class DeskTimerTask;
+
 protected:
-	GameDesk(int nChairs);
+	explicit GameDesk(int nChairs);
 
 public:
 	virtual ~GameDesk();
 
 public:
 	int getChairCount() const { return m_nChairCount; }
+	int getDeskNumber() const { return m_nDeskNumber; }
+
+	// These functions is used by GameRoomServer.
+protected:
+	bool init(GameRoomServer* pRoomServer, int nNumber);
+
+protected:
+	// The underlying implementation is ticked every 100ms. So, the minimum resolution is 100ms.
+	// `uElapse` is better to be a multiplier of 100.
+	bool setTimer(EzUInt uTimerId, EzUInt uElapse);
+	bool killTimer(EzUInt uTimerId);
+
+protected:
+	virtual void onTimer(EzUInt uTimerId);
+
+private:
+	GameRoomServer*	m_pRoomServer;
 
 protected:
 	int				m_nChairCount;
+	int				m_nDeskNumber;
 };
 
 class GameDeskFactory

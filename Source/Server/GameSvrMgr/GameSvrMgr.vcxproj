@@ -96,8 +96,10 @@
     <ClInclude Include="inc\GameNodeData.h" />
     <ClInclude Include="inc\RoomPlayer.h" />
     <ClInclude Include="inc\RoomPlayerManager.h" />
+    <ClInclude Include="src\DeskTimersManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DeskTimersManager.cpp" />
     <ClCompile Include="src\GameDesk.cpp" />
     <ClCompile Include="src\GameNodeData.cpp" />
     <ClCompile Include="src\GameRoomServer.cpp" />

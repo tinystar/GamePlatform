@@ -26,12 +26,12 @@ public:
 public:
 	// TimerTask must be allocated on the heap and it's memory will be managed 
 	// by the manager when it's be successfully added to the manager.
-	bool addNewTask(TimerTask*& pTask, unsigned int uDelay);
+	bool addNewTask(TimerTask* pTask, unsigned int uDelay);
 
 	// The task will be removed from the manager and it's memory will be released.
-	bool killTask(TimerTask*& pTask);
+	bool killTask(TimerTask* pTask);
 
-	bool resetTask(TimerTask*& pTask, unsigned int uNewDelay);
+	bool resetTask(TimerTask* pTask, unsigned int uNewDelay);
 
 	void tick();
 

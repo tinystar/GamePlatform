@@ -10,7 +10,9 @@
 #ifndef __TIMER_TASK_H__
 #define __TIMER_TASK_H__
 
-class TaskNode
+#include "xEzUtil.h"
+
+class TaskNode : public EzHeapOper
 {
 	friend class TimerTaskManager;
 
@@ -39,6 +41,7 @@ public:
 		kContinue
 	};
 
+	// Don't kill any task in this function. Otherwise, it may cause crash.
 	virtual ContinueMode run(TimerTaskManager* pTaskMgr) = 0;
 
 	// Return the delay time that the task next expired if kContinue returned in the run method. 

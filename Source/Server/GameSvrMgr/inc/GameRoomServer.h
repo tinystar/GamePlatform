@@ -14,8 +14,8 @@
 #include "GameNodeInfo.h"
 #include "RoomPlayerManager.h"
 
-class GameDesk;
 class GameDeskFactory;
+class DeskTimersManager;
 
 struct RoomContext
 {
@@ -36,6 +36,8 @@ struct RoomContext
 
 class GameRoomServer : public BaseGameServer
 {
+	friend class GameDesk;
+
 public:
 	explicit GameRoomServer(const RoomContext& ctx);
 	virtual ~GameRoomServer();
@@ -47,14 +49,23 @@ protected:
 	virtual bool onStop();
 
 protected:
+	virtual void onTimerMsg(EzUInt uTimerId);
+
+protected:
 	bool initGameDesks();
 	void cleanGameDesks();
+
+	// Service for the GameDesk.
+protected:
+	bool setDeskTimer(GameDesk* pDesk, EzUInt uTimerId, EzUInt uElapse);
+	bool killDeskTimer(GameDesk* pDesk, EzUInt uTimerId);
 
 protected:
 	const RoomContext	m_RoomCtx;
 	GameDesk**			m_pGameDesks;
 	int					m_nDeskCount;
 	RoomPlayerManager	m_playerManager;
+	DeskTimersManager*	m_pDeskTimersMgr;
 };
 
 #endif // __GAME_ROOM_SERVER_H__
