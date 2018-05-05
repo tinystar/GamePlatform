@@ -17,8 +17,8 @@ using namespace EzTime;
 EzLoggerImp::EzLoggerImp(const TCHAR* pszLogName, LogLevel level)
 	: m_logLevel(level)
 	, m_pCurBuffer(NULL)
-	, m_hWriteEvent(INVALID_HANDLE_VALUE)
-	, m_hQuitEvent(INVALID_HANDLE_VALUE)
+	, m_hWriteEvent(NULL)
+	, m_hQuitEvent(NULL)
 	, m_bRunning(false)
 	, m_hLogThread(INVALID_HANDLE_VALUE)
 	, m_startTime(0)
@@ -85,11 +85,11 @@ bool EzLoggerImp::start()
 		return true;
 
 	m_hWriteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-	if (!EzVerify(m_hWriteEvent != INVALID_HANDLE_VALUE))
+	if (!EzVerify(m_hWriteEvent != NULL))
 		return false;
 
 	m_hQuitEvent = ::CreateEvent(NULL, TRUE, FALSE, NULL);	// manual reset
-	if (!EzVerify(m_hQuitEvent != INVALID_HANDLE_VALUE))
+	if (!EzVerify(m_hQuitEvent != NULL))
 		return false;
 
 	m_LogFile.open(m_szFilePath, ios::app);
@@ -134,10 +134,10 @@ bool EzLoggerImp::stop()
 	m_LogFile.close();
 
 	::CloseHandle(m_hQuitEvent);
-	m_hQuitEvent = INVALID_HANDLE_VALUE;
+	m_hQuitEvent = NULL;
 
 	::CloseHandle(m_hWriteEvent);
-	m_hWriteEvent = INVALID_HANDLE_VALUE;
+	m_hWriteEvent = NULL;
 
 	return true;
 }

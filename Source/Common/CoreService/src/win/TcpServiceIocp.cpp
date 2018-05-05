@@ -110,7 +110,7 @@ TcpServiceIocp::TcpServiceIocp()
 	: m_ulAddress(0)
 	, m_usPort(0)
 	, m_listenSock(INVALID_SOCKET)
-	, m_hIocp(INVALID_HANDLE_VALUE)
+	, m_hIocp(NULL)
 	, m_nThreadCount(0)
 	, m_hThreadEvent(INVALID_HANDLE_VALUE)
 	, m_nAcceptCount(0)
@@ -216,7 +216,7 @@ SVCErrorCode TcpServiceIocp::start()
 		::closesocket(m_listenSock);
 		m_listenSock = INVALID_SOCKET;
 		::CloseHandle(m_hIocp);
-		m_hIocp = INVALID_HANDLE_VALUE;
+		m_hIocp = NULL;
 		return eSystemError;
 	}
 
@@ -226,7 +226,7 @@ SVCErrorCode TcpServiceIocp::start()
 		::closesocket(m_listenSock);
 		m_listenSock = INVALID_SOCKET;
 		::CloseHandle(m_hIocp);
-		m_hIocp = INVALID_HANDLE_VALUE;
+		m_hIocp = NULL;
 		return eSystemError;
 	}
 
@@ -294,7 +294,7 @@ SVCErrorCode TcpServiceIocp::stop()
 	m_listenSock = INVALID_SOCKET;
 
 	::CloseHandle(m_hIocp);
-	m_hIocp = INVALID_HANDLE_VALUE;
+	m_hIocp = NULL;
 
 	m_bRunning = false;
 	return eOk;

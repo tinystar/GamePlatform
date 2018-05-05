@@ -154,7 +154,7 @@ void ClientContextMgr::notifyIteratorsAfterRemove()
 ClientCtxIterator::ClientCtxIterator(ClientContextMgr* pClientCtxMgr, const ClientCtxList* pList)
 	: m_pClientCtxMgr(pClientCtxMgr)
 	, m_pClientList(pList)
-	, m_hRemoveWaitEvent(INVALID_HANDLE_VALUE)
+	, m_hRemoveWaitEvent(NULL)
 	, m_pNodeToBeRemove(NULL)
 	, m_bNeedWait(false)
 {
