@@ -79,7 +79,18 @@ bool GameServerManager::loadGameModule(GameKind* pGameKind)
 
 	GetGameAppVersionFuncPtr pGetAppVersion = (GetGameAppVersionFuncPtr)pModuleMgr->getSymbAddress(GETGAMEAPPVERSION_PROC_NAME);
 	const char* pVersion = pGetAppVersion();
-	// Todo: compare version
+	// Check the game module version to avoid DLL hell problem.
+	if (strcmp(pVersion, GAME_VERSION_STRING) != 0)
+	{
+		GUITHREADINFO info;
+		::memset(&info, 0, sizeof(info));
+		info.cbSize = sizeof(GUITHREADINFO);
+		::GetGUIThreadInfo(::GetCurrentThreadId(), &info);
+		::MessageBox(info.hwndActive, _T("The version isn't match! Please update the sdk and recompile the module."), _T("error"), MB_OK);
+		pAppEntryPoint(kUnloadAppMsg);
+		pModuleMgr->unloadGameModule();
+		return false;
+	}
 
 	return true;
 }

@@ -28,4 +28,9 @@ typedef const char* (*GetGameAppVersionFuncPtr)(void);
 #define GETGAMEDESKFACTORY_PROC_NAME	"GetGameDeskFactory"
 #define GETGAMEAPPVERSION_PROC_NAME		"GetGameAppVersion"
 
+
+// Change this version string if the SDK is updated.
+// It's intent is to solve the DLL hell problem.
+#define GAME_VERSION_STRING				"1.0.0"
+
 #endif // __GAME_MODULE_DEF_H__
