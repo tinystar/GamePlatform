@@ -20,6 +20,7 @@
 #define MSG_SUBID_DB_LOGIN_SUCCESS			4
 #define MSG_SUBID_DB_LOGIN_FAILURE			5
 #define MSG_SUBID_LOGOUT_MAIN				6
+#define MSG_SUBID_CLEAR_USER_MAIN_RECORD	7
 
 #define MSG_SUBID_QUERY_GAMEKINDS			11
 #define MSG_SUBID_QUERY_GAMEPLACES			12
@@ -116,6 +117,17 @@ struct UserLogoutMainMsg
 	CSUINT32			userId;
 
 	UserLogoutMainMsg()
+		: userId(0)
+	{
+	}
+};
+
+struct ClearUserLoginMainRecordMsg
+{
+	GameMsgHeader		header;
+	CSUINT32			userId;
+
+	ClearUserLoginMainRecordMsg()
 		: userId(0)
 	{
 	}

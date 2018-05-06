@@ -347,6 +347,15 @@ void MainServer::onDBLoginSuccess(void* pData, size_t nSize)
 	{
 		if (pUserMsg->clientId.getUniqueHandle() != 0)
 			EzLogInfo(_T("The ClientId has been reused before the login request return from DBServer!\n"));
+
+		// DB服务器校验玩家登录成功会写入主服务器登录记录，如果这个过程中玩家退出主服务器，需要清理登录
+		// 记录，否则玩家无法再次登录主服务器
+		ClearUserLoginMainRecordMsg clearRecMsg;
+		clearRecMsg.header.uMainId = MSG_MAINID_DB;
+		clearRecMsg.header.uSubId = MSG_SUBID_CLEAR_USER_MAIN_RECORD;
+		clearRecMsg.userId = pUserMsg->userInfo.userId;
+		sendMsgToServer(&m_clientToDB, &clearRecMsg, sizeof(clearRecMsg));
+
 		return;
 	}
 

@@ -16,6 +16,7 @@ BEGIN_NETMSG_TABLE(DBServer, BaseGameServer)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_ACCOUNT, &DBServer::onLoginMainByAccount)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGIN_MAIN_BY_USERID, &DBServer::onLoginMainByUserId)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_LOGOUT_MAIN, &DBServer::onUserLogoutMain)
+	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_CLEAR_USER_MAIN_RECORD, &DBServer::onClearUserLoginMainRecord)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEKINDS, &DBServer::onQueryGameKinds)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEPLACES, &DBServer::onQueryGamePlaces)
 	ON_NET_MESSAGE(MSG_MAINID_DB, MSG_SUBID_QUERY_GAMEROOMS, &DBServer::onQueryGameRooms)
@@ -445,8 +446,21 @@ void DBServer::onUserLogoutMain(ClientId id, void* pData, size_t nDataLen)
 	EzAssert(sizeof(UserLogoutMainMsg) == nDataLen);
 	UserLogoutMainMsg* pLogoutMsg = (UserLogoutMainMsg*)pData;
 
+	ClearUserLoginMainRecordMsg clearRecMsg;
+	clearRecMsg.header.uMainId = MSG_MAINID_DB;
+	clearRecMsg.header.uSubId = MSG_SUBID_CLEAR_USER_MAIN_RECORD;
+	clearRecMsg.userId = pLogoutMsg->userId;
+
+	onClearUserLoginMainRecord(id, &clearRecMsg, sizeof(clearRecMsg));
+}
+
+void DBServer::onClearUserLoginMainRecord(ClientId id, void* pData, size_t nDataLen)
+{
+	EzAssert(sizeof(ClearUserLoginMainRecordMsg) == nDataLen);
+	ClearUserLoginMainRecordMsg* pClearRecMsg = (ClearUserLoginMainRecordMsg*)pData;
+
 	CString sSql;
-	sSql.Format(_T("{CALL delete_main_login_record(%d)}"), pLogoutMsg->userId);
+	sSql.Format(_T("{CALL delete_main_login_record(%d)}"), pClearRecMsg->userId);
 
 	try
 	{
@@ -454,11 +468,11 @@ void DBServer::onUserLogoutMain(ClientId id, void* pData, size_t nDataLen)
 	}
 	catch (CDBException* pDBException)
 	{
-		EzLogError(_T("Error occur in onUserLogoutMain, error message: %s.\n"), pDBException->m_strError);
+		EzLogError(_T("Error occur in onClearUserLoginMainRecord, error message: %s.\n"), pDBException->m_strError);
 	}
 	catch (...)
 	{
-		EzLogError(_T("Unknown error occur in onUserLogoutMain.\n"));
+		EzLogError(_T("Unknown error occur in onClearUserLoginMainRecord.\n"));
 	}
 }
 

@@ -43,6 +43,7 @@ protected:
 	void onLoginMainByUserId(ClientId id, void* pData, size_t nDataLen);
 
 	void onUserLogoutMain(ClientId id, void* pData, size_t nDataLen);
+	void onClearUserLoginMainRecord(ClientId id, void* pData, size_t nDataLen);
 
 	void onQueryGameKinds(ClientId id, void* pData, size_t nDataLen);
 	void onQueryGamePlaces(ClientId id, void* pData, size_t nDataLen);
