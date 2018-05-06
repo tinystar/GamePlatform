@@ -19,7 +19,7 @@ extern "C" bool GameAppEntryPoint(AppMsgCode msg)
 
 extern "C" const char* GetGameAppVersion(void)
 {
-	return "1.0.0";
+	return GAME_VERSION_STRING;
 }
 
 extern "C" GameDeskFactory* GetGameDeskFactory(void)

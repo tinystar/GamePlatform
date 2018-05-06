@@ -30,7 +30,7 @@
       <ImportLibrary>$(GameLibDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;$(SolutionDir)Server\GameSvrMgr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\inc;$(SolutionDir)Common\xEzUtil\inc;$(SolutionDir)Common\CoreService\inc;$(SolutionDir)Common\ServerKernel\inc;$(SolutionDir)Server\GameBase\inc;$(SolutionDir)Server\GameSvrMgr\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

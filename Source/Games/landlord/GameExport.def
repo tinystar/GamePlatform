@@ -1,6 +1,7 @@
 
 EXPORTS
 
-GameAppEntryPoint
-GetGameAppVersion
-GetGameDeskFactory
+; Using PRIVATE to prevents these symbols from appearing in an import library for this module.
+GameAppEntryPoint		PRIVATE
+GetGameAppVersion		PRIVATE
+GetGameDeskFactory		PRIVATE
