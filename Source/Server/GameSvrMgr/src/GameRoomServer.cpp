@@ -63,7 +63,7 @@ bool GameRoomServer::initGameDesks()
 		return false;
 
 	int nDeskChairs = pTmpDesk->getChairCount();
-	m_nDeskCount = (int)m_RoomCtx.uMaxUserCount / nDeskChairs + 1;
+	m_nDeskCount = ((int)m_RoomCtx.uMaxUserCount + nDeskChairs - 1) / nDeskChairs;
 
 	m_RoomCtx.pDeskFactory->destroyGameDesk(pTmpDesk);
 
