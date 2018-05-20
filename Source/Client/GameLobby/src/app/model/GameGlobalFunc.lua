@@ -13,7 +13,12 @@ require "app.model.GameConstDefs"
 require "app.network.SocketMsgMapper"
 require "app.network.SocketMsgHandler"
 
+-- -----------------------------------------------------
+-- Message Notifications
+-- -----------------------------------------------------
 local function onMainServerConnect(sockObj, success, errMsg)
+    stopConnectingAnimation()
+
     local eventDispatcher = cc.Director:getInstance():getEventDispatcher()
     if success then
         local event = cc.EventCustom:new(CustEvents.ConnMainSucc)
@@ -40,6 +45,60 @@ local function onMainServerClose(sockObj, reason)
     end
 end
 
+-- -----------------------------------------------------
+-- Connecting Animation
+-- -----------------------------------------------------
+function startConnectingAnimation()
+    local runningScene = cc.Director:getInstance():getRunningScene()
+
+    -- ´¥ÃþÆÁ±Î²ã
+    local touchLayer = cc.Layer:create()
+    touchLayer:onTouch(function(event)
+        if event.name == "began" then
+            return true
+        end
+    end, false, true)
+
+    runningScene.touchLayer_ = touchLayer
+    runningScene:addChild(touchLayer)
+
+    local animNode = cc.CSLoader:createNode("LoadingAnim.csb")
+    local actNode = cc.CSLoader:createTimeline("LoadingAnim.csb")
+    touchLayer:addChild(animNode)
+    animNode:setVisible(false)
+    animNode:setPosition(display.center)
+    touchLayer:runAction(actNode)
+
+    runningScene.connecting_ = true
+    runningScene.playLoadingAnim_ = false
+    local callbackEntry = nil
+    local function startLoadingAnimation(dt)
+        if runningScene.connecting_ then
+            -- play loading animation
+            animNode:setVisible(true)
+            actNode:gotoFrameAndPlay(0, 50, true)
+            runningScene.playLoadingAnim_ = true
+        end
+
+        -- called only once
+        cc.Director:getInstance():getScheduler():unscheduleScriptEntry(callbackEntry)
+    end
+
+    callbackEntry = cc.Director:getInstance():getScheduler():scheduleScriptFunc(startLoadingAnimation, 1, false)
+end
+
+function stopConnectingAnimation()
+    local runningScene = cc.Director:getInstance():getRunningScene()
+
+    runningScene.connecting_ = false
+    if runningScene.playLoadingAnim_ then
+        runningScene.touchLayer_:removeFromParent()
+    end
+end
+
+-- -----------------------------------------------------
+-- Main socket
+-- -----------------------------------------------------
 function createMainSocket()
     if nil == __GData__.MainSocket then
         local mainSock = ClientSocketMgr.createSocket("mainSocket")
@@ -70,6 +129,7 @@ function connectMainServer()
     end
 
     __GData__.MainSocket:connect(__GData__.MainSvrAddress, __GData__.MainSvrPort)
+    startConnectingAnimation()
 end
 
 function cleanMainSocket()
@@ -88,6 +148,9 @@ function cleanMainSocket()
     __GData__.MainSocket = nil
 end
 
+-- -----------------------------------------------------
+-- Misc
+-- -----------------------------------------------------
 function findGameKindById(kindId)
     for i = 1, #__GData__.GameList do
         if __GData__.GameList[i].KindId == kindId then

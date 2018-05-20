@@ -120,6 +120,7 @@ function LoginScene:onEnter()
 
     -- connect to gate server
     self:connectGateServer()
+    -- onEnter中调用全局startConnectingAnimation函数，由于函数中添加了新节点，会导致崩溃
     self:startConnectingAnimation()
 end
 
@@ -156,14 +157,10 @@ function LoginScene:onPromptLayerRemoved(event)
 end
 
 function LoginScene:onEventMainServerConnectSuccessful(event)
-    self:stopConnectingAnimation()
-
     self.LoginPanel:setVisible(true)
 end
 
 function LoginScene:onEventMainServerConnectFailed(event)
-    self:stopConnectingAnimation()
-
     local promptLayer = PromptLayer:create(gres.str.CONNECT_MAIN_FAILED .. event._usedata)
     self:addChild(promptLayer)
 end
@@ -247,7 +244,6 @@ function LoginScene:onMainAddressMsg(sockObj, msg, msgLen)
 
     -- connect to main server
     connectMainServer()
-    self:startConnectingAnimation()
 end
 
 function LoginScene:onNoMainServerMsg(sockObj, msg, msgLen)
