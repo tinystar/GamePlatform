@@ -18,10 +18,21 @@ require "app.network.SocketMsgMapper"
 local mainSvrMsgMap = {
 }
 
+local roomSvrMsgMap = {
+}
+
 function mapMainServerNetMsg(sockObj)
     SocketMsgMapper.registerMsgHandler(sockObj, mainSvrMsgMap)
 end
 
 function unmapMainServerNetMsg(sockObj)
     SocketMsgMapper.removeMsgHandler(sockObj, mainSvrMsgMap)
+end
+
+function mapRoomServerNetMsg(sockObj)
+    SocketMsgMapper.registerMsgHandler(sockObj, roomSvrMsgMap)
+end
+
+function unmapRoomServerNetMsg(sockObj)
+    SocketMsgMapper.removeMsgHandler(sockObj, roomSvrMsgMap)
 end

@@ -40,8 +40,37 @@ local function onMainServerClose(sockObj, reason)
     event._usedata = reason
     eventDispatcher:dispatchEvent(event)
 
-    if reason ~= nil then   -- 不是主动关闭连接
+    if reason ~= nil and reason ~= "connect failed" then   -- 不是主动关闭连接或不是连接过程中失败
         connectMainServer() -- 断线重连
+    end
+end
+
+local function onRoomServerConnect(sockObj, success, errMsg)
+    stopConnectingAnimation()
+
+    local eventDispatcher = cc.Director:getInstance():getEventDispatcher()
+    if success then
+        local event = cc.EventCustom:new(CustEvents.ConnRoomSucc)
+        eventDispatcher:dispatchEvent(event)
+    else
+        local event = cc.EventCustom:new(CustEvents.ConnRoomFail)
+        event._usedata = errMsg
+        eventDispatcher:dispatchEvent(event)
+    end
+end
+
+local function onRoomServerReceived(sockObj, data, len)
+    SocketMsgMapper.onSocketMsgRecv(sockObj, data, len)
+end
+
+local function onRoomServerClose(sockObj, reason)
+    local eventDispatcher = cc.Director:getInstance():getEventDispatcher()
+    local event = cc.EventCustom:new(CustEvents.RoomSockClose)
+    event._usedata = reason
+    eventDispatcher:dispatchEvent(event)
+
+    if reason ~= nil and reason ~= "connect failed" then   -- 不是主动关闭连接或不是连接过程中失败
+        connectRoomServer() -- 断线重连
     end
 end
 
@@ -70,14 +99,12 @@ function startConnectingAnimation()
     touchLayer:runAction(actNode)
 
     runningScene.connecting_ = true
-    runningScene.playLoadingAnim_ = false
     local callbackEntry = nil
     local function startLoadingAnimation(dt)
         if runningScene.connecting_ then
             -- play loading animation
             animNode:setVisible(true)
             actNode:gotoFrameAndPlay(0, 50, true)
-            runningScene.playLoadingAnim_ = true
         end
 
         -- called only once
@@ -91,9 +118,7 @@ function stopConnectingAnimation()
     local runningScene = cc.Director:getInstance():getRunningScene()
 
     runningScene.connecting_ = false
-    if runningScene.playLoadingAnim_ then
-        runningScene.touchLayer_:removeFromParent()
-    end
+    runningScene.touchLayer_:removeFromParent()
 end
 
 -- -----------------------------------------------------
@@ -146,6 +171,58 @@ function cleanMainSocket()
     __GData__.MainSocket:close()
     ClientSocketMgr.removeSocket("mainSocket")
     __GData__.MainSocket = nil
+end
+
+-- -----------------------------------------------------
+-- Room socket
+-- -----------------------------------------------------
+function createRoomSocket()
+    if nil == __GData__.RoomSocket then
+        local roomSock = ClientSocketMgr.createSocket("roomSocket")
+        roomSock:addConnectEventListener(onRoomServerConnect)
+        roomSock:addReceiveEventListener(onRoomServerReceived)
+        roomSock:addCloseEventListener(onRoomServerClose)
+
+        -- map room server net message when room socket object created. 
+        mapRoomServerNetMsg(roomSock)
+        __GData__.RoomSocket = roomSock
+    end
+
+    return __GData__.RoomSocket
+end
+
+function connectRoomServer()
+    if nil == __GData__.RoomSocket then
+        createRoomSocket()
+    end
+
+    if __GData__.RoomSocket:isConnected() then
+        return
+    end
+
+    if __GData__.RoomSvrAddress == nil or
+       __GData__.RoomSvrPort == nil then
+       return
+    end
+
+    __GData__.RoomSocket:connect(__GData__.RoomSvrAddress, __GData__.RoomSvrPort)
+    startConnectingAnimation()
+end
+
+function cleanRoomSocket()
+    if nil == __GData__.RoomSocket then
+        return
+    end
+
+    __GData__.RoomSocket.removeConnectEventListener(onRoomServerConnect)
+    __GData__.RoomSocket.removeReceiveEventListener(onRoomServerReceived)
+    __GData__.RoomSocket.removeCloseEventListener(onRoomServerClose)
+
+    unmapRoomServerNetMsg(__GData__.RoomSocket)
+
+    __GData__.RoomSocket:close()
+    ClientSocketMgr.removeSocket("roomSocket")
+    __GData__.RoomSocket = nil
 end
 
 -- -----------------------------------------------------

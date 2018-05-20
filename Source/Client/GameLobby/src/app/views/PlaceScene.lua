@@ -8,6 +8,8 @@
 -- Date: 2018/2/10
 -- *********************************************************************
 
+local PromptLayer = import(".PromptLayer")
+
 local PlaceScene = class("PlaceScene", cc.load("mvc").ViewBase)
 
 PlaceScene.RESOURCE_FILENAME = "PlaceScene.csb"
@@ -49,6 +51,28 @@ function PlaceScene:initWithGameKind(kindInfo)
     self.PlaceListView:requestDoLayout()
 end
 
+function PlaceScene:initEventListeners()
+    self.eventListeners_ = {}
+
+    local eventDispatcher = self:getEventDispatcher()
+
+    local listener = cc.EventListenerCustom:create(CustEvents.ConnRoomSucc, handler(self, self.onEventRoomServerConnectSuccessful))
+    eventDispatcher:addEventListenerWithFixedPriority(listener, 1)
+    table.insert(self.eventListeners_, listener)
+
+    listener = cc.EventListenerCustom:create(CustEvents.ConnRoomFail, handler(self, self.onEventRoomServerConnectFailed))
+    eventDispatcher:addEventListenerWithFixedPriority(listener, 1)
+    table.insert(self.eventListeners_, listener)
+end
+
+function PlaceScene:cleanupEventListeners()
+    for i, listener in ipairs(self.eventListeners_) do
+        self:getEventDispatcher():removeEventListener(listener)
+    end
+
+    self.eventListeners_ = nil
+end
+
 function PlaceScene:initSocketMsgMap(sockObj, msgMap)
     for _, entry in ipairs(msgMap) do
         SocketMsgMapper.registerAnMapEntry(sockObj, entry.MainMsgId, entry.SubMsgId, handler(self, self[entry.MsgHandler]))
@@ -62,6 +86,7 @@ function PlaceScene:unInitSocketMsgMap(sockObj, msgMap)
 end
 
 function PlaceScene:onEnter()
+    self:initEventListeners()
     self:initSocketMsgMap(__GData__.MainSocket, PlaceScene.MainMsgMap)
 end
 
@@ -69,6 +94,7 @@ function PlaceScene:onExit()
     self:unInitSocketMsgMap(__GData__.MainSocket, PlaceScene.MainMsgMap)
 
     self.GamePlaceItem:release()
+    self:cleanupEventListeners()
 end
 
 function PlaceScene:createPlaceItem(placeInfo)
@@ -98,6 +124,7 @@ function PlaceScene:onGamePlaceClicked(sender)
     end
 
     __GData__.MainSocket:sendData(packEnterGamePlaceMsg(self.gameKind_.KindId, sender.GamePlace_.PlaceId))
+    -- Todo: 显示寻找房间中...
 end
 
 function PlaceScene:onRoomAddressMsg(sockObj, msg, msgLen)
@@ -106,10 +133,25 @@ function PlaceScene:onRoomAddressMsg(sockObj, msg, msgLen)
 
     print(RoomAddrMsg.RoomAddr)
     print(RoomAddrMsg.RoomPort)
+
+    __GData__.RoomSvrAddress = RoomAddrMsg.RoomAddr
+    __GData__.RoomSvrPort = RoomAddrMsg.RoomPort
+
+    -- connect to room server
+    connectRoomServer()
 end
 
 function PlaceScene:onEnterPlaceFailMsg(sockObj, msg, msgLen)
     print("-------onEnterPlaceFailMsg-------")
+end
+
+function PlaceScene:onEventRoomServerConnectSuccessful(event)
+
+end
+
+function PlaceScene:onEventRoomServerConnectFailed(event)
+    local promptLayer = PromptLayer:create(gres.str.CONNECT_ROOM_FAILED .. event._usedata)
+    self:addChild(promptLayer)
 end
 
 return PlaceScene

@@ -44,6 +44,10 @@ __GData__ = {
     --                   }
     --     }
     GameList = {},
+
+    RoomSvrAddress = nil,
+    RoomSvrPort = nil,
+    RoomSocket = nil,
 }
 
 return __GData__

@@ -13,7 +13,10 @@ CustEvents = {
     PromptRemove    = "Prompt.Remove",
     ConnMainSucc    = "Connect.Main.Success",
     ConnMainFail    = "Connect.Main.Failed",
-    MainSockClose   = "Main.Socket.Close"
+    MainSockClose   = "Main.Socket.Close",
+    ConnRoomSucc    = "Connect.Room.Success",
+    ConnRoomFail    = "Connect.Room.Failed",
+    RoomSockClose   = "Room.Socket.Close"
 }
 
 GenderType = {
