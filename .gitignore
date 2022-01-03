@@ -1,0 +1,9 @@
+*.obj
+*.log
+*.tlog
+*.lastbuildstate
+/Source/Games/*.suo
+*.aps
+*.user
+*.suo
+*.sdf
